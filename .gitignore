@@ -1,0 +1,6 @@
+*.pdf
+*.dvi
+*.aux
+*.log
+*.o
+*.so
