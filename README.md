@@ -1,17 +1,41 @@
 # R package conformal.glm 
 
-Conformal Prediction for Generalized Linear Regression Models
+## Conformal Prediction for Generalized Linear Regression Models
 
 This package computes and compares prediciton regions for the normal, Gamma, 
-and inverse Gaussian families in the \texttt{glm} package.  There is 
+and inverse Gaussian families in the `glm` package.  There is 
 functionality to construct the usual Wald type prediction region that one 
 obtains from maximum likelihood estimation and the delta method, the 
 parametric conformal prediction region, the nonparametric conformal 
 prediction region, and prediction regions from conformalization of residuals. 
 
+
+## Usage 
+
+```r
+library(devtools)
+install_github("DEck13/conformal.glm")
+```
+
+[simple example that illustrates functionality]
+```r
+fit = glm(y ~ x, family=gamma) 
+cpred = conformal.glm(fit)
+plot(cpred)
+```
+[then show a picture or something]
+
+To cite this package:
+```r
+citation(conformal.glm)
+```
+
+
+## Further details
+
 For more details on the parametric conformal prediction region, see:
 
-  Eck, D.~J., Crawford, F.~W., and Aronow, P.~M. (2018+)
+  Eck, D.J., Crawford, F.W., and Aronow, P.M. (2018+)
   Conformal prediction for exponential families and generalized linear models.
   Preprint available on request (email daniel.eck@yale.edu).
 
