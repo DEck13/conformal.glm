@@ -2,7 +2,7 @@
 
 ## Conformal Prediction for Generalized Linear Regression Models
 
-This package computes and compares prediciton regions for the normal, Gamma, 
+This package computes and compares prediction regions for the normal, Gamma, 
 and inverse Gaussian families in the `glm` package.  There is 
 functionality to construct the usual Wald type prediction region that one 
 obtains from maximum likelihood estimation and the delta method, the 
