@@ -1,4 +1,4 @@
-R package paraconformal 
+# R package paraconformal 
 
 Conformal Prediction for Generalized Linear Regression Models
 
