@@ -74,7 +74,7 @@
 \details{
   The function which computes all of the prediction regions outlined in the 
   description. It is an internal function of the 
-  \code{\link{conformalprediction}} function which can be fit directly to objects 
+  \code{\link{conformal.glm}} function which can be fit directly to objects 
   of class \code{glm}.  
 }
 \value{
@@ -95,7 +95,7 @@
 }
 
 \seealso{
-  \code{\link{conformalprediction}}, \code{glm}
+  \code{\link{conformal.glm}}, \code{glm}
 }
 \references{
   Eck, D.~J., Crawford, F.~W., and Aronow, P.~M. (2018+)

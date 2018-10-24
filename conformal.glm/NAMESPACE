@@ -1,4 +1,4 @@
-export(regions, conformalprediction)
+export(regions, conformal.glm)
 
 importFrom(stats, lm)
 importFrom(stats, glm)

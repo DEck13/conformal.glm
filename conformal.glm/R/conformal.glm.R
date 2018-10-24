@@ -1,6 +1,6 @@
 
 
-conformalprediction <- function(object, ..., newdata = NULL, alpha = 0.10, 
+conformal.glm <- function(object, ..., newdata = NULL, alpha = 0.10, 
 	cores = 6, bins = NULL, parametric = TRUE, LS = FALSE, intercept = TRUE, 
 	nonparametric = FALSE){
 

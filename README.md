@@ -19,9 +19,17 @@ install_github(repo = "DEck13/conformal.glm", subdir="conformal.glm")
 
 [simple example that illustrates functionality]
 ```r
-fit = glm(y ~ x, family=gamma) 
-cpred = conformal.glm(fit)
-plot(cpred)
+set.seed(13)
+n <- 500
+shape <- 2
+beta <- c(1, 1)
+x <- runif(n)
+rate <- cbind(1, x) %*% beta * shape
+y <- rgamma(n = n, shape = shape, rate = rate)
+data <- data.frame(y = y, x = x)
+
+fit = glm(y ~ x, family = "Gamma", data = data) 
+cpred = conformal.glm(fit, LS = TRUE, nonparametric = TRUE, bins = 5)
 ```
 [then show a picture or something]
 

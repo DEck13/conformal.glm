@@ -1,6 +1,6 @@
-\name{conformalprediction}
+\name{conformal.glm}
 \title{Prediction Regions for Generalized Linear Regression Models}
-\alias{conformalprediction}
+\alias{conformal.glm}
 \concept{regression}
 \concept{linear regression}
 \concept{nonparametric regression}
@@ -21,7 +21,7 @@
   conformalization of residuals. 
 }
 \usage{
-  conformalprediction(object, ..., newdata = NULL, alpha = 0.10, 
+  conformal.glm(object, ..., newdata = NULL, alpha = 0.10, 
   	cores = 6, bins = NULL, parametric = TRUE, LS = FALSE, intercept = TRUE, 
   	nonparametric = FALSE)
 }
