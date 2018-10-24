@@ -14,7 +14,7 @@ prediction region, and prediction regions from conformalization of residuals.
 
 ```r
 library(devtools)
-install_github("DEck13/conformal.glm")
+install_github(repo = "DEck13/conformal.glm", subdir="conformal.glm")
 ```
 
 [simple example that illustrates functionality]
