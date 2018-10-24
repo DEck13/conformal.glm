@@ -27,7 +27,7 @@ plot(cpred)
 
 To cite this package:
 ```r
-citation(conformal.glm)
+citation("conformal.glm")
 ```
 
 
