@@ -16,14 +16,13 @@
   inverse Gaussian families in the \code{glm} package.  There is 
   functionality to construct the usual prediction region that one 
   obtains from maximum likelihood estimation and the delta method, 
-  the parametric conformal prediction region, the nonparametric 
-  conformal prediction region, and prediction regions from 
-  conformalization of residuals. 
+  the parametric conformal prediction region, and the nonparametric 
+  conformal prediction region. 
 }
 \usage{
   regions(formula, data, newdata, family = "gaussian", link, alpha = 0.10, 
     cores = 6, bins = NULL, intercept = TRUE, parametric = TRUE, 
-    LS = FALSE, nonparametric = FALSE)
+    nonparametric = FALSE)
 }
 \arguments{
   \item{formula}{an object of class \code{"\link{formula}"} (or one that
@@ -64,9 +63,6 @@
     residuals (when \code{LS = TRUE}). The default is set at TRUE.}
   \item{parametric}{a Boolean variable corresponding to whether or not the 
     parametric conformal region is to be computed. The default is set at TRUE.}
-  \item{LS}{a Boolean variable corresponding to whether or not the 
-    prediction region by conformalization of residualsis is to be computed. 
-    The default is set at TRUE.}
   \item{nonparametric}{a Boolean variable corresponding to whether or not the 
     nonparametric conformal region is to be computed. The default is set at 
     TRUE.}  
@@ -88,8 +84,6 @@
     returned when \code{parametric = TRUE}.}
   \item{nonparaconformal}{The nonparametric conformal prediction region which 
     is returned when \code{nonparametric = TRUE}.}
-  \item{LSconformal}{The parametric prediction region from conformalization 
-    of residuals which is returned when \code{LS = TRUE}.}
   \item{interval.plugin}{The usual prediction region that one obtains from 
     maximum likelihood estimation and the delta method.}
 }

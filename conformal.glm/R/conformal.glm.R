@@ -1,7 +1,7 @@
 
 
 conformal.glm <- function(object, ..., newdata = NULL, alpha = 0.10, 
-	cores = 6, bins = NULL, parametric = TRUE, LS = FALSE, intercept = TRUE, 
+	cores = 6, bins = NULL, parametric = TRUE, intercept = TRUE, 
 	nonparametric = FALSE){
 
   ## some important quantities
@@ -27,16 +27,14 @@ conformal.glm <- function(object, ..., newdata = NULL, alpha = 0.10,
   int <- regions(formula = formula, data = data, newdata = newdata, 
   	family = family, link, alpha = alpha, cores = cores, bins = bins, 
   	intercept = intercept, parametric = parametric, 
-    LS = LS, nonparametric = nonparametric)
+    nonparametric = nonparametric)
 
   paraconformal <- int$paraconformal
   nonparaconformal <- int$nonparaconformal
-  LSconformal <- int$LSconformal
   interval.plugin <- int$interval.plugin
 
   out = list(paraconformal = paraconformal, 
     nonparaconformal = nonparaconformal,
-    LSconformal = LSconformal, 
     interval.plugin = interval.plugin)
   return(out)
 }

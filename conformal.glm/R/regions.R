@@ -2,7 +2,7 @@
 
 regions <- function(formula, data, newdata, family = "gaussian", link, 
   alpha = 0.10, cores = 6, bins = NULL, intercept = TRUE, parametric = TRUE, 
-  LS = FALSE, nonparametric = FALSE){
+  nonparametric = FALSE){
 
   ## initial quantities
   respname <- all.vars(formula)[1]
@@ -297,21 +297,21 @@ regions <- function(formula, data, newdata, family = "gaussian", link,
     paraconformal <- Copt(newdata.variables)
 
   }
-  if(LS == TRUE){
+  #if(LS == TRUE){
 
     ## Get regression based conformal prediction region 
     ## using conformal.pred in the conformalInference 
     ## package 
-    funs <- lm.funs(intercept = intercept)
-    train.fun <- funs$train.fun
-    predict.fun <- funs$predict.fun
-    p1.tibs <- conformal.pred(x = X, y = Y, x0 = newdata.variables, 
-      train.fun = train.fun, predict.fun = predict.fun, 
-      alpha = alpha, grid.method ="linear",
-      num.grid.pts = 999)
-    LSconformal <- cbind(p1.tibs$lo, p1.tibs$up)
+  #  funs <- lm.funs(intercept = intercept)
+  #  train.fun <- funs$train.fun
+  #  predict.fun <- funs$predict.fun
+  #  p1.tibs <- conformal.pred(x = X, y = Y, x0 = newdata.variables, 
+  #    train.fun = train.fun, predict.fun = predict.fun, 
+  #    alpha = alpha, grid.method ="linear",
+  #    num.grid.pts = 999)
+  #  LSconformal <- cbind(p1.tibs$lo, p1.tibs$up)
 
-  }
+  #}
   if(nonparametric == TRUE){
 
     # ---- The nonparametric conformal implementation -------
@@ -444,65 +444,12 @@ regions <- function(formula, data, newdata, family = "gaussian", link,
       out
     }
 
-  #h <- ((log(n)/n)^(1/(1*(p+2)+1)))
-  #COPS <- function(x){
-
-  #  index <- index.pred[x]
-  #  datak <- subkey[[index]]
-  #  Xk <- datak[, 1:p]
-  #  Yk <- datak[, p+1]
-  #  nk <- nrow(datak)
-
-  #  alpha <- floor((nk+1)*alpha) / (nk+1)
-
-  #  dens <- function(v){
-  #    mean(dnorm(Yk, mean = v, sd = h))
-  #  }
-
-  #  ## hat(p)^(x,y)(v|Ak)
-  #  c1 <- nk / (nk + 1)
-  #  dens.new <- function(v, y){
-  #    c1 * dens(v) +  (1 - c1) * dnorm(y, mean = v, sd = h)
-  #  }
-
-  #  pi <- function(y){
-  #    mean(apply(matrix(c(Yk, y)), 1, 
-  #      FUN = function(x){ 
-  #        as.numeric( dens.new(x, y) <= dens.new(y, y) )
-  #    }))
-  #  }
-
-  #  a <- max( abs(min(Yk)), abs(max(Yk))  )
-  #  y.course <- seq(from = -1.5*a, to = 1.5*a, length = 15)
-  #  b <- apply(matrix(y.course), 1, pi)
-  #  c <- which(b >= alpha)
-  #  y.fine <- seq(from = y.course[min(c)-1], 
-  #    to = y.course[min(c)], length = 250)
-  #  b2 <- apply(matrix(y.fine), 1, pi)
-  #  y.fine2 <- seq(from = y.course[max(c)], 
-  #    to = y.course[max(c)+1], length = 250)
-  #  b3 <- apply(matrix(y.fine2), 1, pi)
-
-  #  c(y.fine[min(which(b2 >= alpha))], 
-  #    y.fine2[max(which(b3 >= alpha))])
-
-  #}
-
-  ### obtain a parametric conformal prediction region for each 
-  ### element of the newdata dataframe
-  #nonparaconformal <- matrix(0, nrow = nrow(newdata), ncol = 2)
-  #for(j in 1:nrow(newdata)){
-  #  nonparaconformal[j, ] <- COPS(j)
-  #}
-
-
     nonparaconformal <- COPS(newdata)
 
   }
 
   out = list(paraconformal = paraconformal, 
     nonparaconformal = nonparaconformal,
-    LSconformal = LSconformal, #interval.glm = interval.glm, 
     interval.plugin = interval.plugin)
   return(out)
 }

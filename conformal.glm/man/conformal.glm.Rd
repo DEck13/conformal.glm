@@ -16,13 +16,12 @@
   inverse Gaussian families in the \code{glm} package.  There is 
   functionality to construct the usual prediction region that one 
   obtains from maximum likelihood estimation and the delta method, 
-  the parametric conformal prediction region, the nonparametric 
-  conformal prediction region, and prediction regions from 
-  conformalization of residuals. 
+  the parametric conformal prediction region, and the nonparametric 
+  conformal prediction region. 
 }
 \usage{
   conformal.glm(object, ..., newdata = NULL, alpha = 0.10, 
-  	cores = 6, bins = NULL, parametric = TRUE, LS = FALSE, intercept = TRUE, 
+  	cores = 6, bins = NULL, parametric = TRUE, intercept = TRUE, 
   	nonparametric = FALSE)
 }
 \arguments{
@@ -45,9 +44,6 @@
     and \code{d} is the dimension of the main effects).}
   \item{parametric}{a Boolean variable corresponding to whether or not the 
     parametric conformal region is to be computed. The default is set at TRUE.}
-  \item{LS}{a Boolean variable corresponding to whether or not the 
-    prediction region by conformalization of residualsis is to be computed. 
-    The default is set at TRUE.}
   \item{intercept}{a Boolean variable corresponding to whether or not the 
     intercept is included in the regression equation. This is only relevant 
     for the computation of the prediction region by conformalization of 
@@ -65,16 +61,13 @@
 \value{
   \code{regions} has functionality to return the usual prediction region that 
   one obtains from maximum likelihood estimation and the delta method, the 
-  parametric conformal prediction region, the nonparametric conformal 
-  prediction region, and prediction regions from conformalization of 
-  residuals. 
+  parametric conformal prediction region, and the nonparametric conformal 
+  prediction region. 
 
   \item{paraconformal}{The parametric conformal prediction region which is 
     returned when \code{parametric = TRUE}.}
   \item{nonparaconformal}{The nonparametric conformal prediction region which 
     is returned when \code{nonparametric = TRUE}.}
-  \item{LSconformal}{The parametric prediction region from conformalization 
-    of residuals which is returned when \code{LS = TRUE}.}
   \item{interval.plugin}{The usual prediction region that one obtains from 
     maximum likelihood estimation and the delta method.}
 }
