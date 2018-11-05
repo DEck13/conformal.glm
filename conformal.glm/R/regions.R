@@ -1,7 +1,7 @@
 
 
 regions <- function(formula, data, newdata, family = "gaussian", link, 
-  alpha = 0.10, cores = 6, bins = NULL, intercept = TRUE, parametric = TRUE, 
+  alpha = 0.10, cores = 1, bins = NULL, intercept = TRUE, parametric = TRUE, 
   nonparametric = FALSE){
 
   ## initial quantities
@@ -22,46 +22,46 @@ regions <- function(formula, data, newdata, family = "gaussian", link,
   k <- ncol(X.variables)
   betaOLS <- betaMLE <- m1$coefficients
   p <- length(betaOLS) - 1
-  InvFish <- p1 <- pred <- sepred <- #interval.glm <- 
-    interval.plugin <- NULL
+  #InvFish <- p1 <- pred <- sepred <- #interval.glm <- 
+  #  interval.plugin <- NULL
   sd.res <- summary(m1)$sigma
 
   ## Get plugin interval for Gaussian Distribution 
-  if(family == "gaussian"){
-    p1 <- predict(m1, newdata = data.frame(newdata), se.fit = T)
-    pred <- p1$fit
-    sepred <- p1$se.fit * sqrt(n)
+  #if(family == "gaussian"){
+  #  p1 <- predict(m1, newdata = data.frame(newdata), se.fit = T)
+  #  pred <- p1$fit
+  #  sepred <- p1$se.fit * sqrt(n)
 
     ## compute glm prediction region
     #interval.plugin <- cbind(pred - qnorm(1 - alpha/2) * sepred, 
     #  pred + qnorm(1 - alpha/2) * sepred)
     #sepred <- sd.res * sqrt(1 + 1/n) ## more needed
-    interval.plugin <- cbind(pred - qnorm(1 - alpha/2) * sepred, 
-      pred + qnorm(1 - alpha/2) * sepred)
-  }
+  #  interval.plugin <- cbind(pred - qnorm(1 - alpha/2) * sepred, 
+  #    pred + qnorm(1 - alpha/2) * sepred)
+  #}
 
 
   ## Get MLEs and plugin interval for gamma gamma distribution 
   shapeMLE <- rateMLE <- 0
   if(family == "Gamma"){
     m1 <- glm(formula, data = data, family = "Gamma")
-    InvFish <- vcov(m1)
+    #InvFish <- vcov(m1)
     betaMLE <- m1$coefficients
     shapeMLE <- as.numeric(gamma.shape(m1)[1])
     rateMLE <- cbind(1, X) %*% betaMLE * shapeMLE
 
-    p1 <- predict(m1, type = "response", 
-      newdata = data.frame(newdata), se.fit = TRUE)
-    pred <- p1$fit
+    #p1 <- predict(m1, type = "response", 
+    #  newdata = data.frame(newdata), se.fit = TRUE)
+    #pred <- p1$fit
     #sepred <- p1$se.fit
     ## compute glm prediction region 
     #interval.glm <- cbind(pred - qnorm(1 - alpha/2) * sepred, 
     #  pred + qnorm(1 - alpha/2) * sepred)
 
     ## compute interval prediction region 
-    sepred <- sqrt(1 / shapeMLE * pred^2)
-    interval.plugin <- cbind(pred - qnorm(1 - alpha / 2) * sepred, 
-      pred + qnorm(1 - alpha / 2) * sepred)
+    #sepred <- sqrt(1 / shapeMLE * pred^2)
+    #interval.plugin <- cbind(pred - qnorm(1 - alpha / 2) * sepred, 
+    #  pred + qnorm(1 - alpha / 2) * sepred)
   }
 
 
@@ -69,14 +69,14 @@ regions <- function(formula, data, newdata, family = "gaussian", link,
   if(family == "inverse.gaussian"){
     m1 <- glm(formula, data = data, family = family)
     betaMLE <- m1$coefficients
-    pred <- predict(m1, type = "response", newdata = data.frame(newdata))
-    gx <- 1 / sqrt( cbind(1, X) %*% betaMLE  )
-    scaleMLE <- 1 / mean((Y - gx)^2 / (Y * gx^2) )
-    sepred <- sqrt(pred^3 * scaleMLE)
+    #pred <- predict(m1, type = "response", newdata = data.frame(newdata))
+    #gx <- 1 / sqrt( cbind(1, X) %*% betaMLE  )
+    #scaleMLE <- 1 / mean((Y - gx)^2 / (Y * gx^2) )
+    #sepred <- sqrt(pred^3 * scaleMLE)
     
     ## compute glm prediction region 
-    interval.plugin <- cbind(pred - qnorm(1 - alpha/2) * sepred, 
-      pred + qnorm(1 - alpha/2) * sepred)
+    #interval.plugin <- cbind(pred - qnorm(1 - alpha/2) * sepred, 
+    #  pred + qnorm(1 - alpha/2) * sepred)
   }
 
   ## set up partition
@@ -121,6 +121,7 @@ regions <- function(formula, data, newdata, family = "gaussian", link,
   ## ignores the intercept of the newdata matrix
   index <- findindex(X.variables)
   index.pred <- findindex(matrix(newdata, ncol = p))
+  indices.pred <- sort(unique(index.pred))
 
   key <- cbind(X, Y, index)
   #subkey <- lapply(unique(index.pred), FUN = function(j){
@@ -132,21 +133,17 @@ regions <- function(formula, data, newdata, family = "gaussian", link,
     datak
   }, mc.cores = cores)
   #subkey <- split(cbind(X, Y), f = as.factor(index))
-
-  ## get newdata in form that is accepted by LS conformal 
-  ## and our paramteric conformal implementation
-  #newform <- update(formula, NULL ~ ., data = data)
   newdata.variables <- as.matrix(
     model.matrix(~ ., data.frame(newdata))[, -1])
-  indices.pred <- sort(unique(index.pred))
+ 
 
   paraconformal <- nonparaconformal <- NULL
   if(parametric == TRUE){
+
     # upfront quantities to improve speed
     shapeMLE.y <- shapeMLE; rateMLE.y <- rbind(rateMLE, 1); betaMLE.y <- betaMLE
     sd.y <- sd.res
     m1.y <- m1
-    
 
     # ---- The parametric conformal implementation -------
     ## Parametric conformal prediction region for each 
@@ -216,10 +213,6 @@ regions <- function(formula, data, newdata, family = "gaussian", link,
         y.upr <- upr
 
         if(nk.tilde > 0){
-
-          ## calculate phatxy for all observed responses
-          phatxyY <- lapply(as.list(Yk), FUN = phatxy)
-          #phatxyY <- phatxy(Yk)
 
           ## perform a crude crude search 
           crudewidth <- sqrt((upr - lwr)*0.001)
@@ -315,21 +308,6 @@ regions <- function(formula, data, newdata, family = "gaussian", link,
 
   }
 
-  #if(LS == TRUE){
-
-    ## Get regression based conformal prediction region 
-    ## using conformal.pred in the conformalInference 
-    ## package 
-  #  funs <- lm.funs(intercept = intercept)
-  #  train.fun <- funs$train.fun
-  #  predict.fun <- funs$predict.fun
-  #  p1.tibs <- conformal.pred(x = X, y = Y, x0 = newdata.variables, 
-  #    train.fun = train.fun, predict.fun = predict.fun, 
-  #    alpha = alpha, grid.method ="linear",
-  #    num.grid.pts = 999)
-  #  LSconformal <- cbind(p1.tibs$lo, p1.tibs$up)
-
-  #}
   if(nonparametric == TRUE){
 
     # ---- The nonparametric conformal implementation -------
@@ -463,12 +441,10 @@ regions <- function(formula, data, newdata, family = "gaussian", link,
     }
 
     nonparaconformal <- COPS(newdata)
-
   }
 
   out = list(paraconformal = paraconformal, 
-    nonparaconformal = nonparaconformal,
-    interval.plugin = interval.plugin)
+    nonparaconformal = nonparaconformal)
   return(out)
 }
 

@@ -14,14 +14,12 @@
 \description{
   Compute and compare prediciton regions for the normal, Gamma, and 
   inverse Gaussian families in the \code{glm} package.  There is 
-  functionality to construct the usual prediction region that one 
-  obtains from maximum likelihood estimation and the delta method, 
-  the parametric conformal prediction region, and the nonparametric 
-  conformal prediction region. 
+  functionality to construct the parametric conformal prediction 
+  region and the nonparametric conformal prediction region. 
 }
 \usage{
   conformal.glm(object, ..., newdata = NULL, alpha = 0.10, 
-  	cores = 6, bins = NULL, parametric = TRUE, intercept = TRUE, 
+  	cores = 1, bins = NULL, parametric = TRUE, intercept = TRUE, 
   	nonparametric = FALSE)
 }
 \arguments{
@@ -34,9 +32,10 @@
   \item{alpha}{the error tolerance desired for the prediction region.  
     The default is set at 0.10.}
   \item{cores}{the number of cores used to compute the conformal 
-    prediction regions. The default is set at 6 cores. Users calling this 
-    function on machines with fewer than 6 cores are encouraged to change 
-    the default.}  
+    prediction regions. The default is set at 1 core so that the 
+    \code{parallel} library is not used. Specifying \code{cores} greater 
+    than 1 will call \code{mclapply} package in the \code{parallel} package 
+    to speed up the optimization process.}  
   \item{bins}{an optional argument for specifying the desired number of 
     bins to use along one dimension of the predictor space. If missing, the 
     theoretical large sample optimal bin width is used 
@@ -59,17 +58,13 @@
   directly on an object of class \code{glm}.
 }
 \value{
-  \code{regions} has functionality to return the usual prediction region that 
-  one obtains from maximum likelihood estimation and the delta method, the 
-  parametric conformal prediction region, and the nonparametric conformal 
-  prediction region. 
+  \code{regions} has functionality for the parametric conformal prediction 
+  region and the nonparametric conformal prediction region. 
 
   \item{paraconformal}{The parametric conformal prediction region which is 
     returned when \code{parametric = TRUE}.}
   \item{nonparaconformal}{The nonparametric conformal prediction region which 
     is returned when \code{nonparametric = TRUE}.}
-  \item{interval.plugin}{The usual prediction region that one obtains from 
-    maximum likelihood estimation and the delta method.}
 }
 \seealso{
   \code{\link{regions}}, \code{glm}

@@ -21,7 +21,7 @@
 }
 \usage{
   regions(formula, data, newdata, family = "gaussian", link, alpha = 0.10, 
-    cores = 6, bins = NULL, intercept = TRUE, parametric = TRUE, 
+    cores = 1, bins = NULL, intercept = TRUE, parametric = TRUE, 
     nonparametric = FALSE)
 }
 \arguments{
@@ -49,9 +49,10 @@
   \item{alpha}{the error tolerance desired for the prediction region.  
     The default is set at 0.10.}
   \item{cores}{the number of cores used to compute the conformal 
-    prediction regions. The default is set at 6 cores. Users calling this 
-    function on machines with fewer than 6 cores are encouraged to change 
-    the default.}  
+    prediction regions. The default is set at 1 core so that the 
+    \code{parallel} library is not used. Specifying \code{cores} greater 
+    than 1 will call \code{mclapply} package in the \code{parallel} package 
+    to speed up the optimization process.}  
   \item{bins}{an optional argument for specifying the desired number of 
     bins to use along one dimension of the predictor space. If missing, the 
     theoretical large sample optimal bin width is used 

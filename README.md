@@ -29,7 +29,7 @@ y <- rgamma(n = n, shape = shape, rate = rate)
 data <- data.frame(y = y, x = x)
 
 fit = glm(y ~ x, family = "Gamma", data = data) 
-cpred = conformal.glm(fit, LS = TRUE, nonparametric = TRUE, bins = 5)
+cpred = conformal.glm(fit, nonparametric = TRUE, bins = 5)
 ```
 [then show a picture or something]
 
