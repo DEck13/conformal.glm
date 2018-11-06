@@ -10,6 +10,13 @@ regions <- function(formula, data, newdata, family = "gaussian", link,
   n <- length(Y)
   n.pred <- nrow(newdata)
   convergence <- 0
+
+  if(is.null(newdata)){ 
+    newdata <- data
+    respname <- all.vars(formula)[1]
+    newdata <- newdata[, !(colnames(data) %in% respname)]
+  }
+  newdata <- as.matrix(newdata)
  
   ## create model calls when appropriate
   ## obtain OLS estimate 
@@ -83,14 +90,15 @@ regions <- function(formula, data, newdata, family = "gaussian", link,
   #  datak <- key[key[, p + 2] == j, ]
   #  datak
   #})
-  subkey <- mclapply(sort(unique(index)), FUN = function(j){
-    datak <- key[key[, p + 2] == j, ]
-    datak
-  }, mc.cores = cores)
+  #subkey <- mclapply(sort(unique(index)), FUN = function(j){
+  #  datak <- key[key[, p + 2] == j, ]
+  #  datak
+  #}, mc.cores = cores)
   #subkey <- split(cbind(X, Y), f = as.factor(index))
   newdata.variables <- as.matrix(
     model.matrix(~ ., data.frame(newdata))[, -1])
  
+
   paraconformal <- nonparaconformal <- NULL
   if(parametric == TRUE){
 
@@ -111,18 +119,18 @@ regions <- function(formula, data, newdata, family = "gaussian", link,
 
       out <- mclapply(1:n.pred, mc.cores = cores, FUN = function(j){
         x <- newdata.variables[j, ]
-        index.j <- which(index.pred[j] == indices.pred)
+        #index.j <- which(index.pred[j] == indices.pred)
         #datak <- matrix(subkey[[index.j]], ncol = p + 2)
         #Xk <- matrix(datak[, 1:p], ncol = p)
         #Yk <- datak[, p+1]
-        Yk <- matrix(subkey[[index.j]], ncol = p + 2)[, p+1]
+        Yk <- key[key[, p + 2] == index.pred[j], ][, p+1]
         nk <- length(Yk)
 
         ## conformal scores
         phatxy <- function(z){
           out <- NULL
-          data.y[, 1] <- c(Y, z)
-          data.y[, -1] <- rbind(X, x)
+          data.y[, colnames(data) %in% respname] <- c(Y, z)
+          data.y[, !(colnames(data) %in% respname)] <- rbind(X, x)
           data.y <- as.data.frame(data.y)
           m1.y <- glm(formula, data = data.y, family = family)
 
@@ -170,7 +178,7 @@ regions <- function(formula, data, newdata, family = "gaussian", link,
             by = crudewidth))
           crude.search <- lapply(crude.seq.y, 
             FUN = function(y){ 
-              foo <- cbind(phatxy(y), c(index.pred, index.pred[j]))
+              foo <- cbind(phatxy(y), c(index, index.pred[j]))
               bar <- foo[which(foo[, 2] == index.pred[j]), -2]
               baz <- rank(bar)[nk + 1]
               baz
@@ -214,7 +222,7 @@ regions <- function(formula, data, newdata, family = "gaussian", link,
               to = endpt2.lwr, length = floor(crudewidth/0.001)))
             precise.search1 <- lapply(precise.seq.y1, 
               FUN = function(y){
-                foo <- cbind(phatxy(y), c(index.pred, index.pred[j]))
+                foo <- cbind(phatxy(y), c(index, index.pred[j]))
                 bar <- foo[which(foo[, 2] == index.pred[j]), -2]
                 baz <- rank(bar)[length(bar)]
                 baz
@@ -226,7 +234,7 @@ regions <- function(formula, data, newdata, family = "gaussian", link,
               to = endpt2.upr, length = floor(crudewidth/0.001)))
             precise.search2 <- lapply(precise.seq.y2, 
               FUN = function(y){ 
-                foo <- cbind(phatxy(y), c(index.pred, index.pred[j]))
+                foo <- cbind(phatxy(y), c(index, index.pred[j]))
                 bar <- foo[which(foo[, 2] == index.pred[j]), -2]
                 baz <- rank(bar)[length(bar)]
                 baz
@@ -263,8 +271,7 @@ regions <- function(formula, data, newdata, family = "gaussian", link,
       #out <- apply(matrix(1:n.pred), 1, FUN = function(j){
         x <- newdata[j, ]
         index.j <- which(index.pred[j] == indices.pred)
-        #datak <- subkey[[index.j]], ncol = k+1)
-        datak <- matrix(subkey[[index.j]], ncol = p + 2)
+        datak <- matrix(key[key[, p + 2] == index.pred[j], ][, -c(p+2)], ncol = p+1)
         Xk <- matrix(datak[, 1:p], ncol = p)
         Yk <- datak[, p+1]
         nk <- nrow(datak)

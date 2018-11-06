@@ -3,7 +3,6 @@
 
 library(MASS)
 library(statmod)
-library(conformalInference)
 library(parallel)
 library(conformal.glm)
 
