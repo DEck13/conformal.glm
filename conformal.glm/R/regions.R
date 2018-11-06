@@ -20,73 +20,28 @@ regions <- function(formula, data, newdata, family = "gaussian", link,
   X.variables <- as.matrix(data[,-which(colnames(data) %in% respname)], 
     nrow = n)
   k <- ncol(X.variables)
-  betaOLS <- betaMLE <- m1$coefficients
+  betaOLS <- betaMLE <- coefficients(m1)
   p <- length(betaOLS) - 1
-  #InvFish <- p1 <- pred <- sepred <- #interval.glm <- 
-  #  interval.plugin <- NULL
   sd.res <- summary(m1)$sigma
-
-  ## Get plugin interval for Gaussian Distribution 
-  #if(family == "gaussian"){
-  #  p1 <- predict(m1, newdata = data.frame(newdata), se.fit = T)
-  #  pred <- p1$fit
-  #  sepred <- p1$se.fit * sqrt(n)
-
-    ## compute glm prediction region
-    #interval.plugin <- cbind(pred - qnorm(1 - alpha/2) * sepred, 
-    #  pred + qnorm(1 - alpha/2) * sepred)
-    #sepred <- sd.res * sqrt(1 + 1/n) ## more needed
-  #  interval.plugin <- cbind(pred - qnorm(1 - alpha/2) * sepred, 
-  #    pred + qnorm(1 - alpha/2) * sepred)
-  #}
-
 
   ## Get MLEs and plugin interval for gamma gamma distribution 
   shapeMLE <- rateMLE <- 0
   if(family == "Gamma"){
-    m1 <- glm(formula, data = data, family = "Gamma")
-    #InvFish <- vcov(m1)
-    betaMLE <- m1$coefficients
+    m1 <- glm(formula, data = data, family = family)
+    betaMLE <- coefficients(m1)
     shapeMLE <- as.numeric(gamma.shape(m1)[1])
     rateMLE <- cbind(1, X) %*% betaMLE * shapeMLE
-
-    #p1 <- predict(m1, type = "response", 
-    #  newdata = data.frame(newdata), se.fit = TRUE)
-    #pred <- p1$fit
-    #sepred <- p1$se.fit
-    ## compute glm prediction region 
-    #interval.glm <- cbind(pred - qnorm(1 - alpha/2) * sepred, 
-    #  pred + qnorm(1 - alpha/2) * sepred)
-
-    ## compute interval prediction region 
-    #sepred <- sqrt(1 / shapeMLE * pred^2)
-    #interval.plugin <- cbind(pred - qnorm(1 - alpha / 2) * sepred, 
-    #  pred + qnorm(1 - alpha / 2) * sepred)
   }
 
 
   ## Get MLEs and plugin interval for Inverse Gaussian Distribution 
   if(family == "inverse.gaussian"){
     m1 <- glm(formula, data = data, family = family)
-    betaMLE <- m1$coefficients
-    #pred <- predict(m1, type = "response", newdata = data.frame(newdata))
-    #gx <- 1 / sqrt( cbind(1, X) %*% betaMLE  )
-    #scaleMLE <- 1 / mean((Y - gx)^2 / (Y * gx^2) )
-    #sepred <- sqrt(pred^3 * scaleMLE)
-    
-    ## compute glm prediction region 
-    #interval.plugin <- cbind(pred - qnorm(1 - alpha/2) * sepred, 
-    #  pred + qnorm(1 - alpha/2) * sepred)
+    betaMLE <- coefficients(m1)
   }
 
   ## set up partition
-  #wn <- min(1 / ceiling((n/log(n))^(k/(k+3))), 
-  #  1/3) # width of partition (max width = 1/3)
-  #wn <- min(1 / floor((n/log(n))^(1/2)), 
-  #  1/3) # width of partition (max width = 1/3)
-  #wn <- min(1 / floor(n / 100), 1/3)
   wn <- min(1/ floor(1 / (log(n)/n)^(1/(k+3))), 1/2)
-  #if(n <= 200) wn <- 1/2
   if(class(bins) != "NULL") wn <- 1 / bins
   A1 <- seq(from = 0, to = 1 - wn, by = wn)
   A2 <- seq(from = wn, to = 1, wn)
@@ -136,7 +91,6 @@ regions <- function(formula, data, newdata, family = "gaussian", link,
   newdata.variables <- as.matrix(
     model.matrix(~ ., data.frame(newdata))[, -1])
  
-
   paraconformal <- nonparaconformal <- NULL
   if(parametric == TRUE){
 
@@ -149,48 +103,44 @@ regions <- function(formula, data, newdata, family = "gaussian", link,
     ## Parametric conformal prediction region for each 
     ## desired predictor combination 
     ## ignores the intercept of the newdata matrix
-    Copt <- function(newdata){ 
+    Copt <- function(newdata){
+
+      ## initial quantities
+      data.y <- matrix(0, nrow = nrow(data) + 1, ncol = ncol(data))
+      colnames(data.y) <- colnames(data)
+
       out <- mclapply(1:n.pred, mc.cores = cores, FUN = function(j){
-        #x <- newdata.list[[j]]
         x <- newdata.variables[j, ]
         index.j <- which(index.pred[j] == indices.pred)
-        #datak <- subkey[[index.j]], ncol = k+1)
-        datak <- matrix(subkey[[index.j]], ncol = p + 2)
-        Xk <- matrix(datak[, 1:p], ncol = p)
-        Yk <- datak[, p+1]
-        nk <- nrow(datak)
-        rateMLE <- cbind(1, Xk) %*% betaMLE * shapeMLE
-        rate.x <- as.numeric(c(1, x) %*% betaMLE * shapeMLE)
-        datak.y <- matrix(0, nrow = nrow(datak) + 1, ncol = ncol(datak) - 1)
-        colnames(datak.y) <- colnames(data)
-        data.y <- matrix(0, nrow = nrow(data) + 1, ncol = ncol(data))
-        colnames(data.y) <- colnames(data)
+        #datak <- matrix(subkey[[index.j]], ncol = p + 2)
+        #Xk <- matrix(datak[, 1:p], ncol = p)
+        #Yk <- datak[, p+1]
+        Yk <- matrix(subkey[[index.j]], ncol = p + 2)[, p+1]
+        nk <- length(Yk)
+
+        ## conformal scores
         phatxy <- function(z){
           out <- NULL
-          #datak.y[, 1] <- c(Yk, z)
-          #datak.y[, -1] <- rbind(Xk, x)
-          #datak.y <- as.data.frame(datak.y)
           data.y[, 1] <- c(Y, z)
           data.y[, -1] <- rbind(X, x)
-          data.y <- as.data.frame(data.y)          
+          data.y <- as.data.frame(data.y)
           m1.y <- glm(formula, data = data.y, family = family)
-          betaMLE.y <- m1.y$coefficients
 
           if(family == "Gamma"){
-            ## phat|Ak
             shapeMLE.y <- as.numeric(gamma.shape(m1.y)[1])
-            rateMLE.y <- cbind(1, data.y[, -1]) %*% betaMLE.y * shapeMLE.y
-            out <- dgamma(data.y[, 1], rate = rateMLE.y, shape = shapeMLE.y)
+            out <- dgamma(c(Y, z), 
+              rate = cbind(1, rbind(X, x)) %*% coefficients(m1.y) * shapeMLE.y, 
+              shape = shapeMLE.y)
           }
 
           if(family == "gaussian"){
-            ## phat|Ak
-            sd.y <- summary(m1.y)$sigma
-            out <- dnorm(data.y[, 1], mean = cbind(1, data.y[, -1]) %*% betaMLE.y, sd = sd.res)
+            out <- dnorm(c(Y, z), 
+              mean = cbind(1, rbind(X, x)) %*% coefficients(m1.y), 
+              sd = summary(m1.y)$sigma)
           }
 
           if(family == "inverse.gaussian"){
-            out <- dinvgauss(data.y[, 1], mean = 1 / sqrt(cbind(1, data.y[, -1]) %*% betaMLE.y))
+            out <- dinvgauss(c(Y, z), mean = 1 / sqrt(cbind(1, rbind(X, x)) %*% coefficients(m1.y)))
           }
 
           out
@@ -200,11 +150,11 @@ regions <- function(formula, data, newdata, family = "gaussian", link,
         ## construct the parametric conformal prediction 
         ## region
         lwr <- min(Yk)
-        if(min(Yk) < 0) lwr <- 3 * lwr
-        if(min(Yk) >= 0) lwr <- (1/3) * lwr
+        if(min(Yk) < 0) lwr <- 2 * lwr
+        if(min(Yk) >= 0) lwr <- (1/2) * lwr
         upr <- max(Yk)
-        if(max(Yk) < 0) upr <- (1/3) * upr
-        if(max(Yk) >= 0) upr <- 3 * upr
+        if(max(Yk) < 0) upr <- (1/2) * upr
+        if(max(Yk) >= 0) upr <- 2 * upr
 
         ## an intial crude approximation of the 
         ## parametric conformal prediction region 
@@ -220,9 +170,9 @@ regions <- function(formula, data, newdata, family = "gaussian", link,
             by = crudewidth))
           crude.search <- lapply(crude.seq.y, 
             FUN = function(y){ 
-              foo <- cbind(phatxy(y), c(index.pred, index.j))
-              bar <- foo[which(foo[, 2] == index.j), -2]
-              baz <- rank(bar)[length(bar)]
+              foo <- cbind(phatxy(y), c(index.pred, index.pred[j]))
+              bar <- foo[which(foo[, 2] == index.pred[j]), -2]
+              baz <- rank(bar)[nk + 1]
               baz
             })
           
@@ -259,34 +209,25 @@ regions <- function(formula, data, newdata, family = "gaussian", link,
             }  
 
             if(family == "Gamma") endpt1.lwr <- 0.00001
+
             precise.seq.y1 <- as.list(seq(from = endpt1.lwr, 
               to = endpt2.lwr, length = floor(crudewidth/0.001)))
             precise.search1 <- lapply(precise.seq.y1, 
               FUN = function(y){
-                foo <- cbind(phatxy(y), c(index.pred, index.j))
-                bar <- foo[which(foo[, 2] == index.j), -2]
+                foo <- cbind(phatxy(y), c(index.pred, index.pred[j]))
+                bar <- foo[which(foo[, 2] == index.pred[j]), -2]
                 baz <- rank(bar)[length(bar)]
                 baz
               })
-            #precise.search1 <- apply(
-            #  matrix(precise.seq.y1), 1, FUN = function(y){
-            #    length(which(phatxy(y) >= phatxyY))
-            #}) 
             cand1 <- min(which(precise.search1 >= nk.tilde))
             y.lwr <- precise.seq.y1[[cand1]]
 
-            #precise.seq.y2 <- seq(from = endpt1.upr, 
-            #  to = endpt2.upr, by = 0.001)
-            #precise.search2 <- apply(matrix(precise.seq.y2), 
-            #  1, FUN = function(y){
-            #    length(which(phatxy(y) >= phatxyY))
-            #  })
             precise.seq.y2 <- as.list(seq(from = endpt1.upr, 
               to = endpt2.upr, length = floor(crudewidth/0.001)))
             precise.search2 <- lapply(precise.seq.y2, 
               FUN = function(y){ 
-                foo <- cbind(phatxy(y), c(index.pred, index.j))
-                bar <- foo[which(foo[, 2] == index.j), -2]
+                foo <- cbind(phatxy(y), c(index.pred, index.pred[j]))
+                bar <- foo[which(foo[, 2] == index.pred[j]), -2]
                 baz <- rank(bar)[length(bar)]
                 baz
               })
