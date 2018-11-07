@@ -6,6 +6,7 @@ regions <- function(formula, data, newdata, family = "gaussian", link,
 
   ## initial quantities
   respname <- all.vars(formula)[1]
+  predname <- all.vars(formula)[2]
   Y <- data[, colnames(data) %in% respname]
   n <- length(Y)
   n.pred <- nrow(newdata)
@@ -13,7 +14,6 @@ regions <- function(formula, data, newdata, family = "gaussian", link,
 
   if(is.null(newdata)){ 
     newdata <- data
-    respname <- all.vars(formula)[1]
     newdata <- newdata[, !(colnames(data) %in% respname)]
   }
   newdata <- as.matrix(newdata)
@@ -84,21 +84,10 @@ regions <- function(formula, data, newdata, family = "gaussian", link,
   index <- findindex(X.variables)
   index.pred <- findindex(matrix(newdata, ncol = p))
   indices.pred <- sort(unique(index.pred))
-
   key <- cbind(X, Y, index)
-  #subkey <- lapply(unique(index.pred), FUN = function(j){
-  #  datak <- key[key[, p + 2] == j, ]
-  #  datak
-  #})
-  #subkey <- mclapply(sort(unique(index)), FUN = function(j){
-  #  datak <- key[key[, p + 2] == j, ]
-  #  datak
-  #}, mc.cores = cores)
-  #subkey <- split(cbind(X, Y), f = as.factor(index))
   newdata.variables <- as.matrix(
     model.matrix(~ ., data.frame(newdata))[, -1])
  
-
   paraconformal <- nonparaconformal <- NULL
   if(parametric == TRUE){
 
@@ -106,21 +95,18 @@ regions <- function(formula, data, newdata, family = "gaussian", link,
     shapeMLE.y <- shapeMLE; rateMLE.y <- rbind(rateMLE, 1); betaMLE.y <- betaMLE
     sd.y <- sd.res
     m1.y <- m1
-
+    data.y <- matrix(0, nrow = nrow(data) + 1, ncol = ncol(data))
+    colnames(data.y) <- colnames(data)
+    x <- NULL; Yk <- NULL; nk <- 0
     # ---- The parametric conformal implementation -------
     ## Parametric conformal prediction region for each 
     ## desired predictor combination 
     ## ignores the intercept of the newdata matrix
     Copt <- function(newdata){
 
-      ## initial quantities
-      data.y <- matrix(0, nrow = nrow(data) + 1, ncol = ncol(data))
-      colnames(data.y) <- colnames(data)
-
       out <- mclapply(1:n.pred, mc.cores = cores, FUN = function(j){
-        x <- newdata.variables[j, ]
+        x <- matrix(newdata.variables[j, ], nrow = 1, ncol = p)
         #index.j <- which(index.pred[j] == indices.pred)
-        #datak <- matrix(subkey[[index.j]], ncol = p + 2)
         #Xk <- matrix(datak[, 1:p], ncol = p)
         #Yk <- datak[, p+1]
         Yk <- key[key[, p + 2] == index.pred[j], ][, p+1]
@@ -136,9 +122,17 @@ regions <- function(formula, data, newdata, family = "gaussian", link,
 
           if(family == "Gamma"){
             shapeMLE.y <- as.numeric(gamma.shape(m1.y)[1])
-            out <- dgamma(c(Y, z), 
-              rate = cbind(1, rbind(X, x)) %*% coefficients(m1.y) * shapeMLE.y, 
-              shape = shapeMLE.y)
+            if(link == "identity"){
+              rateMLE.y <- 1 / (cbind(1, x) %*% coefficients(m1.y)) * shapeMLE.y
+            }
+            if(link == "inverse"){
+              rateMLE.y <- cbind(1, x) %*% coefficients(m1.y) * shapeMLE.y 
+            }
+            if(link == "log"){
+              rateMLE.y <- exp(cbind(1, x) %*% coefficients(m1.y)) * shapeMLE.y
+            }
+
+            out <- dgamma(c(Y, z), rate = rateMLE.y, shape = shapeMLE.y)
           }
 
           if(family == "gaussian"){
@@ -275,12 +269,6 @@ regions <- function(formula, data, newdata, family = "gaussian", link,
         Xk <- matrix(datak[, 1:p], ncol = p)
         Yk <- datak[, p+1]
         nk <- nrow(datak)
-        #x <- newdata[j, ]
-        #index.j <- index.pred[j]
-        #datak <- subkey[[index.j]]
-        #Xk <- datak[, 1:p]
-        #Yk <- datak[, p+1]
-        #nk <- nrow(datak)
 
         ## nonparametric density
         phatxy <- function(y){                

@@ -24,7 +24,7 @@ library(conformal.glm)
 library(parallel)
 set.seed(13)
 n <- 200
-shape <- 1
+shape <- 2
 beta <- c(1, 1/4)
 x <- matrix(runif(n), ncol = 1)
 rate <- cbind(1, x) %*% beta * shape
@@ -32,7 +32,7 @@ y <- rgamma(n = n, shape = shape, rate = rate)
 data <- data.frame(y = y, x = x)
 colnames(data)[2] <- c("x1")
 
-fit = glm(y ~ x1, family = "Gamma", data = data) 
+fit = glm(y ~ x1, family = Gamma, data = data) 
 cpred = conformal.glm(fit, nonparametric = TRUE, bins = 5, 
 	cores = 6)
 ```

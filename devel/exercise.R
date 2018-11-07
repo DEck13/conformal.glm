@@ -13,7 +13,7 @@ gout <- conformal.glm(m1, bins = 3, cores = 6)
 gout
 
 ## Works but is slow
-#gout2 <- conformal.glm(m1, bins = 3, parametric = FALSE,  
-#	nonparametric = TRUE, cores = 6)
-#gout2
+gout2 <- conformal.glm(m1, bins = 3, parametric = FALSE,  
+	nonparametric = TRUE, cores = 6)
+gout2
 

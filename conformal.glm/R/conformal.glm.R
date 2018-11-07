@@ -25,8 +25,8 @@ conformal.glm <- function(object, ..., newdata = NULL, alpha = 0.10,
   stopifnot(family %in% c("Gamma", "gaussian", "inverse.gaussian"))
 
   int <- regions(formula = formula, data = data, newdata = newdata, 
-  	family = family, link, alpha = alpha, cores = cores, bins = bins, 
-  	intercept = intercept, parametric = parametric, 
+  	family = family, link = link, alpha = alpha, cores = cores, 
+    bins = bins, intercept = intercept, parametric = parametric, 
     nonparametric = nonparametric)
 
   paraconformal <- int$paraconformal
