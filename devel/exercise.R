@@ -17,3 +17,8 @@ gout2 <- conformal.glm(m1, bins = 3, parametric = FALSE,
 	nonparametric = TRUE, cores = 6)
 gout2
 
+paraCI <- gout$paraconformal
+nonparaCI <- gout2$nonparaconformal
+mean(apply(paraCI, 1, diff))
+mean(apply(nonparaCI, 1, diff))
+

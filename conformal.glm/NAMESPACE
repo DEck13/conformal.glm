@@ -11,7 +11,6 @@ importFrom(stats, predict.glm)
 importFrom(stats, dgamma)
 importFrom(stats, dnorm)
 importFrom(stats, qnorm)
-importFrom(stats, model.matrix)
 importFrom(stats, coefficients)
 
 importFrom(MASS, gamma.shape)

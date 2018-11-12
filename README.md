@@ -23,9 +23,9 @@ library(MASS)
 library(conformal.glm)
 library(parallel)
 set.seed(13)
-n <- 200
+n <- 300
 shape <- 2
-beta <- c(1, 1/4)
+beta <- c(1/4, 1/4)
 x <- matrix(runif(n), ncol = 1)
 rate <- cbind(1, x) %*% beta * shape
 y <- rgamma(n = n, shape = shape, rate = rate)
@@ -33,7 +33,7 @@ data <- data.frame(y = y, x = x)
 colnames(data)[2] <- c("x1")
 
 fit = glm(y ~ x1, family = Gamma, data = data) 
-cpred = conformal.glm(fit, nonparametric = TRUE, bins = 5, 
+cpred = conformal.glm(fit, nonparametric = TRUE, bins = 3, 
 	cores = 6)
 ```
 [then show a picture or something]
