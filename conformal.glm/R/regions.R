@@ -94,8 +94,14 @@ regions <- function(formula, data, newdata, family = "gaussian", link,
   #  datak
   #}, mc.cores = cores)
   #subkey <- split(cbind(X, Y), f = as.factor(index))
+
+  ## newdata object for main effects only
   newdata.variables <- as.matrix(model.frame(~ ., as.data.frame(newdata)))
-  newdata.formula <- as.matrix(model.frame(formula, as.data.frame(newdata))[, -1])
+
+  ## newdata object for complete formula
+  foo <- cbind(Y[1:nrow(newdata)], newdata)
+  colnames(foo)[1] <- respname
+  newdata.formula <- as.matrix(model.frame(formula, as.data.frame(foo))[, -1])
   
 
   paraconformal <- nonparaconformal <- NULL
@@ -132,9 +138,9 @@ regions <- function(formula, data, newdata, family = "gaussian", link,
           data.y[, colnames(data) %in% respname] <- c(Y, z)
           data.y[, !(colnames(data) %in% respname)] <- rbind(X.variables, x.variables)
           data.y <- as.data.frame(data.y)
-          m1.y <- glm(formula, data = data.y, family = family)
 
           if(family == "Gamma"){
+            m1.y <- glm(formula, data = data.y, family = family)
             shapeMLE.y <- as.numeric(gamma.shape(m1.y)[1])
             if(link == "identity"){
               rateMLE.y <- 1 / (cbind(1, x) %*% coefficients(m1.y)) * shapeMLE.y
@@ -146,19 +152,20 @@ regions <- function(formula, data, newdata, family = "gaussian", link,
               rateMLE.y <- (1 / exp(cbind(1, x) %*% coefficients(m1.y))) * shapeMLE.y
             }
 
-
             out <- dgamma(c(Y, z), 
               rate = cbind(1, rbind(X, x)) %*% coefficients(m1.y) * shapeMLE.y, 
               shape = shapeMLE.y)
           }
 
           if(family == "gaussian"){
+            m1.y <- lm(formula, data = data.y)
             out <- dnorm(c(Y, z), 
-              mean = cbind(1, rbind(X, x)) %*% coefficients(m1.y), 
+              mean = as.numeric(cbind(1, rbind(X, x)) %*% coefficients(m1.y)), 
               sd = summary(m1.y)$sigma)
           }
 
           if(family == "inverse.gaussian"){
+            m1.y <- glm(formula, data = data.y, family = family)
             out <- dinvgauss(c(Y, z), mean = 1 / sqrt(cbind(1, rbind(X, x)) %*% coefficients(m1.y)))
           }
 
@@ -169,11 +176,7 @@ regions <- function(formula, data, newdata, family = "gaussian", link,
         ## construct the parametric conformal prediction 
         ## region
         lwr <- min(Yk)
-        if(min(Yk) < 0) lwr <- 2 * lwr
-        if(min(Yk) >= 0) lwr <- (1/2) * lwr
         upr <- max(Yk)
-        if(max(Yk) < 0) upr <- (1/2) * upr
-        if(max(Yk) >= 0) upr <- 2 * upr
 
         ## an intial crude approximation of the 
         ## parametric conformal prediction region 
@@ -303,11 +306,7 @@ regions <- function(formula, data, newdata, family = "gaussian", link,
         ## construct the parametric conformal prediction 
         ## region
         lwr <- min(Yk)
-        if(min(Yk) < 0) lwr <- 2 * lwr
-        if(min(Yk) >= 0) lwr <- (1/2) * lwr
         upr <- max(Yk)
-        if(max(Yk) < 0) upr <- (1/2) * upr
-        if(max(Yk) >= 0) upr <- 2 * upr
 
         ## an intial crude approximation of the 
         ## parametric conformal prediction region 
