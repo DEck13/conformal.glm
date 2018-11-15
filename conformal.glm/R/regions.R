@@ -13,11 +13,11 @@ regions <- function(formula, data, newdata, family = "gaussian", link,
 
   if(is.null(newdata)){ 
     newdata <- data
-    respname <- all.vars(formula)[1]
     newdata <- newdata[, !(colnames(data) %in% respname)]
   }
+
   newdata <- as.matrix(newdata)
- 
+  colnames(newdata) <- colnames(data)[!(colnames(data) %in% respname)]
   ## create model calls when appropriate
   ## obtain OLS estimate 
   ## calculate important quantities for the gaussian 
@@ -95,7 +95,7 @@ regions <- function(formula, data, newdata, family = "gaussian", link,
   #}, mc.cores = cores)
   #subkey <- split(cbind(X, Y), f = as.factor(index))
   newdata.variables <- as.matrix(model.frame(~ ., as.data.frame(newdata)))
-  newdata.formula <- as.matrix(model.frame(formula, as.data.frame(newdata)))[, -1]
+  newdata.formula <- as.matrix(model.frame(formula, as.data.frame(newdata))[, -1])
   
 
   paraconformal <- nonparaconformal <- NULL
