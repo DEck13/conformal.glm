@@ -177,6 +177,10 @@ regions <- function(formula, data, newdata, family = "gaussian", link,
         ## region
         lwr <- min(Yk)
         upr <- max(Yk)
+        if(lwr > 0) lwr <- lwr / 1.5
+        if(lwr < 0) lwr <- lwr * 1.5
+        if(upr > 0) upr <- upr * 1.5
+        if(upr < 0) upr <- upr / 1.5
 
         ## an intial crude approximation of the 
         ## parametric conformal prediction region 
@@ -307,6 +311,10 @@ regions <- function(formula, data, newdata, family = "gaussian", link,
         ## region
         lwr <- min(Yk)
         upr <- max(Yk)
+        if(lwr > 0) lwr <- lwr / 1.5
+        if(lwr < 0) lwr <- lwr * 1.5
+        if(upr > 0) upr <- upr * 1.5
+        if(upr < 0) upr <- upr / 1.5
 
         ## an intial crude approximation of the 
         ## parametric conformal prediction region 
