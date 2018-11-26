@@ -191,9 +191,13 @@ regions <- function(formula, data, newdata, family = "gaussian", link,
         if(nk.tilde > 0){
 
           ## perform a crude crude search 
-          crudewidth <- sqrt((upr - lwr)*0.001)
-          crude.seq.y <- as.list(seq(from = lwr, to = upr, 
-            by = crudewidth))
+          prec <- max( min(diff(sort(Yk))), 0.001)
+          crudewidth <- sqrt((upr - lwr)*prec*2*alpha)
+          crude.seq.y <- seq(from = lwr, to = upr, 
+            by = crudewidth)
+          quant.Yk <- quantile(Yk, probs = c(alpha, 1 - alpha))
+          crude.seq.y <- as.list(
+            crude.seq.y[!(crude.seq.y > quant.Yk[1] & crude.seq.y < quant.Yk[2])])
           crude.search <- lapply(crude.seq.y, 
             FUN = function(y){ 
               foo <- cbind(phatxy(y), c(index, index.pred[j]))
@@ -210,8 +214,9 @@ regions <- function(formula, data, newdata, family = "gaussian", link,
             endpt1.lwr <- endpt2.lwr <- endpt1.upr <- 
               endpt2.upr <- 0
             if(min(cand) == 1){ 
-              endpt1.lwr <- lwr - crudewidth 
+              endpt1.lwr <- lwr - crudewidth
               endpt2.lwr <- lwr
+              if(family != "gaussian") endpt1.lwr <- max(endpt1.lwr, 0.00001)
             }
             if(max(cand) == length(crude.seq.y)){ 
               endpt2.upr <- upr + crudewidth
@@ -234,10 +239,10 @@ regions <- function(formula, data, newdata, family = "gaussian", link,
                 crude.seq.y[[max(cand) - 1]])
             }  
 
-            if(family == "Gamma") endpt1.lwr <- 0.00001
+            if(family == "Gamma") if(lwr <= 0.01) endpt1.lwr <- 0.00001
 
             precise.seq.y1 <- as.list(seq(from = endpt1.lwr, 
-              to = endpt2.lwr, length = floor(crudewidth/0.001)))
+              to = endpt2.lwr, length = floor(crudewidth/prec)))
             precise.search1 <- lapply(precise.seq.y1, 
               FUN = function(y){
                 foo <- cbind(phatxy(y), c(index, index.pred[j]))
@@ -249,7 +254,7 @@ regions <- function(formula, data, newdata, family = "gaussian", link,
             y.lwr <- precise.seq.y1[[cand1]]
 
             precise.seq.y2 <- as.list(seq(from = endpt1.upr, 
-              to = endpt2.upr, length = floor(crudewidth/0.001)))
+              to = endpt2.upr, length = floor(crudewidth/prec)))
             precise.search2 <- lapply(precise.seq.y2, 
               FUN = function(y){ 
                 foo <- cbind(phatxy(y), c(index, index.pred[j]))
@@ -319,9 +324,11 @@ regions <- function(formula, data, newdata, family = "gaussian", link,
         ## an intial crude approximation of the 
         ## parametric conformal prediction region 
         nk.tilde <- floor(alpha * (nk + 1))
-        crudewidth <- sqrt((upr - lwr)*0.001) # chosen to minimze 
+        #crudewidth <- sqrt((upr - lwr)*0.001) # chosen to minimze 
            # the number of candidate points to search over when we 
-           # desire a final precision of 0.001                    
+           # desire a final precision of 0.001
+        prec <- max( min(diff(sort(Yk))), 0.001)   
+        crudewidth <- sqrt((upr - lwr)*prec*2*alpha)                    
         #crude.seq.y <- seq(from = lwr, to = upr, by = crudewidth)
         #crude.search <- apply(matrix(crude.seq.y), 1, 
         #  FUN = function(y){
@@ -332,7 +339,12 @@ regions <- function(formula, data, newdata, family = "gaussian", link,
         #    }
         #    out
         #  })
-        crude.seq.y <- as.list(seq(from = lwr, to = upr, by = crudewidth))
+        #crude.seq.y <- as.list(seq(from = lwr, to = upr, by = crudewidth))
+        crude.seq.y <- seq(from = lwr, to = upr, 
+          by = crudewidth)
+        quant.Yk <- quantile(Yk, probs = c(alpha, 1 - alpha))
+        crude.seq.y <- as.list(
+          crude.seq.y[!(crude.seq.y > quant.Yk[1] & crude.seq.y < quant.Yk[2])])
         crude.search <- lapply(crude.seq.y, FUN = function(y){
             int <- out <- phatxy(y)
             out <- length(int)
@@ -366,7 +378,7 @@ regions <- function(formula, data, newdata, family = "gaussian", link,
           }  
 
           precise.seq.y1 <- as.list(seq(from = endpt1.lwr, 
-            to = endpt2.lwr, length = floor(crudewidth/0.001)))
+            to = endpt2.lwr, length = floor(crudewidth/prec)))
           precise.search1 <- lapply(precise.seq.y1, FUN = function(y){
               int <- out <- phatxy(y)
               out <- length(int)
@@ -379,7 +391,7 @@ regions <- function(formula, data, newdata, family = "gaussian", link,
           y.lwr <- precise.seq.y1[[cand1]]
  
           precise.seq.y2 <- as.list(seq(from = endpt1.upr, 
-            to = endpt2.upr, length = floor(crudewidth/0.001)))
+            to = endpt2.upr, length = floor(crudewidth/prec)))
           precise.search2 <- lapply(precise.seq.y2, FUN = function(y){
               int <- out <- phatxy(y)
               out <- length(int)

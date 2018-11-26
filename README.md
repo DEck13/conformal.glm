@@ -34,10 +34,12 @@ rate <- cbind(1, x) %*% beta * shape
 y <- rgamma(n = n, shape = shape, rate = rate)
 data <- data.frame(y = y, x = x)
 colnames(data)[2] <- c("x1")
+newdata <- matrix(seq(0.01, 0.99, by = 0.01), ncol = 1)
+colnames(newdata) <- c("x1")
 
 fit = glm(y ~ x1, family = Gamma, data = data) 
-cpred = conformal.glm(fit, nonparametric = TRUE, bins = 3, 
-	cores = 6)
+system.time(cpred <- conformal.glm(fit, nonparametric = TRUE, bins = 3, 
+	newdata = newdata, cores = 6))
 ```
 
 [least squares conformal prediction from the conformalInference package]
@@ -46,47 +48,48 @@ library(conformalInference)
 funs <- lm.funs(intercept = TRUE)
 train.fun <- funs$train.fun
 predict.fun <- funs$predict.fun
-p1.tibs <- conformal.pred(x = x, y = y, x0 = x, 
+system.time(p1.tibs <- conformal.pred(x = x, y = y, x0 = newdata, 
   train.fun = train.fun, predict.fun = predict.fun, 
   alpha = alpha, grid.method = "linear",
-  num.grid.pts = 999)
+  num.grid.pts = 999))
 cresid = cbind(p1.tibs$lo, p1.tibs$up)
 ```
 
 [plots of parametric, non parametric, and least squares precition regions and the plot of the prediction region obtained from the delta method]
 ```r
 par(mfrow = c(2,2))
-index <- sort(x, index.return = TRUE)$ix
 
 ## parametric conformal prediction region
 paraCI <- cpred$paraconformal
 mean(apply(paraCI, 1, diff))
 plot(x, y, pch = 20)
-lines(x[index], paraCI[, 1][index], type = "l", col = "red")
-lines(x[index], paraCI[, 2][index], type = "l", col = "red")
+lines(newdata, paraCI[, 1], type = "l", col = "red")
+lines(newdata, paraCI[, 2], type = "l", col = "red")
 
 ## nonparametric conformal prediction region
 nonparaCI <- cpred$nonparaconformal
 mean(apply(nonparaCI, 1, diff))
 plot(x, y, pch = 20)
-lines(x[index], nonparaCI[, 1][index], type = "l", col = "red")
-lines(x[index], nonparaCI[, 2][index], type = "l", col = "red")
+lines(newdata, nonparaCI[, 1], type = "l", col = "red")
+lines(newdata, nonparaCI[, 2], type = "l", col = "red")
 
 ## least squares conformal prediction region
 mean(apply(cresid, 1, diff))
 plot(x, y, pch = 20)
-lines(x[index], cresid[, 1][index], type = "l", col = "red")
-lines(x[index], cresid[, 2][index], type = "l", col = "red")
+lines(newdata, cresid[, 1], type = "l", col = "red")
+lines(newdata, cresid[, 2], type = "l", col = "red")
 
 ## delta method prediction region
-p1 <- predict(fit, type = "response", se.fit = TRUE)
+p1 <- predict(fit, type = "response", 
+  newdata = as.data.frame(newdata), 
+  se.fit = TRUE)
 pred <- p1$fit
 se <- p1$se.fit * sqrt(n)
 deltaCI <- cbind(pred + se*qnorm(alpha/2), pred + se*qnorm(1-alpha/2))
 mean(apply(deltaCI, 1, diff))
 plot(x, y, pch = 20)
-lines(x[index], deltaCI[, 1][index], type = "l", col = "red")
-lines(x[index], deltaCI[, 2][index], type = "l", col = "red")
+lines(newdata, deltaCI[, 1], type = "l", col = "red")
+lines(newdata, deltaCI[, 2], type = "l", col = "red")
 ```
 
 [approximate the highest density region]
@@ -95,18 +98,17 @@ betaMLE <- coefficients(fit)
 shapeMLE <- as.numeric(gamma.shape(fit)[1])
 rateMLE <- cbind(1, x) %*% betaMLE * shapeMLE
 foo <- cbind(rateMLE, shapeMLE)
-bar <- seq(from = 1e-5, 
-  to = qgamma(alpha - 1e-5, rate = foo[j,1], shape = foo[j,2]), 
-  length = 100000)
-p.lwr <- pgamma(bar, rate = foo[j,1], shape = foo[j,2])
-p.upr <- p.lwr + 1 - alpha
-y.lwr <- qgamma(p.lwr, rate = foo[j,1], shape = foo[j,2])
-y.upr <- qgamma(p.upr, rate = foo[j,1], shape = foo[j,2])
-min.index <- which.min(y.upr - y.lwr)
-p.a <- p.lwr[min.index]
-p.b <- p.upr[min.index]
-
-minlengthCI <- do.call(rbind, lapply(1:nrow(x), FUN = function(j){
+minlength <- do.call(rbind, lapply(1:nrow(rateMLE), FUN = function(j){
+  bar <- seq(from = 1e-5, 
+    to = qgamma(alpha - 1e-5, rate = foo[j,1], shape = foo[j,2]), 
+    length = 100000)
+  p.lwr <- pgamma(bar, rate = foo[j,1], shape = foo[j,2])
+  p.upr <- p.lwr + 1 - alpha
+  y.lwr <- qgamma(p.lwr, rate = foo[j,1], shape = foo[j,2])
+  y.upr <- qgamma(p.upr, rate = foo[j,1], shape = foo[j,2])
+  min.index <- which.min(y.upr - y.lwr)
+  p.a <- p.lwr[min.index]
+  p.b <- p.upr[min.index]
   a <- qgamma(p.a, rate = foo[j,1], shape = foo[j,2])
   b <- qgamma(p.b, rate = foo[j,1], shape = foo[j,2])
   c(a,b)
@@ -121,14 +123,14 @@ par(mfrow = c(1,2))
 ## parametric conformal prediction region
 mean(apply(paraCI, 1, diff))
 plot(x, y, pch = 20)
-lines(x[index], paraCI[, 1][index], type = "l", col = "red")
-lines(x[index], paraCI[, 2][index], type = "l", col = "red")
+lines(newdata, paraCI[, 1], type = "l", col = "red")
+lines(newdata, paraCI[, 2], type = "l", col = "red")
 
 ## minimum length prediction region under assumed model
-mean(apply(minlengthCI, 1, diff))
+mean(apply(minlength, 1, diff))
 plot(x, y, pch = 20)
-lines(x[index], minlengthCI[, 1][index], type = "l", col = "red")
-lines(x[index], minlengthCI[, 2][index], type = "l", col = "red")
+lines(x[index], minlength[, 1][index], type = "l", col = "red")
+lines(x[index], minlength[, 2][index], type = "l", col = "red")
 ```
 
 

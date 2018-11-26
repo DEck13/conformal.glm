@@ -12,6 +12,7 @@ importFrom(stats, dgamma)
 importFrom(stats, dnorm)
 importFrom(stats, qnorm)
 importFrom(stats, coefficients)
+importFrom(stats, quantile)
 
 importFrom(MASS, gamma.shape)
 importFrom(parallel, mclapply)
