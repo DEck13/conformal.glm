@@ -1,4 +1,79 @@
 
+find.index <- function(mat, wn, k){
+  A <- seq(from = 0, to = 1 - wn, by = wn)
+  n.out <- nrow(mat)
+  out <- rep(0, n.out)
+  for(j in 1:n.out){
+    foo <- 0
+    for(i in 1:k){
+      if(i < k){
+        foo <- foo + 
+          (max(which(A < mat[j, i])) - 1) * (1/wn)^(k-i)
+      }
+      if(i == k){
+        foo <- foo + 
+          max(which(A < mat[j, i]))
+      }
+    }
+    out[j] <- foo
+  }
+  out
+}
+
+
+
+
+
+local.coverage <- function(region, data, newdata, k, bins = NULL,
+  at.data = "TRUE"){
+
+  n <- nrow(data)
+  wn <- min(1/ floor(1 / (log(n)/n)^(1/(k+3))), 1/2)
+  if(class(bins) != "NULL") wn <- 1 / bins
+
+  index.data <- find.index(as.matrix(data[, 1:k + 1]), wn = wn, k = k)
+  index.newdata <- find.index(newdata, wn = wn, k = k)
+  # parametric and nonparametric prediction regions are 
+  # formatted as (newdata, region).
+  # data is formatted as (y, predictors)
+  output <- NULL
+  if(at.data == TRUE){
+    colnames(region)[c(k+1,k+2)] <- c("lwr","upr")
+    output <- unlist(lapply(sort(unique(index.data)), function(j){    
+      y <- data[index.data == j, 1]
+      lwr <- region[index.newdata == j, k+1]
+      upr <- region[index.newdata == j, k+2]
+      out <- mean(lwr <= y & y <= upr)
+      out
+    }))
+  }
+
+  if(at.data == FALSE){
+    ### right now only works for univariate regression
+    colnames(region)[c(k+1,k+2)] <- c("lwr","upr")
+    output <- unlist(lapply(sort(unique(index.data)), function(j){
+      input1 <- region[, 1:k]
+      m.lwr <- lm(lwr ~ poly(input1, degree = 3), 
+        data = as.data.frame(region)[, c(1:k, k+1)], 
+        subset = index.newdata == j)
+      m.upr <- lm(upr ~ poly(input1, degree = 3), 
+        data = as.data.frame(region)[, c(1:k, k+2)], 
+        subset = index.newdata == j)
+
+      newdat <- as.data.frame(data[index.data == j, 1:k + 1])
+      colnames(newdat) <- paste("input", 1:k, sep = "")
+      p.lwr <- predict(m.lwr, newdata = newdat)
+      p.upr <- predict(m.upr, newdata = newdat)
+      y <- data[index.data == j, 1]
+      out <- mean(p.lwr <= y & y <= p.upr)
+    }))  
+  }
+  output
+}
+
+
+
+
 
 regions <- function(formula, data, newdata, family = "gaussian", link, 
   alpha = 0.10, cores = 1, bins = NULL, intercept = TRUE, parametric = TRUE, 
@@ -49,42 +124,15 @@ regions <- function(formula, data, newdata, family = "gaussian", link,
   ## set up partition
   wn <- min(1/ floor(1 / (log(n)/n)^(1/(k+3))), 1/2)
   if(class(bins) != "NULL") wn <- 1 / bins
-  A1 <- seq(from = 0, to = 1 - wn, by = wn)
-  A2 <- seq(from = wn, to = 1, wn)
-  A <- cbind(A1, A2)
-
-  ## function to allocate X and Y data to all relevant 
-  ## partitions via indexing
-  ## takes an nXk matrix as an argument where k is the 
-  ## number of unique variables
-  findindex <- function(mat){
-    n.out <- nrow(mat)
-    out <- rep(0, n.out)
-    for(j in 1:n.out){
-      foo <- 0
-      for(i in 1:k){
-        if(i < k){
-          foo <- foo + 
-            (max(which(A[, 1] < mat[j, i])) - 1) * (1/wn)^(k-i)
-        }
-        if(i == k){
-          foo <- foo + 
-            max(which(A[, 1] < mat[j, i]))
-        }
-      }
-      out[j] <- foo
-    }
-    out
-  }
 
   ## important internal quantities for our prediction regions   
   ## create seperate data frames with respect to each partition 
   ## ignores the intercept of the newdata matrix
-  index <- findindex(X.variables)
-  index.pred <- findindex(matrix(newdata, ncol = k))
+  index <- find.index(X.variables, wn = wn, k = k)
+  index.pred <- find.index(matrix(newdata, ncol = k), wn = wn, k = k)
   indices.pred <- sort(unique(index.pred))
-
   key <- cbind(X, Y, index)
+
   #subkey <- lapply(unique(index.pred), FUN = function(j){
   #  datak <- key[key[, p + 2] == j, ]
   #  datak
