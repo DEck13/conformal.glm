@@ -133,16 +133,6 @@ regions <- function(formula, data, newdata, family = "gaussian", link,
   indices.pred <- sort(unique(index.pred))
   key <- cbind(X, Y, index)
 
-  #subkey <- lapply(unique(index.pred), FUN = function(j){
-  #  datak <- key[key[, p + 2] == j, ]
-  #  datak
-  #})
-  #subkey <- mclapply(sort(unique(index)), FUN = function(j){
-  #  datak <- key[key[, p + 2] == j, ]
-  #  datak
-  #}, mc.cores = cores)
-  #subkey <- split(cbind(X, Y), f = as.factor(index))
-
   ## newdata object for main effects only
   newdata.variables <- as.matrix(model.frame(~ ., as.data.frame(newdata)))
 
