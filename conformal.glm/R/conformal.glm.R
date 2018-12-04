@@ -35,7 +35,6 @@ conformal.glm <- function(object, ..., newdata = NULL, alpha = 0.10,
 
   out = list(paraconformal = paraconformal, 
     nonparaconformal = nonparaconformal)
-    #interval.plugin = interval.plugin)
   return(out)
 }
 

@@ -1,6 +1,7 @@
 
 find.index <- function(mat, wn, k){
   A <- seq(from = 0, to = 1 - wn, by = wn)
+  if(wn == 1) A <- 0
   n.out <- nrow(mat)
   out <- rep(0, n.out)
   for(j in 1:n.out){
@@ -131,7 +132,7 @@ regions <- function(formula, data, newdata, family = "gaussian", link,
   index <- find.index(X.variables, wn = wn, k = k)
   index.pred <- find.index(matrix(newdata, ncol = k), wn = wn, k = k)
   indices.pred <- sort(unique(index.pred))
-  key <- cbind(X, Y, index)
+
 
   ## newdata object for main effects only
   newdata.variables <- as.matrix(model.frame(~ ., as.data.frame(newdata)))
@@ -163,16 +164,14 @@ regions <- function(formula, data, newdata, family = "gaussian", link,
       out <- mclapply(1:n.pred, mc.cores = cores, FUN = function(j){
         x.variables <- matrix(newdata.variables[j, ], nrow = 1, ncol = k)
         x <- matrix(newdata.formula[j, ], nrow = 1, ncol = p)
-        #index.j <- which(index.pred[j] == indices.pred)
-        #datak <- matrix(subkey[[index.j]], ncol = p + 2)
-        #Xk <- matrix(datak[, 1:p], ncol = p)
-        #Yk <- datak[, p+1]
-        Yk <- key[key[, p + 2] == index.pred[j], ][, p+1]
-        nk <- length(Yk)
+        index.bin <- which(index == index.pred[j])
+        nk <- length(index.bin)
+        Xk <- matrix(X[index.bin, ], ncol = p)
+        Yk <- Y[index.bin]
 
         ## conformal scores
         phatxy <- function(z){
-          out <- NULL
+          out <- rateMLE.y <- NULL
           data.y[, colnames(data) %in% respname] <- c(Y, z)
           data.y[, !(colnames(data) %in% respname)] <- rbind(X.variables, x.variables)
           data.y <- as.data.frame(data.y)
@@ -180,131 +179,150 @@ regions <- function(formula, data, newdata, family = "gaussian", link,
           if(family == "Gamma"){
             m1.y <- glm(formula, data = data.y, family = family)
             shapeMLE.y <- as.numeric(gamma.shape(m1.y)[1])
+
             if(link == "identity"){
-              rateMLE.y <- 1 / (cbind(1, x) %*% coefficients(m1.y)) * shapeMLE.y
+              rateMLE.y <- 1 / (cbind(1, rbind(Xk, x)) %*% 
+                coefficients(m1.y)) * shapeMLE.y
             }
             if(link == "inverse"){
-              rateMLE.y <- cbind(1, x) %*% coefficients(m1.y) * shapeMLE.y
+              rateMLE.y <- (cbind(1, rbind(Xk, x)) %*% 
+                coefficients(m1.y)) * shapeMLE.y
             }
             if(link == "log"){
-              rateMLE.y <- (1 / exp(cbind(1, x) %*% coefficients(m1.y))) * shapeMLE.y
+              rateMLE.y <- (1 / exp(cbind(1, rbind(Xk, x)) %*% 
+                coefficients(m1.y))) * shapeMLE.y
             }
 
-            out <- dgamma(c(Y, z), 
-              rate = cbind(1, rbind(X, x)) %*% coefficients(m1.y) * shapeMLE.y, 
-              shape = shapeMLE.y)
+            out <- dgamma(c(Yk, z), rate = rateMLE.y, shape = shapeMLE.y)
           }
 
           if(family == "gaussian"){
             m1.y <- lm(formula, data = data.y)
-            out <- dnorm(c(Y, z), 
-              mean = as.numeric(cbind(1, rbind(X, x)) %*% coefficients(m1.y)), 
-              sd = summary(m1.y)$sigma)
+            out <- dnorm(c(Yk, z), mean = as.numeric(cbind(1, rbind(Xk, x)) %*% 
+              coefficients(m1.y)), sd = summary(m1.y)$sigma)
           }
 
           if(family == "inverse.gaussian"){
             m1.y <- glm(formula, data = data.y, family = family)
-            out <- dinvgauss(c(Y, z), mean = 1 / sqrt(cbind(1, rbind(X, x)) %*% coefficients(m1.y)))
+            out <- dinvgauss(c(Yk, z), mean = 1 / sqrt(cbind(1, rbind(Xk, x)) %*% 
+              coefficients(m1.y)))
           }
 
           out
         }
 
-        ## set up range of candidate points used to 
-        ## construct the parametric conformal prediction 
-        ## region
-        lwr <- min(Yk)
-        upr <- max(Yk)
-        if(lwr > 0) lwr <- lwr / 1.5
-        if(lwr < 0) lwr <- lwr * 1.5
-        if(upr > 0) upr <- upr * 1.5
-        if(upr < 0) upr <- upr / 1.5
+        ## initial check for enough data within bin
+        nk.tilde <- floor(alpha * (nk + 1))
+        if(nk.tilde == 0) stop("bin width is too small")
+
+        ## set up a lower (upper lower bound) and upper bound 
+        ## (lower upper bound) to start two line searchs in order to 
+        ## construct the parametric conformal prediction region
+        quant.Yk <- quantile(Yk, probs = c(2 * alpha, 1 - 2 * alpha ))
+        y.lwr <- as.numeric(quant.Yk[1])
+        y.upr <- as.numeric(quant.Yk[2])
+
+        # lower line search
+        prec <- max( min(diff(sort(Yk[Yk <= y.lwr]))), 0.001)      
+        steps <- 1
+        while(rank(phatxy(y.lwr))[nk + 1] >= nk.tilde){
+          y.lwr <- y.lwr - steps * prec
+          if(family != "Gaussian"){ 
+            if(y.lwr < 0.00001) y.lwr <- 0.00001
+          }
+          steps <- steps + 1
+        }
+
+        # upper line search
+        prec <- max( min(diff(sort(Yk[Yk >= y.upr]))), 0.001)
+        steps <- 1
+        while(rank(phatxy(y.upr))[nk + 1] >= nk.tilde){
+          y.upr <- y.upr + steps * prec
+          if(family != "Gaussian"){ 
+            if(y.lwr < 0.00001) y.lwr <- 0.00001
+          }
+          steps <- steps + 1
+        }
+
+
+
+        #lwr <- min(Y[index.bin])
+        #upr <- max(Y[index.bin])
+        #if(lwr > 0) lwr <- lwr / 1.5
+        #if(lwr < 0) lwr <- lwr * 1.5
+        #if(upr > 0) upr <- upr * 1.5
+        #if(upr < 0) upr <- upr / 1.5
+        #y.lwr <- lwr
+        #y.upr <- upr
 
         ## an intial crude approximation of the 
         ## parametric conformal prediction region 
-        nk.tilde <- floor(alpha * (nk + 1))
-        y.lwr <- lwr
-        y.upr <- upr
+        ## perform a crude crude search 
+        #prec <- max( min(diff(sort(Y[index.bin]))), 0.001)
+        #crudewidth <- sqrt((upr - lwr)*prec*2*alpha)
+        #crude.seq.y <- seq(from = lwr, to = upr, by = crudewidth)
+        #quant.Yk <- quantile(Y[index.bin], 
+        #  probs = c(alpha + 0.001, 1 - alpha - 0.001))
+        #crude.seq.y <- as.list(
+        #  crude.seq.y[!(crude.seq.y > quant.Yk[1] & crude.seq.y < quant.Yk[2])])
+        #crude.search <- lapply(crude.seq.y, 
+        #  FUN = function(y) rank(phatxy(y))[nk + 1])
+        ## new thing to try ################
+        #crude.seq.y <- seq(from = lwr, to = upr, by = crudewidth)
+        #crude.seq.y.lwr[crude.seq.y <= quant.Yk[1]]
+        #crude.seq.y.lwr[crude.seq.y >= quant.Yk[2]]
 
-        if(nk.tilde > 0){
+        ## get nk threshold        
+        #cand <- which(crude.search >= nk.tilde)
+        #breaks <- diff(cand) ## corresponds to number of modes
 
-          ## perform a crude crude search 
-          prec <- max( min(diff(sort(Yk))), 0.001)
-          crudewidth <- sqrt((upr - lwr)*prec*2*alpha)
-          crude.seq.y <- seq(from = lwr, to = upr, 
-            by = crudewidth)
-          quant.Yk <- quantile(Yk, probs = c(alpha, 1 - alpha))
-          crude.seq.y <- as.list(
-            crude.seq.y[!(crude.seq.y > quant.Yk[1] & crude.seq.y < quant.Yk[2])])
-          crude.search <- lapply(crude.seq.y, 
-            FUN = function(y){ 
-              foo <- cbind(phatxy(y), c(index, index.pred[j]))
-              bar <- foo[which(foo[, 2] == index.pred[j]), -2]
-              baz <- rank(bar)[nk + 1]
-              baz
-            })
+        #if(unique(breaks) == 1){ ## modes occur in an interval 
+        #  endpt1.lwr <- endpt2.lwr <- endpt1.upr <- 
+        #    endpt2.upr <- 0
+        #  if(min(cand) == 1){ 
+        #    endpt1.lwr <- lwr - crudewidth
+        #    endpt2.lwr <- lwr
+        #    if(family != "gaussian") endpt1.lwr <- max(endpt1.lwr, 0.00001)
+        #  }
+        #  if(max(cand) == length(crude.seq.y)){ 
+        #    endpt2.upr <- upr + crudewidth
+        #    endpt1.upr <- upr
+        #  }
+        #  if(min(cand) > 1){
+        #    endpt1.lwr <- min(crude.seq.y[[min(cand) - 1]], 
+        #      crude.seq.y[[min(cand)]],
+        #      crude.seq.y[[min(cand) + 1]])
+        #    endpt2.lwr <- max(crude.seq.y[[min(cand) - 1]], 
+        #      crude.seq.y[[min(cand)]], 
+        #      crude.seq.y[[min(cand) + 1]])
+        #  }
+        #  if(max(cand) < length(crude.seq.y)){ 
+        #    endpt2.upr <- max(crude.seq.y[[max(cand) + 1]], 
+        #      crude.seq.y[[max(cand)]], 
+        #      crude.seq.y[[max(cand) - 1]])
+        #    endpt1.upr <- min(crude.seq.y[[max(cand) + 1]], 
+        #      crude.seq.y[[max(cand)]],
+        #      crude.seq.y[[max(cand) - 1]])
+        #  }  
+
+        #  if(family == "Gamma") if(lwr <= 0.01) endpt1.lwr <- 0.00001
+
+        #  precise.seq.y1 <- as.list(seq(from = endpt1.lwr, 
+        #    to = endpt2.lwr, length = floor(crudewidth/prec)))
+        #  precise.search1 <- lapply(precise.seq.y1, 
+        #    FUN = function(y) rank(phatxy(y))[nk + 1])
+        #  cand1 <- min(which(precise.search1 >= nk.tilde))
+        #  y.lwr <- precise.seq.y1[[cand1]]
+
+        #  precise.seq.y2 <- as.list(seq(from = endpt1.upr, 
+        #    to = endpt2.upr, length = floor(crudewidth/prec)))
+        #  precise.search2 <- lapply(precise.seq.y2, 
+        #    FUN = function(y) rank(phatxy(y))[nk + 1])
+        #  cand2 <- max(which(precise.search2 >= nk.tilde))
+        #  y.upr <- precise.seq.y2[[cand2]]
+        #}
           
-          ## get nk threshold        
-          cand <- which(crude.search >= nk.tilde)
-          breaks <- diff(cand) ## corresponds to number of modes
-
-          if(unique(breaks) == 1){ ## modes occur in an interval 
-            endpt1.lwr <- endpt2.lwr <- endpt1.upr <- 
-              endpt2.upr <- 0
-            if(min(cand) == 1){ 
-              endpt1.lwr <- lwr - crudewidth
-              endpt2.lwr <- lwr
-              if(family != "gaussian") endpt1.lwr <- max(endpt1.lwr, 0.00001)
-            }
-            if(max(cand) == length(crude.seq.y)){ 
-              endpt2.upr <- upr + crudewidth
-              endpt1.upr <- upr
-            }
-            if(min(cand) > 1){
-              endpt1.lwr <- min(crude.seq.y[[min(cand) - 1]], 
-                crude.seq.y[[min(cand)]],
-                crude.seq.y[[min(cand) + 1]])
-              endpt2.lwr <- max(crude.seq.y[[min(cand) - 1]], 
-                crude.seq.y[[min(cand)]], 
-                crude.seq.y[[min(cand) + 1]])
-            }
-            if(max(cand) < length(crude.seq.y)){ 
-              endpt2.upr <- max(crude.seq.y[[max(cand) + 1]], 
-                crude.seq.y[[max(cand)]], 
-                crude.seq.y[[max(cand) - 1]])
-              endpt1.upr <- min(crude.seq.y[[max(cand) + 1]], 
-                crude.seq.y[[max(cand)]],
-                crude.seq.y[[max(cand) - 1]])
-            }  
-
-            if(family == "Gamma") if(lwr <= 0.01) endpt1.lwr <- 0.00001
-
-            precise.seq.y1 <- as.list(seq(from = endpt1.lwr, 
-              to = endpt2.lwr, length = floor(crudewidth/prec)))
-            precise.search1 <- lapply(precise.seq.y1, 
-              FUN = function(y){
-                foo <- cbind(phatxy(y), c(index, index.pred[j]))
-                bar <- foo[which(foo[, 2] == index.pred[j]), -2]
-                baz <- rank(bar)[length(bar)]
-                baz
-              })
-            cand1 <- min(which(precise.search1 >= nk.tilde))
-            y.lwr <- precise.seq.y1[[cand1]]
-
-            precise.seq.y2 <- as.list(seq(from = endpt1.upr, 
-              to = endpt2.upr, length = floor(crudewidth/prec)))
-            precise.search2 <- lapply(precise.seq.y2, 
-              FUN = function(y){ 
-                foo <- cbind(phatxy(y), c(index, index.pred[j]))
-                bar <- foo[which(foo[, 2] == index.pred[j]), -2]
-                baz <- rank(bar)[length(bar)]
-                baz
-              })
-            cand2 <- max(which(precise.search2 >= nk.tilde))
-            y.upr <- precise.seq.y2[[cand2]]
-          }
-        }  
- 
+        
         c(y.lwr, y.upr)
       })
 
@@ -318,6 +336,7 @@ regions <- function(formula, data, newdata, family = "gaussian", link,
 
   }
 
+
   if(nonparametric == TRUE){
 
     # ---- The nonparametric conformal implementation -------
@@ -326,6 +345,7 @@ regions <- function(formula, data, newdata, family = "gaussian", link,
     ## ignores the intercept of the newdata matrix
     #wn <- min(1/ floor(1 / (log(n)/n)^(1/(k+3))), 1/2)
     #hn <- ((log(n)/n)^(1/(1*(p+2)+1)))
+    key <- cbind(X, Y, index)
     hn <- wn
     COPS <- function(newdata){ 
       out <- mclapply(1:n.pred, mc.cores = cores, FUN = function(j){
@@ -348,6 +368,41 @@ regions <- function(formula, data, newdata, family = "gaussian", link,
           if(length(out) == 0) out <- -1
           out
         }
+
+        ## initial check for enough data within bin
+        #nk.tilde <- floor(alpha * (nk + 1))
+        #if(nk.tilde == 0) stop("bin width is too small")
+
+        ## set up a lower (upper lower bound) and upper bound 
+        ## (lower upper bound) to start two line searchs in order to 
+        ## construct the parametric conformal prediction region
+        #quant.Yk <- quantile(Yk, probs = c(2 * alpha, 1 - 2 * alpha ))
+        #y.lwr <- as.numeric(quant.Yk[1])
+        #y.upr <- as.numeric(quant.Yk[2])
+
+        # lower line search
+        #prec <- max( min(diff(sort(Yk[Yk <= y.lwr]))), 0.001)      
+        #steps <- 1
+        #while(rank(phatxy(y.lwr))[nk + 1] >= nk.tilde){
+        #  y.lwr <- y.lwr - steps * prec
+        #  if(family != "Gaussian"){ 
+        #    if(y.lwr < 0.00001) y.lwr <- 0.00001
+        #  }
+        #  steps <- steps + 1
+        #}
+
+        # upper line search
+        #prec <- max( min(diff(sort(Yk[Yk >= y.upr]))), 0.001)
+        #steps <- 1
+        #while(rank(phatxy(y.upr))[nk + 1] >= nk.tilde){
+        #  y.upr <- y.upr + steps * prec
+        #  if(family != "Gaussian"){ 
+        #    if(y.lwr < 0.00001) y.lwr <- 0.00001
+        #  }
+        #  steps <- steps + 1
+        #}
+
+
 
         ## set up range of candidate points used to 
         ## construct the parametric conformal prediction 

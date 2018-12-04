@@ -19,19 +19,32 @@ Type 'q()' to quit R.
 
 > 
 > 
-> library(MASS)
-> library(parallel)
-> library(conformal.glm)
+> ## Test for speed: (n = 2000, bins = 8, first run: 53.610)
 > 
-> ## Works but is slow
-> data(insurance)
-> m1 <- glm(Y ~ ., data = insurance, family = "Gamma")
-> system.time(gout <- conformal.glm(m1, bins = 3, cores = 6))
-Error in dimnames(x) <- dn : 
-  length of 'dimnames' [2] not equal to array extent
-Calls: system.time -> conformal.glm -> regions -> Copt -> colnames<-
-In addition: Warning message:
-In mclapply(1:n.pred, mc.cores = cores, FUN = function(j) { :
-  all scheduled cores encountered errors in user code
-Timing stopped at: 0.109 0.038 0.07
-Execution halted
+> library(MASS)
+> library(conformal.glm)
+> library(parallel)
+> 
+> alpha <- 0.10
+> n <- 2000
+> shape <- 2
+> beta <- c(1/4, 2)
+> 
+> set.seed(13)
+> x <- matrix(runif(n), ncol = 1)
+> rate <- cbind(1, x) %*% beta * shape
+> y <- rgamma(n = n, shape = shape, rate = rate)
+> data <- data.frame(y = y, x = x)
+> colnames(data)[2] <- c("x1")
+> newdata <- matrix(seq(0.01, 0.99, by = 0.01), ncol = 1)
+> colnames(newdata) <- c("x1")
+> 
+> fit = glm(y ~ x1, family = Gamma, data = data) 
+> system.time(cpred <- conformal.glm(fit, nonparametric = FALSE, bins = 8, 
++ 	newdata = newdata, cores = 6))
+   user  system elapsed 
+ 82.768   0.121  18.722 
+> 
+> proc.time()
+   user  system elapsed 
+ 83.165   0.624  18.960 
