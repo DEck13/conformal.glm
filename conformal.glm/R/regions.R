@@ -78,7 +78,7 @@ local.coverage <- function(region, data, newdata, k, bins = NULL,
 
 
 regions <- function(formula, data, newdata, family = "gaussian", link, 
-  alpha = 0.10, cores = 1, bins = NULL, intercept = TRUE, parametric = TRUE, 
+  alpha = 0.10, cores = 1, bins = NULL, parametric = TRUE, 
   nonparametric = FALSE){
 
   ## initial quantities
@@ -228,7 +228,7 @@ regions <- function(formula, data, newdata, family = "gaussian", link,
         steps <- 1
         while(rank(phatxy(y.lwr))[nk + 1] >= nk.tilde){
           y.lwr <- y.lwr - steps * prec
-          if(family != "Gaussian"){ 
+          if(family != "gaussian"){ 
             if(y.lwr < 0.00001) y.lwr <- 0.00001
           }
           steps <- steps + 1
@@ -238,7 +238,7 @@ regions <- function(formula, data, newdata, family = "gaussian", link,
         if(prec < 0.001) prec <- mean(min(diff(sort(Yk[Yk <= y.min]))), 0.001)
         while(rank(phatxy(y.lwr))[nk + 1] < nk.tilde){
           y.lwr <- y.lwr + steps * prec
-          if(family != "Gaussian"){ 
+          if(family != "gaussian"){ 
             if(y.lwr < 0.00001) y.lwr <- 0.00001
           }
           steps <- steps + 1
@@ -249,7 +249,7 @@ regions <- function(formula, data, newdata, family = "gaussian", link,
         steps <- 1
         while(rank(phatxy(y.upr))[nk + 1] >= nk.tilde){
           y.upr <- y.upr + steps * prec
-          if(family != "Gaussian"){ 
+          if(family != "gaussian"){ 
             if(y.lwr < 0.00001) y.lwr <- 0.00001
           }
           steps <- steps + 1
@@ -259,7 +259,7 @@ regions <- function(formula, data, newdata, family = "gaussian", link,
         if(prec < 0.001) prec <- mean(min(diff(sort(Yk[Yk >= y.max]))), 0.001)
         while(rank(phatxy(y.upr))[nk + 1] < nk.tilde){
           y.upr <- y.upr - steps * prec
-          if(family != "Gaussian"){ 
+          if(family != "gaussian"){ 
             if(y.lwr < 0.00001) y.lwr <- 0.00001
           }
           steps <- steps + 1
@@ -327,9 +327,6 @@ regions <- function(formula, data, newdata, family = "gaussian", link,
         steps <- 1
         while(phatxy(y.lwr)){
           y.lwr <- y.lwr - steps * prec
-          if(family != "Gaussian"){ 
-            if(y.lwr < 0.00001) y.lwr <- 0.00001
-          }
           steps <- steps + 1
         }
         steps <- 1

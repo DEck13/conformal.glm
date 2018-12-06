@@ -14,15 +14,12 @@
 \description{
   Compute and compare prediciton regions for the normal, Gamma, and 
   inverse Gaussian families in the \code{glm} package.  There is 
-  functionality to construct the usual prediction region that one 
-  obtains from maximum likelihood estimation and the delta method, 
-  the parametric conformal prediction region, and the nonparametric 
-  conformal prediction region. 
+  functionality to construct the parametric conformal prediction region 
+  and the nonparametric conformal prediction region. 
 }
 \usage{
   regions(formula, data, newdata, family = "gaussian", link, alpha = 0.10, 
-    cores = 1, bins = NULL, intercept = TRUE, parametric = TRUE, 
-    nonparametric = FALSE)
+    cores = 1, bins = NULL, parametric = TRUE, nonparametric = FALSE)
 }
 \arguments{
   \item{formula}{an object of class \code{"\link{formula}"} (or one that
@@ -58,10 +55,6 @@
     theoretical large sample optimal bin width is used 
     (width = \code{O(log(n)/n)^(1/(d+1))} where \code{n} is the sample size 
     and \code{d} is the dimension of the main effects).}
-  \item{intercept}{a Boolean variable corresponding to whether or not the 
-    intercept is included in the regression equation. This is only relevant 
-    for the computation of the prediction region by conformalization of 
-    residuals (when \code{LS = TRUE}). The default is set at TRUE.}
   \item{parametric}{a Boolean variable corresponding to whether or not the 
     parametric conformal region is to be computed. The default is set at TRUE.}
   \item{nonparametric}{a Boolean variable corresponding to whether or not the 

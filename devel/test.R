@@ -26,3 +26,8 @@ colnames(newdata) <- c("x1")
 fit = glm(y ~ x1, family = Gamma, data = data) 
 system.time(cpred <- conformal.glm(fit, nonparametric = FALSE, bins = 8, 
 	newdata = newdata, cores = 6))
+
+system.time(cpred <- conformal.glm(fit, parametric = FALSE, 
+	nonparametric = TRUE, bins = 8, 
+	newdata = newdata, cores = 6))
+

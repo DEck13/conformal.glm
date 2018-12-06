@@ -26,8 +26,7 @@ conformal.glm <- function(object, ..., newdata = NULL, alpha = 0.10,
 
   int <- regions(formula = formula, data = data, newdata = newdata, 
   	family = family, link = link, alpha = alpha, cores = cores, 
-    bins = bins, intercept = intercept, parametric = parametric, 
-    nonparametric = nonparametric)
+    bins = bins, parametric = parametric, nonparametric = nonparametric)
 
   paraconformal <- int$paraconformal
   nonparaconformal <- int$nonparaconformal
