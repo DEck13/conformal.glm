@@ -6,13 +6,11 @@ Author: Daniel J. Eck <daniel.eck@yale.edu>
 Maintainer: Daniel J. Eck <daniel.eck@yale.edu>
 Depends: R (>= 3.0.0)
 Imports: stats, MASS, statmod, parallel
-Suggests: conformalInference
+Suggests: conformalInference, HDInterval
 ByteCompile: FALSE
 Description: Compute and compare prediciton regions for the normal, Gamma, 
   and inverse Gaussian families in the \code{glm} package.  There is 
-  functionality to construct the usual prediction region that one obtains 
-  from maximum likelihood estimation and the delta method, the parametric 
-  conformal prediction region, the nonparametric conformal prediction region, 
-  and prediction regions from conformalization of residuals. 
+  functionality to construct parametric and nonparametric conformal 
+  prediction regions. 
 License: MIT + file LICENSE
 URL: https://github.com/DEck13/conformal.glm

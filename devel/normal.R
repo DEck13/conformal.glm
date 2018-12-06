@@ -7,7 +7,7 @@ library(conformal.glm)
 # ---- generate X data -------
 set.seed(13)
 alpha <- 0.10
-n <- 5e2
+n <- 2000
 beta <- c(1, 10)
 sd <- 1/2
 x <- matrix(runif(n), ncol = 1)
@@ -21,17 +21,17 @@ fit <- glm(y ~ x1, data = data, family = "gaussian")
 
 
 # ---- get new data for predictions -------
-newdata <- cbind(seq(from = 0.01, to = 0.99, by = 0.01))
+newdata <- cbind(seq(from = 0.01, to = 0.99, by = 0.005))
 colnames(newdata) <- "x1"
 
 # ---- parametric conformal prediction region -------
 system.time(out <- conformal.glm(fit, 
-	newdata = newdata, bins = 5))
+	newdata = newdata, bins = 3))
 paraCI <- out$paraconformal
 
 # ---- nonparametric conformal prediction region -------
 system.time(out2 <- conformal.glm(fit, newdata = newdata, 
-	bins = 5, parametric = FALSE, nonparametric = TRUE))
+	bins = 3, parametric = FALSE, nonparametric = TRUE))
 nonparaCI <- out2$nonparaconformal
 
 # ---- LS conformal prediction region -------
@@ -51,19 +51,26 @@ cresid = cbind(p1.tibs$lo, p1.tibs$up)
 ## parametric conformal prediction region
 par(mfrow = c(2,2))
 
+
 mean(apply(paraCI, 1, diff))
+local.coverage(paraCI, data = data, newdata = newdata, k = 1, 
+	bins = 3, at.data = FALSE)
 plot(x, y, pch = 20, main = "parametric conformal")
 lines(newdata, paraCI[, 1], type = "l", col = "red")
 lines(newdata, paraCI[, 2], type = "l", col = "red")
 
 ## nonparametric conformal prediction region
 mean(apply(nonparaCI, 1, diff))
+local.coverage(nonparaCI, data = data, newdata = newdata, 
+	k = 1, bins = 3, at.data = FALSE)
 plot(x, y, pch = 20, main = "nonparametric conformal")
 lines(newdata, nonparaCI[, 1], type = "l", col = "red")
 lines(newdata, nonparaCI[, 2], type = "l", col = "red")
 
 ## nonparametric conformal prediction region
 mean(apply(cresid, 1, diff))
+local.coverage(cresid, data = data, newdata = newdata, 
+	k = 1, bins = 3, at.data = FALSE)
 plot(x, y, pch = 20, main = "LS conformal")
 lines(newdata, cresid[, 1], type = "l", col = "red")
 lines(newdata, cresid[, 2], type = "l", col = "red")

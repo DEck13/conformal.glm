@@ -17,10 +17,9 @@
     typically the environment from which \code{regions} is called. The 
     \code{local.coverage} functionality assumes that the response variable 
     is in the first column.}
-  \item{newdata}{an optional matrix, list or environment (or object
+  \item{newdata}{an matrix, list or environment (or object
     coercible by \code{\link{as.data.frame}} to a data frame) containing
-    new observations for which a prediction is desired. If missing, then 
-    prediction regions will be provided at the observed data.}
+    new observations for which a prediction is desired. }
   \item{k}{desired dimension of the predictor space corresponding to the 
     model of interest.} 
   \item{bins}{an optional argument for specifying the desired number of 
@@ -47,7 +46,7 @@
 \value{
   \item{output}{estimated coverage probabilities of the region given by 
     \code{region} for each bin.  If each coverage probability is greater 
-    or equal to \code{1 - alpha}, then we say that the region satisties 
+    or equal to \code{1 - alpha}, then we say that the region satisfies 
     finite sample local validity.}
 }
 

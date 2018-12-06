@@ -55,7 +55,7 @@ system.time(p1.tibs <- conformal.pred(x = x, y = y, x0 = newdata,
 cresid = cbind(p1.tibs$lo, p1.tibs$up)
 ```
 
-[plots of parametric, non parametric, and least squares precition regions and the plot of the prediction region obtained from the delta method]
+[plots of parametric, non parametric, and least squares conformal precition regions]
 ```r
 par(mfrow = c(2,2))
 
@@ -78,59 +78,29 @@ mean(apply(cresid, 1, diff))
 plot(x, y, pch = 20)
 lines(newdata, cresid[, 1], type = "l", col = "red")
 lines(newdata, cresid[, 2], type = "l", col = "red")
-
-## delta method prediction region
-p1 <- predict(fit, type = "response", 
-  newdata = as.data.frame(newdata), 
-  se.fit = TRUE)
-pred <- p1$fit
-se <- p1$se.fit * sqrt(n)
-deltaCI <- cbind(pred + se*qnorm(alpha/2), pred + se*qnorm(1-alpha/2))
-mean(apply(deltaCI, 1, diff))
-plot(x, y, pch = 20)
-lines(newdata, deltaCI[, 1], type = "l", col = "red")
-lines(newdata, deltaCI[, 2], type = "l", col = "red")
 ```
 
-[approximate the highest density region]
+[estimate the highest density region]
 ```r
+library(HDInterval)
 betaMLE <- coefficients(fit)
 shapeMLE <- as.numeric(gamma.shape(fit)[1])
-rateMLE <- cbind(1, x) %*% betaMLE * shapeMLE
-foo <- cbind(rateMLE, shapeMLE)
-minlength <- do.call(rbind, lapply(1:nrow(rateMLE), FUN = function(j){
-  bar <- seq(from = 1e-5, 
-    to = qgamma(alpha - 1e-5, rate = foo[j,1], shape = foo[j,2]), 
-    length = 100000)
-  p.lwr <- pgamma(bar, rate = foo[j,1], shape = foo[j,2])
-  p.upr <- p.lwr + 1 - alpha
-  y.lwr <- qgamma(p.lwr, rate = foo[j,1], shape = foo[j,2])
-  y.upr <- qgamma(p.upr, rate = foo[j,1], shape = foo[j,2])
-  min.index <- which.min(y.upr - y.lwr)
-  p.a <- p.lwr[min.index]
-  p.b <- p.upr[min.index]
-  a <- qgamma(p.a, rate = foo[j,1], shape = foo[j,2])
-  b <- qgamma(p.b, rate = foo[j,1], shape = foo[j,2])
-  c(a,b)
-}))
+rateMLE <- cbind(1, newdata) %*% betaMLE * shapeMLE
+
+minlength <- do.call(rbind, 
+  lapply(1:nrow(newdata), function(j){ 
+    hdi(qgamma, 0.90, shape = shapeMLE, rate = rateMLE[j, 1])
+  }))
 ```
 
 
-[comparison of parametric conformal prediction region and highest density region]
+[plot the highest density region]
 ```r
-par(mfrow = c(1,2))
-
-## parametric conformal prediction region
-mean(apply(paraCI, 1, diff))
-plot(x, y, pch = 20)
-lines(newdata, paraCI[, 1], type = "l", col = "red")
-lines(newdata, paraCI[, 2], type = "l", col = "red")
-
 ## minimum length prediction region under assumed model
 mean(apply(minlength, 1, diff))
 plot(x, y, pch = 20)
-lines(x[index], minlength[, 1][index], type = "l", col = "red")
-lines(x[index], minlength[, 2][index], type = "l", col = "red")
+lines(newdata, minlength[, 1], type = "l", col = "red")
+lines(newdata, minlength[, 2], type = "l", col = "red")
 ```
 
 

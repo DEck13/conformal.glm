@@ -28,6 +28,7 @@ find.index <- function(mat, wn, k){
 local.coverage <- function(region, data, newdata, k, bins = NULL,
   at.data = "TRUE"){
 
+  region <- cbind(newdata, region)
   n <- nrow(data)
   wn <- min(1/ floor(1 / (log(n)/n)^(1/(k+3))), 1/2)
   if(class(bins) != "NULL") wn <- 1 / bins
@@ -219,11 +220,11 @@ regions <- function(formula, data, newdata, family = "gaussian", link,
         ## (lower upper bound) to start two line searchs in order to 
         ## construct the parametric conformal prediction region
         quant.Yk <- quantile(Yk, probs = c(2 * alpha, 1 - 2 * alpha ))
-        y.lwr <- as.numeric(quant.Yk[1])
-        y.upr <- as.numeric(quant.Yk[2])
+        y.lwr <- y.min <- as.numeric(quant.Yk[1])
+        y.upr <- y.max <- as.numeric(quant.Yk[2])
 
         # lower line search
-        prec <- max( min(diff(sort(Yk[Yk <= y.lwr]))), 0.001)      
+        prec <- max( min(diff(sort(Yk[Yk <= y.min]))), 0.001)      
         steps <- 1
         while(rank(phatxy(y.lwr))[nk + 1] >= nk.tilde){
           y.lwr <- y.lwr - steps * prec
@@ -232,9 +233,19 @@ regions <- function(formula, data, newdata, family = "gaussian", link,
           }
           steps <- steps + 1
         }
+        steps <- 1
+        prec <- min( min(diff(sort(Yk[Yk <= y.min]))), 0.001)
+        if(prec < 0.001) prec <- mean(min(diff(sort(Yk[Yk <= y.min]))), 0.001)
+        while(rank(phatxy(y.lwr))[nk + 1] < nk.tilde){
+          y.lwr <- y.lwr + steps * prec
+          if(family != "Gaussian"){ 
+            if(y.lwr < 0.00001) y.lwr <- 0.00001
+          }
+          steps <- steps + 1
+        }
 
         # upper line search
-        prec <- max( min(diff(sort(Yk[Yk >= y.upr]))), 0.001)
+        prec <- max( min(diff(sort(Yk[Yk >= y.max]))), 0.001)
         steps <- 1
         while(rank(phatxy(y.upr))[nk + 1] >= nk.tilde){
           y.upr <- y.upr + steps * prec
@@ -243,85 +254,16 @@ regions <- function(formula, data, newdata, family = "gaussian", link,
           }
           steps <- steps + 1
         }
-
-
-
-        #lwr <- min(Y[index.bin])
-        #upr <- max(Y[index.bin])
-        #if(lwr > 0) lwr <- lwr / 1.5
-        #if(lwr < 0) lwr <- lwr * 1.5
-        #if(upr > 0) upr <- upr * 1.5
-        #if(upr < 0) upr <- upr / 1.5
-        #y.lwr <- lwr
-        #y.upr <- upr
-
-        ## an intial crude approximation of the 
-        ## parametric conformal prediction region 
-        ## perform a crude crude search 
-        #prec <- max( min(diff(sort(Y[index.bin]))), 0.001)
-        #crudewidth <- sqrt((upr - lwr)*prec*2*alpha)
-        #crude.seq.y <- seq(from = lwr, to = upr, by = crudewidth)
-        #quant.Yk <- quantile(Y[index.bin], 
-        #  probs = c(alpha + 0.001, 1 - alpha - 0.001))
-        #crude.seq.y <- as.list(
-        #  crude.seq.y[!(crude.seq.y > quant.Yk[1] & crude.seq.y < quant.Yk[2])])
-        #crude.search <- lapply(crude.seq.y, 
-        #  FUN = function(y) rank(phatxy(y))[nk + 1])
-        ## new thing to try ################
-        #crude.seq.y <- seq(from = lwr, to = upr, by = crudewidth)
-        #crude.seq.y.lwr[crude.seq.y <= quant.Yk[1]]
-        #crude.seq.y.lwr[crude.seq.y >= quant.Yk[2]]
-
-        ## get nk threshold        
-        #cand <- which(crude.search >= nk.tilde)
-        #breaks <- diff(cand) ## corresponds to number of modes
-
-        #if(unique(breaks) == 1){ ## modes occur in an interval 
-        #  endpt1.lwr <- endpt2.lwr <- endpt1.upr <- 
-        #    endpt2.upr <- 0
-        #  if(min(cand) == 1){ 
-        #    endpt1.lwr <- lwr - crudewidth
-        #    endpt2.lwr <- lwr
-        #    if(family != "gaussian") endpt1.lwr <- max(endpt1.lwr, 0.00001)
-        #  }
-        #  if(max(cand) == length(crude.seq.y)){ 
-        #    endpt2.upr <- upr + crudewidth
-        #    endpt1.upr <- upr
-        #  }
-        #  if(min(cand) > 1){
-        #    endpt1.lwr <- min(crude.seq.y[[min(cand) - 1]], 
-        #      crude.seq.y[[min(cand)]],
-        #      crude.seq.y[[min(cand) + 1]])
-        #    endpt2.lwr <- max(crude.seq.y[[min(cand) - 1]], 
-        #      crude.seq.y[[min(cand)]], 
-        #      crude.seq.y[[min(cand) + 1]])
-        #  }
-        #  if(max(cand) < length(crude.seq.y)){ 
-        #    endpt2.upr <- max(crude.seq.y[[max(cand) + 1]], 
-        #      crude.seq.y[[max(cand)]], 
-        #      crude.seq.y[[max(cand) - 1]])
-        #    endpt1.upr <- min(crude.seq.y[[max(cand) + 1]], 
-        #      crude.seq.y[[max(cand)]],
-        #      crude.seq.y[[max(cand) - 1]])
-        #  }  
-
-        #  if(family == "Gamma") if(lwr <= 0.01) endpt1.lwr <- 0.00001
-
-        #  precise.seq.y1 <- as.list(seq(from = endpt1.lwr, 
-        #    to = endpt2.lwr, length = floor(crudewidth/prec)))
-        #  precise.search1 <- lapply(precise.seq.y1, 
-        #    FUN = function(y) rank(phatxy(y))[nk + 1])
-        #  cand1 <- min(which(precise.search1 >= nk.tilde))
-        #  y.lwr <- precise.seq.y1[[cand1]]
-
-        #  precise.seq.y2 <- as.list(seq(from = endpt1.upr, 
-        #    to = endpt2.upr, length = floor(crudewidth/prec)))
-        #  precise.search2 <- lapply(precise.seq.y2, 
-        #    FUN = function(y) rank(phatxy(y))[nk + 1])
-        #  cand2 <- max(which(precise.search2 >= nk.tilde))
-        #  y.upr <- precise.seq.y2[[cand2]]
-        #}
-          
+        steps <- 1
+        prec <- min( min(diff(sort(Yk[Yk >= y.max]))), 0.001) 
+        if(prec < 0.001) prec <- mean(min(diff(sort(Yk[Yk >= y.max]))), 0.001)
+        while(rank(phatxy(y.upr))[nk + 1] < nk.tilde){
+          y.upr <- y.upr - steps * prec
+          if(family != "Gaussian"){ 
+            if(y.lwr < 0.00001) y.lwr <- 0.00001
+          }
+          steps <- steps + 1
+        }          
         
         c(y.lwr, y.upr)
       })
@@ -345,17 +287,21 @@ regions <- function(formula, data, newdata, family = "gaussian", link,
     ## ignores the intercept of the newdata matrix
     #wn <- min(1/ floor(1 / (log(n)/n)^(1/(k+3))), 1/2)
     #hn <- ((log(n)/n)^(1/(1*(p+2)+1)))
-    key <- cbind(X, Y, index)
     hn <- wn
     COPS <- function(newdata){ 
       out <- mclapply(1:n.pred, mc.cores = cores, FUN = function(j){
       #out <- apply(matrix(1:n.pred), 1, FUN = function(j){
-        x <- newdata[j, ]
-        index.j <- which(index.pred[j] == indices.pred)
-        datak <- matrix(key[key[, p + 2] == index.pred[j], ][, -c(p+2)], ncol = p+1)
-        Xk <- matrix(datak[, 1:p], ncol = p)
-        Yk <- datak[, p+1]
-        nk <- nrow(datak)
+        x.variables <- matrix(newdata.variables[j, ], nrow = 1, ncol = k)
+        x <- matrix(newdata.formula[j, ], nrow = 1, ncol = p)
+        index.bin <- which(index == index.pred[j])
+        nk <- length(index.bin)
+        Xk <- matrix(X[index.bin, ], ncol = p)
+        Yk <- Y[index.bin]
+
+        ## initial check for enough data within bin
+        nk.tilde <- floor(alpha * (nk + 1))
+        if(nk.tilde == 0) stop("bin width is too small")
+
 
         ## nonparametric density
         phatxy <- function(y){                
@@ -366,135 +312,47 @@ regions <- function(formula, data, newdata, family = "gaussian", link,
               - dnorm(Yknotj, mean = Ykj, sd = hn))
           })) >= 0)
           if(length(out) == 0) out <- -1
-          out
+          length(out) >= nk.tilde
         }
-
-        ## initial check for enough data within bin
-        #nk.tilde <- floor(alpha * (nk + 1))
-        #if(nk.tilde == 0) stop("bin width is too small")
 
         ## set up a lower (upper lower bound) and upper bound 
         ## (lower upper bound) to start two line searchs in order to 
         ## construct the parametric conformal prediction region
-        #quant.Yk <- quantile(Yk, probs = c(2 * alpha, 1 - 2 * alpha ))
-        #y.lwr <- as.numeric(quant.Yk[1])
-        #y.upr <- as.numeric(quant.Yk[2])
+        quant.Yk <- quantile(Yk, probs = c(2 * alpha, 1 - 2 * alpha ))
+        y.lwr <- y.min <- as.numeric(quant.Yk[1])
+        y.upr <- y.max <- as.numeric(quant.Yk[2])
 
         # lower line search
-        #prec <- max( min(diff(sort(Yk[Yk <= y.lwr]))), 0.001)      
-        #steps <- 1
-        #while(rank(phatxy(y.lwr))[nk + 1] >= nk.tilde){
-        #  y.lwr <- y.lwr - steps * prec
-        #  if(family != "Gaussian"){ 
-        #    if(y.lwr < 0.00001) y.lwr <- 0.00001
-        #  }
-        #  steps <- steps + 1
-        #}
+        prec <- max( min(diff(sort(Yk[Yk <= y.min]))), 0.001)      
+        steps <- 1
+        while(phatxy(y.lwr)){
+          y.lwr <- y.lwr - steps * prec
+          if(family != "Gaussian"){ 
+            if(y.lwr < 0.00001) y.lwr <- 0.00001
+          }
+          steps <- steps + 1
+        }
+        steps <- 1
+        prec <- min( min(diff(sort(Yk[Yk <= y.min]))), 0.001)
+        if(prec < 0.001) prec <- mean(min(diff(sort(Yk[Yk <= y.min]))), 0.001)
+        while(!phatxy(y.lwr)){
+          y.lwr <- y.lwr + steps * prec
+          steps <- steps + 1
+        }
 
         # upper line search
-        #prec <- max( min(diff(sort(Yk[Yk >= y.upr]))), 0.001)
-        #steps <- 1
-        #while(rank(phatxy(y.upr))[nk + 1] >= nk.tilde){
-        #  y.upr <- y.upr + steps * prec
-        #  if(family != "Gaussian"){ 
-        #    if(y.lwr < 0.00001) y.lwr <- 0.00001
-        #  }
-        #  steps <- steps + 1
-        #}
-
-
-
-        ## set up range of candidate points used to 
-        ## construct the parametric conformal prediction 
-        ## region
-        lwr <- min(Yk)
-        upr <- max(Yk)
-        if(lwr > 0) lwr <- lwr / 1.5
-        if(lwr < 0) lwr <- lwr * 1.5
-        if(upr > 0) upr <- upr * 1.5
-        if(upr < 0) upr <- upr / 1.5
-
-        ## an intial crude approximation of the 
-        ## parametric conformal prediction region 
-        nk.tilde <- floor(alpha * (nk + 1))
-        #crudewidth <- sqrt((upr - lwr)*0.001) # chosen to minimze 
-           # the number of candidate points to search over when we 
-           # desire a final precision of 0.001
-        prec <- max( min(diff(sort(Yk))), 0.001)   
-        crudewidth <- sqrt((upr - lwr)*prec*2*alpha)                    
-        #crude.seq.y <- seq(from = lwr, to = upr, by = crudewidth)
-        #crude.search <- apply(matrix(crude.seq.y), 1, 
-        #  FUN = function(y){
-        #    int <- out <- phatxy(y)
-        #    out <- length(int)
-        #    if(out == 1){
-        #      if(int == -1) out <- 0
-        #    }
-        #    out
-        #  })
-        #crude.seq.y <- as.list(seq(from = lwr, to = upr, by = crudewidth))
-        crude.seq.y <- seq(from = lwr, to = upr, 
-          by = crudewidth)
-        quant.Yk <- quantile(Yk, probs = c(alpha, 1 - alpha))
-        crude.seq.y <- as.list(
-          crude.seq.y[!(crude.seq.y > quant.Yk[1] & crude.seq.y < quant.Yk[2])])
-        crude.search <- lapply(crude.seq.y, FUN = function(y){
-            int <- out <- phatxy(y)
-            out <- length(int)
-            if(out == 1){
-              if(int == -1) out <- 0
-            }
-            out
-          })         
-        cand <- which(crude.search >= nk.tilde)
-        breaks <- diff(cand) ## corresponds to number of modes
-
-        y.lwr <- y.upr <- 0
-        if(unique(breaks) == 1){ ## modes occur in an interval 
-          endpt1.lwr <- endpt2.lwr <- endpt1.upr <- 
-            endpt2.upr <- 0
-          if(min(cand) == 1){ 
-            endpt1.lwr <- lwr - crudewidth 
-            endpt2.lwr <- lwr
-          }
-          if(max(cand) == length(crude.seq.y)){ 
-            endpt2.upr <- upr + crudewidth
-            endpt1.upr <- upr
-          }
-          if(min(cand) > 1){
-            endpt1.lwr <- crude.seq.y[[min(cand) - 1]] 
-            endpt2.lwr <- crude.seq.y[[min(cand)]] 
-          }
-          if(max(cand) < length(crude.seq.y)){ 
-            endpt2.upr <- crude.seq.y[[max(cand) + 1]]
-            endpt1.upr <- crude.seq.y[[max(cand)]]
-          }  
-
-          precise.seq.y1 <- as.list(seq(from = endpt1.lwr, 
-            to = endpt2.lwr, length = floor(crudewidth/prec)))
-          precise.search1 <- lapply(precise.seq.y1, FUN = function(y){
-              int <- out <- phatxy(y)
-              out <- length(int)
-              if(out == 1){
-                if(int == -1) out <- 0
-              }
-              out
-            }) 
-          cand1 <- min(which(precise.search1 >= nk.tilde))
-          y.lwr <- precise.seq.y1[[cand1]]
- 
-          precise.seq.y2 <- as.list(seq(from = endpt1.upr, 
-            to = endpt2.upr, length = floor(crudewidth/prec)))
-          precise.search2 <- lapply(precise.seq.y2, FUN = function(y){
-              int <- out <- phatxy(y)
-              out <- length(int)
-              if(out == 1){
-                if(int == -1) out <- 0
-              }
-              out
-            }) 
-          cand2 <- max(which(precise.search2 >= nk.tilde))
-          y.upr <- precise.seq.y2[[cand2]]
+        prec <- max( min(diff(sort(Yk[Yk >= y.max]))), 0.001)
+        steps <- 1
+        while(phatxy(y.upr)){
+          y.upr <- y.upr + steps * prec
+          steps <- steps + 1
+        }
+        steps <- 1
+        prec <- min( min(diff(sort(Yk[Yk >= y.max]))), 0.001) 
+        if(prec < 0.001) prec <- mean(min(diff(sort(Yk[Yk >= y.max]))), 0.001)
+        while(!phatxy(y.upr)){
+          y.upr <- y.upr - steps * prec
+          steps <- steps + 1
         }
 
         c(y.lwr, y.upr)

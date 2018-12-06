@@ -1,6 +1,9 @@
 
 
-## Test for speed: (n = 2000, bins = 8, first run: 53.610; trimmed down to ~18 seconds!)
+## Test for speed: (n = 2000, bins = 8), 
+# first run: 53.610 seconds with old code 
+# conservative region: trimmed down to ~18 seconds!
+# double back line search: 44.578 seconds (~45 seconds)
 
 library(MASS)
 library(conformal.glm)
