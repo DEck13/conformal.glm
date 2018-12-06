@@ -5,3 +5,6 @@
 *.o
 *.so
 *.bbl
+*.Rcheck
+*.RData
+*.Rout
