@@ -219,52 +219,77 @@ regions <- function(formula, data, newdata, family = "gaussian", link,
         ## set up a lower (upper lower bound) and upper bound 
         ## (lower upper bound) to start two line searchs in order to 
         ## construct the parametric conformal prediction region
-        quant.Yk <- quantile(Yk, probs = c(2 * alpha, 1 - 2 * alpha ))
+        quant.Yk <- quantile(Yk, probs = c(alpha, 1 - alpha ))
         y.lwr <- y.min <- as.numeric(quant.Yk[1])
         y.upr <- y.max <- as.numeric(quant.Yk[2])
 
-        # lower line search
+
+        ## lower line search
         prec <- max( min(diff(sort(Yk[Yk <= y.min]))), 0.001)      
         steps <- 1
-        while(rank(phatxy(y.lwr))[nk + 1] >= nk.tilde){
+        flag <- FALSE
+        while(rank(phatxy(y.lwr))[nk + 1] >= nk.tilde & flag == FALSE){
           y.lwr <- y.lwr - steps * prec
           if(family != "gaussian"){ 
-            if(y.lwr < 0.00001) y.lwr <- 0.00001
+            if(y.lwr <= 0.00001){ 
+              y.lwr <- 0.00001
+              flag <- TRUE
+            }
           }
           steps <- steps + 1
         }
-        steps <- 1
-        prec <- min( min(diff(sort(Yk[Yk <= y.min]))), 0.001)
-        if(prec < 0.001) prec <- mean(min(diff(sort(Yk[Yk <= y.min]))), 0.001)
-        while(rank(phatxy(y.lwr))[nk + 1] < nk.tilde){
-          y.lwr <- y.lwr + steps * prec
-          if(family != "gaussian"){ 
-            if(y.lwr < 0.00001) y.lwr <- 0.00001
+        if(flag == FALSE){
+          steps <- 1
+          if(y.min - y.lwr <= 0.001){ 
+            prec <- min( min(diff(sort(Yk[Yk <= y.min]))), 0.001) / 2
           }
-          steps <- steps + 1
+          if(y.min - y.lwr > 0.001){
+            prec <- min( min(diff(sort(Yk[Yk <= y.min]))), 0.001)
+            if(prec < 0.001){ 
+              prec <- mean(min(diff(sort(Yk[Yk <= y.min]))), 0.0001)
+            }
+          }
+          while(rank(phatxy(y.lwr))[nk + 1] < nk.tilde & y.lwr < max(Yk)){
+            y.lwr <- y.lwr + steps * prec
+            steps <- steps + 1
+          }
         }
 
-        # upper line search
+        ## upper line search
+        if(y.lwr >= y.upr) y.upr <- 2^sign(max(Yk)) * max(Yk)
         prec <- max( min(diff(sort(Yk[Yk >= y.max]))), 0.001)
         steps <- 1
         while(rank(phatxy(y.upr))[nk + 1] >= nk.tilde){
           y.upr <- y.upr + steps * prec
-          if(family != "gaussian"){ 
-            if(y.lwr < 0.00001) y.lwr <- 0.00001
-          }
           steps <- steps + 1
         }
         steps <- 1
-        prec <- min( min(diff(sort(Yk[Yk >= y.max]))), 0.001) 
-        if(prec < 0.001) prec <- mean(min(diff(sort(Yk[Yk >= y.max]))), 0.001)
+        if(y.upr - y.max <= 0.001){ 
+          prec <- min( min(diff(sort(Yk[Yk >= y.max]))), 0.001)
+        }
+        if(y.upr - y.max > 0.001){
+          prec <- min( min(diff(sort(Yk[Yk >= y.max]))), 0.001)
+          if(prec < 0.001){ 
+            prec <- mean(min(diff(sort(Yk[Yk >= y.max]))), 0.0001)
+          }
+        }        
         while(rank(phatxy(y.upr))[nk + 1] < nk.tilde){
           y.upr <- y.upr - steps * prec
           if(family != "gaussian"){ 
-            if(y.lwr < 0.00001) y.lwr <- 0.00001
+            if(y.upr < 0.00001){ 
+              y.upr <- 0.00001
+              break
+            }
           }
           steps <- steps + 1
         }          
-        
+        if(abs(y.lwr - y.upr) < 0.002) y.lwr <- 0.00001
+        if(y.lwr > y.upr){
+          quant.Yk2 <- quantile(Yk, probs = c(alpha/2, 1 - alpha/2))
+          y.lwr <- as.numeric(quant.Yk2[1])
+          y.upr <- as.numeric(quant.Yk2[2])
+        }
+
         c(y.lwr, y.upr)
       })
 

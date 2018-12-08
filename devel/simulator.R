@@ -50,14 +50,21 @@ simulator <- function(n, alpha = 0.10, beta, bins = NULL, family = "Gamma",
     colnames(data)[2:(p+1)] <- paste("x", 1:p, sep = "")
   }
 
-  fit = glm(y ~ ., family = confamily, data = data) 
-  formula <- fit$formula
-  newdata <- data
-  respname <- all.vars(formula)[1]
-  newdata <- newdata[, !(colnames(data) %in% respname)]
-  newdata <- as.matrix(newdata)
-
+  tr <- try(fit <- glm(y ~ ., family = confamily, data = data))
   paraCI <- nonparaCI <- LSCI <- HDCI <- NULL
+  newdata <- NULL
+
+  if(class(tr) != "try-error"){
+    formula <- fit$formula
+    newdata <- data
+    respname <- all.vars(formula)[1]
+    newdata <- newdata[, !(colnames(data) %in% respname)]
+    newdata <- as.matrix(newdata)
+  }
+  if(class(tr) == "try-error"){
+    parametric <- nonparametric <- LS <- HD <- FALSE
+  }
+
   if(parametric){ 
     cpred <- conformal.glm(fit, parametric = TRUE, 
       nonparametric = FALSE, alpha = alpha,
@@ -106,7 +113,7 @@ simulator <- function(n, alpha = 0.10, beta, bins = NULL, family = "Gamma",
 
   ## local coverage for prediction regions
   output.parametric <- output.nonparametric <- 
-    output.LS <- output.HD <- rep(0, bins + 1)
+    output.LS <- output.HD <- rep(NA, bins + 1)
   if(parametric){
     local.parametric <- local.coverage(region = paraCI, 
   	  data = data, newdata = newdata, k = p, bins = bins, 
