@@ -52,14 +52,14 @@ fit = glm(y ~ x1, family = Gamma, data = data)
 ```
 
 
-# parametric and nonparametric conformal prediction regions
+Compute the parametric and nonparametric conformal prediction regions.
 ```r
 system.time(cpred <- conformal.glm(fit, nonparametric = TRUE, bins = 3, 
   newdata = newdata, cores = 6))
 ```
 
 
-# least squares conformal prediction from the conformalInference package 
+Compute the least squares conformal prediction from the conformalInference package.
 ```r
 library(conformalInference)
 funs <- lm.funs(intercept = TRUE)
@@ -73,7 +73,7 @@ cresid = cbind(p1.tibs$lo, p1.tibs$up)
 ```
 
 
-# estimate the highest density region
+Compute the highest density region.
 ```r
 library(HDInterval)
 betaMLE <- coefficients(fit)
@@ -115,7 +115,6 @@ mtext("x", side = 1, line = 2.5, outer = TRUE, cex = 2)
 mtext("y", side = 2, line = 2.5, outer = TRUE, cex = 2)
 ```
 
-![Depiction of prediction regions](https://github.com/DEck13/conformal.glm/tree/master/gammasimexample.pdf)
 
 
 ## Coverage properties and estimated area of all prediction regions
