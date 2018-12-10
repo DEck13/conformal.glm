@@ -157,7 +157,7 @@ cbind(apply(gamgam500.5, 2, mean),
 
 
 
-file <- paste("Gamma-gaama-output", collapse = "")
+file <- paste("Gamma-gamma-output", collapse = "")
 file <- paste(file, "RData", sep = ".", collapse = "")
 save.image(file = file, ascii = TRUE)
 
