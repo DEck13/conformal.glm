@@ -4,10 +4,8 @@
 
 This package computes and compares prediction regions for the normal, Gamma, 
 and inverse Gaussian families in the `glm` package.  There is 
-functionality to construct the usual Wald type prediction region that one 
-obtains from maximum likelihood estimation and the delta method, the 
-parametric conformal prediction region, the nonparametric conformal 
-prediction region, and prediction regions from conformalization of residuals. 
+functionality to construct the parametric conformal prediction region and the 
+nonparametric conformal prediction region. 
 
 
 ## Usage 
