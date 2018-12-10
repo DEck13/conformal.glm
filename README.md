@@ -87,6 +87,19 @@ minlength <- do.call(rbind,
 
 
 ## Plot of all prediction regions
+
+The four prediction regions for this data are depicted below.  
+The top row depicts the parametric conformal prediction region (left panel) 
+and the nonparametric conformal prediction region (right panel).  The bin 
+width was specified as 1/3 for these conformal prediction regions.  
+The bottom row depicts the least squares conformal prediction region 
+(left panel) and the highest density region (right panel).  We see that the 
+parametric conformal prediction region is a close discretization of the 
+highest density region, the nonparametric conformal prediction region is 
+quite jagged and unnatural, and the least squares conformal prediction region 
+exhibits undercoverage for small $x$, exhibits overcoverage for large $x$, 
+and includes negative response values of large magnitude. 
+
 ```r
 par(mfrow = c(2,2), oma = c(4,4,0,0), mar = c(1,1,1,1))
 
@@ -116,8 +129,24 @@ mtext("y", side = 2, line = 2.5, outer = TRUE, cex = 2)
 ```
 
 
+![alt text](https://github.com/DEck13/conformal.glm/blob/master/gammasimexample.pdf)
+
 
 ## Coverage properties and estimated area of all prediction regions
+
+All of the presented prediction regions exhibit finite-sample marginal 
+validity.  However, the least squares conformal prediction region does not 
+exhibit finite-sample local validity with bins of (0,1/3], (1/3, 2/3], 
+(2/3, 1] used to assess local validity.  The highest density prediction 
+region is the smallest in size with an estimated area of 2.28.  The 
+parametric conformal prediction region is close in size with an estimated 
+area of 2.35.  The nonparametric conformal prediction region has an 
+estimated area of 2.62 and the least square conformal prediction region 
+has an estimated area of 2.94.  Under correct model specification, the 
+parametric conformal prediction region is similar in performance to that of 
+the highest density prediction region.
+
+
 ```r
 ## parametric conformal prediction region
 paraCI <- cpred$paraconformal
@@ -169,7 +198,6 @@ local.coverage(region = minlength,
       data = data, newdata = newdata, k = p, bins = 1, 
       at.data = "FALSE")
 ```
-
 
 To cite this package:
 ```r
