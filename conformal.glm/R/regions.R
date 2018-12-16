@@ -327,7 +327,6 @@ regions <- function(formula, data, newdata, family = "gaussian", link,
         nk.tilde <- floor(alpha * (nk + 1))
         if(nk.tilde == 0) stop("bin width is too small")
 
-
         ## nonparametric density
         phatxy <- function(y){                
           out <- which(unlist(lapply(1:nk, FUN = function(j){

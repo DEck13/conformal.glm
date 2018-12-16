@@ -3,9 +3,9 @@
 ## Conformal Prediction for Generalized Linear Regression Models
 
 This package computes and compares prediction regions for the normal, Gamma, 
-and inverse Gaussian families in the `glm` package.  There is 
-functionality to construct the parametric conformal prediction region and the 
-nonparametric conformal prediction region. 
+and inverse Gaussian families in the `glm` package.  There is functionality to 
+construct the parametric conformal prediction region and the nonparametric 
+conformal prediction region. 
 
 
 ## Usage 
@@ -25,7 +25,7 @@ the correct model. This example is included in the corresponding paper:
 
   Eck, D.J., Crawford, F.W., and Aronow, P.M. (2018+)
   Conformal prediction for exponential families and generalized linear models.
-  Preprint available on request (email daniel.eck@yale.edu)..
+  Preprint available on request (email daniel.eck@yale.edu).
 
 ```r
 library(MASS)
@@ -54,10 +54,12 @@ Compute the parametric and nonparametric conformal prediction regions.
 ```r
 system.time(cpred <- conformal.glm(fit, nonparametric = TRUE, bins = 3, 
   newdata = newdata, cores = 6))
+paraCI <- cpred$paraconformal
+nonparaCI <- cpred$nonparaconformal
 ```
 
 
-Compute the least squares conformal prediction from the conformalInference package.
+Compute the least squares conformal prediction region from the conformalInference package.
 ```r
 library(conformalInference)
 funs <- lm.funs(intercept = TRUE)
@@ -86,40 +88,51 @@ minlength <- do.call(rbind,
 
 ## Plot of all prediction regions
 
-The four prediction regions for this data are depicted below.  
-The top row depicts the parametric conformal prediction region (left panel) 
-and the nonparametric conformal prediction region (right panel).  The bin 
-width was specified as 1/3 for these conformal prediction regions.  
-The bottom row depicts the least squares conformal prediction region 
-(left panel) and the highest density region (right panel).  We see that the 
-parametric conformal prediction region is a close discretization of the 
-highest density region, the nonparametric conformal prediction region is 
-quite jagged and unnatural, and the least squares conformal prediction region 
-exhibits undercoverage for small $x$, exhibits overcoverage for large $x$, 
-and includes negative response values of large magnitude. 
+The four prediction regions for this data are depicted below.  The top row 
+depicts the parametric conformal prediction region (left panel) and the 
+nonparametric conformal prediction region (right panel).  The bin width was 
+specified as 1/3 for these conformal prediction regions.  The bottom row 
+depicts the least squares conformal prediction region (left panel) and the 
+highest density region (right panel).  We see that the parametric conformal 
+prediction region is a close discretization of the highest density region, the 
+nonparametric conformal prediction region is quite jagged and unnatural, and 
+the least squares conformal prediction region exhibits undercoverage for small 
+x, exhibits overcoverage for large x, and includes negative response values 
+of large magnitude. 
 
 ```r
 par(mfrow = c(2,2), oma = c(4,4,0,0), mar = c(1,1,1,1))
 
 # parametric conformal prediction region
-plot(x, y, pch = 20, xaxt = 'n', ann = FALSE)
+plot.new()
+plot.window(xlim = c(0,1), ylim = c(0,max(y)))
+points(x, y, pch = 19, col = "gray")
 lines(newdata, paraCI[, 1], type = "l", col = "red")
 lines(newdata, paraCI[, 2], type = "l", col = "red")
+axis(2)
 
 # nonparametric conformal prediction region
-plot(x, y, pch = 20, xaxt = 'n', yaxt = 'n', ann = FALSE)
+plot.new()
+plot.window(xlim = c(0,1), ylim = c(0,max(y)))
+points(x, y, pch = 19, col = "gray")
 lines(newdata, nonparaCI[, 1], type = "l", col = "red")
 lines(newdata, nonparaCI[, 2], type = "l", col = "red")
 
 # least squares conformal prediction region
-plot(x, y, pch = 20, ann = FALSE)
+plot.new()
+plot.window(xlim = c(0,1), ylim = c(0,max(y)))
+points(x, y, pch = 19, col = "gray")
 lines(newdata, cresid[, 1], type = "l", col = "red")
 lines(newdata, cresid[, 2], type = "l", col = "red")
+axis(1); axis(2)
 
 # highest density region
-plot(x, y, pch = 20, yaxt = 'n', ann = FALSE)
+plot.new()
+plot.window(xlim = c(0,1), ylim = c(0,max(y)))
+points(x, y, pch = 19, col = "gray")
 lines(newdata, minlength[, 1], type = "l", col = "red")
 lines(newdata, minlength[, 2], type = "l", col = "red")
+axis(1)
 
 # axis labels
 mtext("x", side = 1, line = 2.5, outer = TRUE, cex = 2)
@@ -136,13 +149,13 @@ All of the presented prediction regions exhibit finite-sample marginal
 validity.  However, the least squares conformal prediction region does not 
 exhibit finite-sample local validity with bins of (0,1/3], (1/3, 2/3], 
 (2/3, 1] used to assess local validity.  The highest density prediction 
-region is the smallest in size with an estimated area of 2.28.  The 
-parametric conformal prediction region is close in size with an estimated 
-area of 2.35.  The nonparametric conformal prediction region has an 
-estimated area of 2.62 and the least square conformal prediction region 
-has an estimated area of 2.94.  Under correct model specification, the 
-parametric conformal prediction region is similar in performance to that of 
-the highest density prediction region.
+region is the smallest in size with an estimated area of 2.28.  The parametric 
+conformal prediction region is close in size with an estimated area of 2.35.  
+The nonparametric conformal prediction region has an estimated area of 2.62 
+and the least square conformal prediction region has an estimated area of 
+2.94.  Under correct model specification, the parametric conformal prediction 
+region is similar in performance to that of the highest density prediction 
+region.
 
 
 ```r
@@ -151,6 +164,7 @@ paraCI <- cpred$paraconformal
 # estimated area
 mean(apply(paraCI, 1, diff))
 # local coverage
+p <- length(beta) - 1
 local.coverage(region = paraCI, 
       data = data, newdata = newdata, k = p, bins = 3, 
       at.data = "FALSE")

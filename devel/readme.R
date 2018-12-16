@@ -54,6 +54,7 @@ paraCI <- cpred$paraconformal
 # estimated area
 mean(apply(paraCI, 1, diff))
 # local coverage
+p <- length(beta) - 1
 local.coverage(region = paraCI, 
   	  data = data, newdata = newdata, k = p, bins = 3, 
       at.data = "FALSE")
@@ -105,28 +106,40 @@ local.coverage(region = minlength,
 par(mfrow = c(2,2), oma = c(4,4,0,0), mar = c(1,1,1,1))
 
 # parametric conformal prediction region
-plot(x, y, pch = 20, xaxt = 'n', ann = FALSE)
+plot.new()
+plot.window(xlim = c(0,1), ylim = c(0,max(y)))
+points(x, y, pch = 19, col = "gray")
 lines(newdata, paraCI[, 1], type = "l", col = "red")
 lines(newdata, paraCI[, 2], type = "l", col = "red")
+axis(2)
 
 # nonparametric conformal prediction region
-plot(x, y, pch = 20, xaxt = 'n', yaxt = 'n', ann = FALSE)
+plot.new()
+plot.window(xlim = c(0,1), ylim = c(0,max(y)))
+points(x, y, pch = 19, col = "gray")
 lines(newdata, nonparaCI[, 1], type = "l", col = "red")
 lines(newdata, nonparaCI[, 2], type = "l", col = "red")
 
 # least squares conformal prediction region
-plot(x, y, pch = 20, ann = FALSE)
+plot.new()
+plot.window(xlim = c(0,1), ylim = c(0,max(y)))
+points(x, y, pch = 19, col = "gray")
 lines(newdata, cresid[, 1], type = "l", col = "red")
 lines(newdata, cresid[, 2], type = "l", col = "red")
+axis(1); axis(2)
 
 # highest density region
-plot(x, y, pch = 20, yaxt = 'n', ann = FALSE)
+plot.new()
+plot.window(xlim = c(0,1), ylim = c(0,max(y)))
+points(x, y, pch = 19, col = "gray")
 lines(newdata, minlength[, 1], type = "l", col = "red")
 lines(newdata, minlength[, 2], type = "l", col = "red")
+axis(1)
 
 # axis labels
 mtext("x", side = 1, line = 2.5, outer = TRUE, cex = 2)
 mtext("y", side = 2, line = 2.5, outer = TRUE, cex = 2)
+
 
 
 

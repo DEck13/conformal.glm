@@ -1,5 +1,19 @@
 
 
+absolute.error <- function(y, region, squared = FALSE){
+    lwr <- region[, 1]
+    upr <- region[, 2]
+    index <- which(!(lwr <= y & y <= upr))
+    out <- sum(unlist(lapply(index, function(j){
+      foo <- NULL
+      if(squared == FALSE) foo <- min(abs(y[j] - lwr[j]), abs(y[j] - upr[j]))
+      if(squared == TRUE) foo <- (min(abs(y[j] - lwr[j]), abs(y[j] - upr[j])))^2
+      foo
+    }))) / length(y)
+    out
+}
+
+
 simulator <- function(n, alpha = 0.10, beta, bins = NULL, family = "Gamma", 
   link = "inverse", shape = NULL, sd = NULL, confamily = "Gamma",
   parametric = TRUE, nonparametric = FALSE, 
@@ -17,13 +31,13 @@ simulator <- function(n, alpha = 0.10, beta, bins = NULL, family = "Gamma",
 
   if(family == "Gamma"){
     if(link == "identity"){
-      rate <- 1 / (cbind(1, x) %*% beta) * shape
+      rate <- (1 / (cbind(1, x) %*% beta)) * shape
       y <- rgamma(n = n, shape = shape, rate = rate)
       data <- data.frame(y = y, x = x)
       colnames(data)[2:(p+1)] <- paste("x", 1:p, sep = "")
     }
     if(link == "inverse"){
-      rate <- cbind(1, x) %*% beta * shape
+      rate <- (cbind(1, x) %*% beta) * shape
       y <- rgamma(n = n, shape = shape, rate = rate)
       data <- data.frame(y = y, x = x)
       colnames(data)[2:(p+1)] <- paste("x", 1:p, sep = "")
@@ -50,7 +64,7 @@ simulator <- function(n, alpha = 0.10, beta, bins = NULL, family = "Gamma",
     colnames(data)[2:(p+1)] <- paste("x", 1:p, sep = "")
   }
 
-  tr <- try(fit <- glm(y ~ ., family = confamily, data = data))
+  tr <- try(fit <- glm(y ~ ., family = "gaussian", data = data))
   paraCI <- nonparaCI <- LSCI <- HDCI <- NULL
   newdata <- NULL
 
@@ -111,34 +125,40 @@ simulator <- function(n, alpha = 0.10, beta, bins = NULL, family = "Gamma",
 
   }
 
-  ## local coverage for prediction regions
+  ## local coverage and prediction error for prediction regions
   output.parametric <- output.nonparametric <- 
     output.LS <- output.HD <- rep(NA, bins + 1)
   if(parametric){
     local.parametric <- local.coverage(region = paraCI, 
   	  data = data, newdata = newdata, k = p, bins = bins, 
       at.data = "TRUE")
-    output.parametric <- c(local.parametric, 
+    para.pred.error <- absolute.error(y, paraCI)
+    output.parametric <- c(local.parametric, para.pred.error, 
       mean(apply(paraCI, 1, diff)))
   }
   if(nonparametric){
     local.nonparametric <- local.coverage(region = nonparaCI, 
       data = data, newdata = newdata, k = p, bins = bins, 
       at.data = "TRUE")
-    output.nonparametric <- c(local.nonparametric, 
+    nonpara.pred.error <- absolute.error(y, nonparaCI)
+    output.nonparametric <- c(local.nonparametric, nonpara.pred.error, 
       mean(apply(nonparaCI, 1, diff)))
   }
   if(LS){
     local.LS <- local.coverage(region = LSCI, 
       data = data, newdata = newdata, k = p, bins = bins, 
       at.data = "TRUE")
-    output.LS <- c(local.LS, mean(apply(LSCI, 1, diff))) 
+    LS.pred.error <- absolute.error(y, LSCI)
+    output.LS <- c(local.LS, LS.pred.error, 
+      mean(apply(LSCI, 1, diff))) 
   }
   if(HD){
     local.HD <- local.coverage(region = HDCI, 
       data = data, newdata = newdata, k = p, bins = bins, 
       at.data = "TRUE")
-    output.HD <- c(local.HD, mean(apply(HDCI, 1, diff))) 
+    HD.pred.error <- absolute.error(y, HDCI)
+    output.HD <- c(local.HD, HD.pred.error, 
+      mean(apply(HDCI, 1, diff))) 
   }
 
   output <- list(output.parametric = output.parametric, 
@@ -148,3 +168,8 @@ simulator <- function(n, alpha = 0.10, beta, bins = NULL, family = "Gamma",
   output
 
 }
+
+
+
+
+
