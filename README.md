@@ -140,7 +140,7 @@ mtext("y", side = 2, line = 2.5, outer = TRUE, cex = 2)
 ```
 
 
-![Plot of prediction regions](https://github.com/DEck13/conformal.glm/blob/master/gammasimexample.pdf)
+![Plot of prediction regions](gammasimexample.pdf)
 
 
 ## Coverage properties and estimated area of all prediction regions
