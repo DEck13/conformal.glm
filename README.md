@@ -140,7 +140,7 @@ mtext("y", side = 2, line = 2.5, outer = TRUE, cex = 2)
 ```
 
 
-![Plot of prediction regions](gammasimexample.pdf)
+![Plot of prediction regions](gammasimexample.png)
 
 
 ## Coverage properties and estimated area of all prediction regions
