@@ -20,7 +20,7 @@
 \usage{
   conformal.glm(object, ..., newdata = NULL, alpha = 0.10, 
   	cores = 1, bins = NULL, parametric = TRUE, intercept = TRUE, 
-  	nonparametric = FALSE)
+  	nonparametric = FALSE, h = NULL)
 }
 \arguments{
   \item{object}{an object of class \code{"glm"}.}
@@ -50,6 +50,9 @@
   \item{nonparametric}{a Boolean variable corresponding to whether or not the 
     nonparametric conformal region is to be computed. The default is set at 
     TRUE.}
+  \item{h}{The bandwidth corresponding to the estimated density to form the 
+    nonparametric conformal prediction region.  The default value is 
+    \code{1/bins}.}
 }
 \details{
   This function calls on the \code{\link{regions}} function to compute all of 
@@ -87,10 +90,7 @@
   Journal of the American Statistical Association, 108(501), 278-287.
 }
 \examples{
-# example of section 2.4 in Geyer (2009)
-# data(sports)
-# out <- glmdr(cbind(wins, losses) ~ 0 + ., family = "binomial", data = sports)
-#summary(out)
+
 }
 \keyword{generalized linear regression models}
 \keyword{conformal prediction}

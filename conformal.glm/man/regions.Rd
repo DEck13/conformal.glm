@@ -19,7 +19,8 @@
 }
 \usage{
   regions(formula, data, newdata, family = "gaussian", link, alpha = 0.10, 
-    cores = 1, bins = NULL, parametric = TRUE, nonparametric = FALSE)
+    cores = 1, bins = NULL, parametric = TRUE, nonparametric = FALSE, 
+    h = NULL)
 }
 \arguments{
   \item{formula}{an object of class \code{"\link{formula}"} (or one that
@@ -59,7 +60,10 @@
     parametric conformal region is to be computed. The default is set at TRUE.}
   \item{nonparametric}{a Boolean variable corresponding to whether or not the 
     nonparametric conformal region is to be computed. The default is set at 
-    TRUE.}  
+    TRUE.}
+  \item{h}{The bandwidth corresponding to the estimated density to form the 
+    nonparametric conformal prediction region.  The default value is 
+    \code{1/bins}.}
 }
 \details{
   The function which computes all of the prediction regions outlined in the 
@@ -103,10 +107,7 @@
   Journal of the American Statistical Association, 108(501), 278-287.
 }
 \examples{
-# example of section 2.4 in Geyer (2009)
-# data(sports)
-# out <- glmdr(cbind(wins, losses) ~ 0 + ., family = "binomial", data = sports)
-#summary(out)
+
 }
 \keyword{generalized linear regression models}
 \keyword{conformal prediction}

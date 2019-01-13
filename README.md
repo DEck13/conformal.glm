@@ -33,7 +33,7 @@ library(conformal.glm)
 library(parallel)
 
 alpha <- 0.10
-n <- 200
+n <- 500
 shape <- 2
 beta <- c(1/4, 2)
 
@@ -52,7 +52,7 @@ fit = glm(y ~ x1, family = Gamma, data = data)
 
 Compute the parametric and nonparametric conformal prediction regions.
 ```r
-system.time(cpred <- conformal.glm(fit, nonparametric = TRUE, bins = 3, 
+system.time(cpred <- conformal.glm(fit, nonparametric = TRUE, bins = 5, 
   newdata = newdata, cores = 6))
 paraCI <- cpred$paraconformal
 nonparaCI <- cpred$nonparaconformal
@@ -166,7 +166,7 @@ mean(apply(paraCI, 1, diff))
 # local coverage
 p <- length(beta) - 1
 local.coverage(region = paraCI, 
-      data = data, newdata = newdata, k = p, bins = 3, 
+      data = data, newdata = newdata, k = p, bins = 5, 
       at.data = "FALSE")
 # marginal coverage
 local.coverage(region = paraCI, 
@@ -179,7 +179,7 @@ nonparaCI <- cpred$nonparaconformal
 mean(apply(nonparaCI, 1, diff))
 # local coverage
 local.coverage(region = nonparaCI, 
-      data = data, newdata = newdata, k = p, bins = 3, 
+      data = data, newdata = newdata, k = p, bins = 5, 
       at.data = "FALSE")
 # marginal coverage
 local.coverage(region = nonparaCI, 
@@ -191,7 +191,7 @@ local.coverage(region = nonparaCI,
 mean(apply(cresid, 1, diff))
 # local coverage
 local.coverage(region = cresid, 
-      data = data, newdata = newdata, k = p, bins = 3, 
+      data = data, newdata = newdata, k = p, bins = 5, 
       at.data = "FALSE")
 # marginal coverage
 local.coverage(region = cresid, 
@@ -203,7 +203,7 @@ local.coverage(region = cresid,
 mean(apply(minlength, 1, diff))
 # local coverage
 local.coverage(region = minlength, 
-      data = data, newdata = newdata, k = p, bins = 3, 
+      data = data, newdata = newdata, k = p, bins = 5, 
       at.data = "FALSE")
 # marginal coverage
 local.coverage(region = minlength, 

@@ -79,7 +79,7 @@ local.coverage <- function(region, data, newdata, k, bins = NULL,
 
 regions <- function(formula, data, newdata, family = "gaussian", link, 
   alpha = 0.10, cores = 1, bins = NULL, parametric = TRUE, 
-  nonparametric = FALSE){
+  nonparametric = FALSE, h = NULL){
 
   ## initial quantities
   respname <- all.vars(formula)[1]
@@ -223,7 +223,6 @@ regions <- function(formula, data, newdata, family = "gaussian", link,
         y.lwr <- y.min <- as.numeric(quant.Yk[1])
         y.upr <- y.max <- as.numeric(quant.Yk[2])
 
-
         ## lower line search
         prec <- max( min(diff(sort(Yk[Yk <= y.min]))), 0.001)      
         steps <- 1
@@ -310,9 +309,7 @@ regions <- function(formula, data, newdata, family = "gaussian", link,
     ## Nonparametric conformal prediction region for each 
     ## desired predictor combination 
     ## ignores the intercept of the newdata matrix
-    #wn <- min(1/ floor(1 / (log(n)/n)^(1/(k+3))), 1/2)
-    #hn <- ((log(n)/n)^(1/(1*(p+2)+1)))
-    hn <- wn
+    if(class(h) == "NULL") h <- wn
     COPS <- function(newdata){ 
       out <- mclapply(1:n.pred, mc.cores = cores, FUN = function(j){
       #out <- apply(matrix(1:n.pred), 1, FUN = function(j){
@@ -332,8 +329,8 @@ regions <- function(formula, data, newdata, family = "gaussian", link,
           out <- which(unlist(lapply(1:nk, FUN = function(j){
             Yknotj <- Yk[-j]
             Ykj <- Yk[j]
-            sum(dnorm(Yknotj, mean = y, sd = hn) 
-              - dnorm(Yknotj, mean = Ykj, sd = hn))
+            sum(dnorm(Yknotj, mean = y, sd = h) 
+              - dnorm(Yknotj, mean = Ykj, sd = h))
           })) >= 0)
           if(length(out) == 0) out <- -1
           length(out) >= nk.tilde
