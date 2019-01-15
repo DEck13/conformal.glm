@@ -25,41 +25,65 @@ find.index <- function(mat, wn, k){
 
 
 
-local.coverage <- function(region, data, newdata, k, bins = NULL,
-  at.data = "TRUE"){
+local.coverage <- function(region, nonparametric = "FALSE", data, 
+  at.data = "TRUE", newdata = NULL, k, bins = NULL){
 
-  region <- cbind(newdata, region)
   n <- nrow(data)
   wn <- min(1/ floor(1 / (log(n)/n)^(1/(k+3))), 1/2)
   if(class(bins) != "NULL") wn <- 1 / bins
-
   index.data <- find.index(as.matrix(data[, 1:k + 1]), wn = wn, k = k)
-  index.newdata <- find.index(newdata, wn = wn, k = k)
+
   # parametric and nonparametric prediction regions are 
-  # formatted as (newdata, region).
   # data is formatted as (y, predictors)
   output <- NULL
   if(at.data == TRUE){
-    colnames(region)[c(k+1,k+2)] <- c("lwr","upr")
-    output <- unlist(lapply(sort(unique(index.data)), function(j){    
-      y <- data[index.data == j, 1]
-      lwr <- region[index.newdata == j, k+1]
-      upr <- region[index.newdata == j, k+2]
-      out <- mean(lwr <= y & y <= upr)
-      out
-    }))
+    if(nonparametric == "FALSE"){
+      x <- as.matrix(data[,1:k + 1], col = k)
+      index.newdata <- find.index(x, wn = wn, k = k)
+      colnames(region) <- c("lwr","upr")
+      output <- unlist(lapply(sort(unique(index.data)), function(j){    
+        y <- data[index.data == j, 1]
+        lwr <- region[index.newdata == j, 1]
+        upr <- region[index.newdata == j, 2]
+        out <- mean(lwr <= y & y <= upr)
+        out
+      }))
+    }
+    if(nonparametric == "TRUE"){
+      n.bins.region <- length(region)
+      x <- as.matrix(data[,1:k + 1], col = k)
+      index.bins.region <- find.index(x, wn = 1/n.bins.region, k = k)
+      y <- data[, 1]
+      ## put each y value with its corresponding prediction interval
+      foo <- lapply(1:n, FUN = function(j){
+        c(y[j], region[[index.bins.region[j]]])
+      })
+
+      output <- unlist(lapply(sort(unique(index.data)), function(j){
+        index.j <- which(index.data == j)
+        ## indicate which endpoints y is between
+        int <- unlist(lapply(index.j, FUN = function(x){
+          which(foo[[x]][1] > foo[[x]][-1])
+        }))
+        ## only odd numbers correspond to y being in one of the 
+        ## (possibly disjoint) intervals
+        mean(int %% 2 == 1)
+      }))
+    }
   }
 
   if(at.data == FALSE){
     ### right now only works for univariate regression
-    colnames(region)[c(k+1,k+2)] <- c("lwr","upr")
+    ### and unimodal regions
+    colnames(region) <- c("lwr","upr")
+    index.newdata <- find.index(newdata, wn = wn, k = k)
     output <- unlist(lapply(sort(unique(index.data)), function(j){
-      input1 <- region[, 1:k]
+      input1 <- data[, 1:k + 1]
       m.lwr <- lm(lwr ~ poly(input1, degree = 3), 
-        data = as.data.frame(region)[, c(1:k, k+1)], 
+        data = as.data.frame(cbind(data, region)), 
         subset = index.newdata == j)
       m.upr <- lm(upr ~ poly(input1, degree = 3), 
-        data = as.data.frame(region)[, c(1:k, k+2)], 
+        data = as.data.frame(cbind(data, region)),
         subset = index.newdata == j)
 
       newdat <- as.data.frame(data[index.data == j, 1:k + 1])
@@ -77,9 +101,11 @@ local.coverage <- function(region, data, newdata, k, bins = NULL,
 
 
 
+
+
 regions <- function(formula, data, newdata, family = "gaussian", link, 
   alpha = 0.10, cores = 1, bins = NULL, parametric = TRUE, 
-  nonparametric = FALSE, h = NULL){
+  nonparametric = FALSE, h = NULL, precision = 0.001){
 
   ## initial quantities
   respname <- all.vars(formula)[1]
@@ -224,7 +250,7 @@ regions <- function(formula, data, newdata, family = "gaussian", link,
         y.upr <- y.max <- as.numeric(quant.Yk[2])
 
         ## lower line search
-        prec <- max( min(diff(sort(Yk[Yk <= y.min]))), 0.001)      
+        prec <- max( min(diff(sort(Yk[Yk <= y.min]))), precision)      
         steps <- 1
         flag <- FALSE
         while(rank(phatxy(y.lwr))[nk + 1] >= nk.tilde & flag == FALSE){
@@ -240,13 +266,13 @@ regions <- function(formula, data, newdata, family = "gaussian", link,
         if(flag == FALSE){
           steps <- 1
           if(y.min - y.lwr <= 0.001){ 
-            prec <- min( min(diff(sort(Yk[Yk <= y.min]))), 0.001) / 2
+            prec <- min( min(diff(sort(Yk[Yk <= y.min]))), precision) / 2
           }
           if(y.min - y.lwr > 0.001){
-            prec <- min( min(diff(sort(Yk[Yk <= y.min]))), 0.001)
-            if(prec < 0.001){ 
-              prec <- mean(min(diff(sort(Yk[Yk <= y.min]))), 0.0001)
-            }
+            prec <- min( min(diff(sort(Yk[Yk <= y.min]))), precision)
+            #if(prec < precision){ 
+            #  prec <- mean(min(diff(sort(Yk[Yk <= y.min]))), 0.0001)
+            #}
           }
           while(rank(phatxy(y.lwr))[nk + 1] < nk.tilde & y.lwr < max(Yk)){
             y.lwr <- y.lwr + steps * prec
@@ -256,21 +282,21 @@ regions <- function(formula, data, newdata, family = "gaussian", link,
 
         ## upper line search
         if(y.lwr >= y.upr) y.upr <- 2^sign(max(Yk)) * max(Yk)
-        prec <- max( min(diff(sort(Yk[Yk >= y.max]))), 0.001)
+        prec <- max( min(diff(sort(Yk[Yk >= y.max]))), precision)
         steps <- 1
         while(rank(phatxy(y.upr))[nk + 1] >= nk.tilde){
           y.upr <- y.upr + steps * prec
           steps <- steps + 1
         }
         steps <- 1
-        if(y.upr - y.max <= 0.001){ 
-          prec <- min( min(diff(sort(Yk[Yk >= y.max]))), 0.001)
+        if(y.upr - y.max <= precision){ 
+          prec <- min( min(diff(sort(Yk[Yk >= y.max]))), precision)
         }
-        if(y.upr - y.max > 0.001){
-          prec <- min( min(diff(sort(Yk[Yk >= y.max]))), 0.001)
-          if(prec < 0.001){ 
-            prec <- mean(min(diff(sort(Yk[Yk >= y.max]))), 0.0001)
-          }
+        if(y.upr - y.max > precision){
+          prec <- min( min(diff(sort(Yk[Yk >= y.max]))), precision)
+          #if(prec < 0.001){ 
+          #  prec <- mean(min(diff(sort(Yk[Yk >= y.max]))), 0.0001)
+          #}
         }        
         while(rank(phatxy(y.upr))[nk + 1] < nk.tilde){
           y.upr <- y.upr - steps * prec
@@ -310,14 +336,82 @@ regions <- function(formula, data, newdata, family = "gaussian", link,
     ## desired predictor combination 
     ## ignores the intercept of the newdata matrix
     if(class(h) == "NULL") h <- wn
+    
+    #COPS <- function(newdata){ 
+    #  out <- mclapply(1:n.pred, mc.cores = cores, FUN = function(j){
+    #    index.bin <- which(index == index.pred[j])
+    #    nk <- length(index.bin)
+    #    Yk <- Y[index.bin]
+
+    #    ## initial check for enough data within bin
+    #    nk.tilde <- floor(alpha * (nk + 1))
+    #   if(nk.tilde == 0) stop("bin width is too small")
+
+    #    ## nonparametric density
+    #    phatxy <- function(y){                
+    #      out <- which(unlist(lapply(1:nk, FUN = function(j){
+    #       Yknotj <- Yk[-j]
+    #        Ykj <- Yk[j]
+    #        sum(dnorm(Yknotj, mean = y, sd = h) 
+    #          - dnorm(Yknotj, mean = Ykj, sd = h))
+    #      })) >= 0)
+    #      if(length(out) == 0) out <- -1
+    #      length(out) >= nk.tilde
+    #    }
+
+    #    ## set up a lower (upper lower bound) and upper bound 
+    #    ## (lower upper bound) to start two line searchs in order to 
+    #    ## construct the nonparametric conformal prediction region
+    #    quant.Yk <- quantile(Yk, probs = c(2 * alpha, 1 - 2 * alpha ))
+    #    y.lwr <- y.min <- as.numeric(quant.Yk[1])
+    #    y.upr <- y.max <- as.numeric(quant.Yk[2])
+
+    #    # lower line search
+    #    prec <- max( min(diff(sort(Yk[Yk <= y.min]))), 0.001)      
+    #    steps <- 1
+    #    while(phatxy(y.lwr)){
+    #      y.lwr <- y.lwr - steps * prec
+    #      steps <- steps + 1
+    #    }
+    #    steps <- 1
+    #    prec <- min( min(diff(sort(Yk[Yk <= y.min]))), 0.001)
+    #    if(prec < 0.001) prec <- mean(min(diff(sort(Yk[Yk <= y.min]))), 0.001)
+    #    while(!phatxy(y.lwr)){
+    #      y.lwr <- y.lwr + steps * prec
+    #      steps <- steps + 1
+    #    }
+
+    #    # upper line search
+    #    prec <- max( min(diff(sort(Yk[Yk >= y.max]))), 0.001)
+    #    steps <- 1
+    #    while(phatxy(y.upr)){
+    #      y.upr <- y.upr + steps * prec
+    #      steps <- steps + 1
+    #    }
+    #    steps <- 1
+    #    prec <- min( min(diff(sort(Yk[Yk >= y.max]))), 0.001) 
+    #    if(prec < 0.001) prec <- mean(min(diff(sort(Yk[Yk >= y.max]))), 0.001)
+    #    while(!phatxy(y.upr)){
+    #      y.upr <- y.upr - steps * prec
+    #      steps <- steps + 1
+    #    }
+
+    #    c(y.lwr, y.upr)
+    #  })
+
+    #  out <- do.call(rbind, out)
+    #  colnames(out) <- c("lwr", "upr")
+    #  out
+    #}
+
+    #nonparaconformal <- COPS(newdata)
+
     COPS <- function(newdata){ 
-      out <- mclapply(1:n.pred, mc.cores = cores, FUN = function(j){
-      #out <- apply(matrix(1:n.pred), 1, FUN = function(j){
-        x.variables <- matrix(newdata.variables[j, ], nrow = 1, ncol = k)
-        x <- matrix(newdata.formula[j, ], nrow = 1, ncol = p)
-        index.bin <- which(index == index.pred[j])
+      out <- mclapply(sort(unique(index.pred)), mc.cores = cores, 
+        FUN = function(j){
+
+        index.bin <- which(index == j)
         nk <- length(index.bin)
-        Xk <- matrix(X[index.bin, ], ncol = p)
         Yk <- Y[index.bin]
 
         ## initial check for enough data within bin
@@ -326,61 +420,74 @@ regions <- function(formula, data, newdata, family = "gaussian", link,
 
         ## nonparametric density
         phatxy <- function(y){                
-          out <- which(unlist(lapply(1:nk, FUN = function(j){
+          int <- which(unlist(lapply(1:nk, FUN = function(j){
             Yknotj <- Yk[-j]
             Ykj <- Yk[j]
             sum(dnorm(Yknotj, mean = y, sd = h) 
               - dnorm(Yknotj, mean = Ykj, sd = h))
           })) >= 0)
-          if(length(out) == 0) out <- -1
-          length(out) >= nk.tilde
+          if(length(int) == 0) int <- -1
+          out <- length(int) >= nk.tilde
+          out
         }
-
-        ## set up a lower (upper lower bound) and upper bound 
-        ## (lower upper bound) to start two line searchs in order to 
-        ## construct the parametric conformal prediction region
-        quant.Yk <- quantile(Yk, probs = c(2 * alpha, 1 - 2 * alpha ))
-        y.lwr <- y.min <- as.numeric(quant.Yk[1])
-        y.upr <- y.max <- as.numeric(quant.Yk[2])
 
         # lower line search
-        prec <- max( min(diff(sort(Yk[Yk <= y.min]))), 0.001)      
+        y.lwr <- y.min <- min(Yk)
+        quant.Yk <- quantile(Yk, probs = c(2 * alpha, 1 - 2 * alpha ))
+        prec <- max( min(diff(sort(Yk[Yk <= quant.Yk[1]]))), precision)      
         steps <- 1
-        while(phatxy(y.lwr)){
-          y.lwr <- y.lwr - steps * prec
-          steps <- steps + 1
-        }
-        steps <- 1
-        prec <- min( min(diff(sort(Yk[Yk <= y.min]))), 0.001)
-        if(prec < 0.001) prec <- mean(min(diff(sort(Yk[Yk <= y.min]))), 0.001)
         while(!phatxy(y.lwr)){
           y.lwr <- y.lwr + steps * prec
           steps <- steps + 1
         }
-
-        # upper line search
-        prec <- max( min(diff(sort(Yk[Yk >= y.max]))), 0.001)
         steps <- 1
-        while(phatxy(y.upr)){
-          y.upr <- y.upr + steps * prec
+        prec <- min( min(diff(sort(Yk[Yk <= quant.Yk[1]]))), precision)
+        #if(prec < 0.001) prec <- 0.0005
+          #mean(min(diff(sort(Yk[Yk <= quant.Yk[1]]))), 0.001)
+        while(phatxy(y.lwr)){
+          y.lwr <- y.lwr - steps * prec
           steps <- steps + 1
         }
+
+        # upper line search
+        y.upr <- y.max <- max(Yk)
+        prec <- max( min(diff(sort(Yk[Yk >= quant.Yk[2]]))), precision)
         steps <- 1
-        prec <- min( min(diff(sort(Yk[Yk >= y.max]))), 0.001) 
-        if(prec < 0.001) prec <- mean(min(diff(sort(Yk[Yk >= y.max]))), 0.001)
         while(!phatxy(y.upr)){
           y.upr <- y.upr - steps * prec
           steps <- steps + 1
         }
+        steps <- 1
+        prec <- min( min(diff(sort(Yk[Yk >= quant.Yk[2]]))), precision)
+        #if(prec < 0.001) prec <- 0.0005
+          #mean(min(diff(sort(Yk[Yk >= quant.Yk[2]]))), 0.001)
+        while(phatxy(y.upr)){
+          y.upr <- y.upr + steps * prec
+          steps <- steps + 1
+        }
 
-        c(y.lwr, y.upr)
+        y.seq <- seq(y.lwr, y.upr, by = precision)
+        foo <- unlist(lapply(y.seq, FUN = phatxy))
+        y.seq <- y.seq[foo]
+        breaks <- which(round(diff(y.seq), 
+          ceiling(log10(1/precision))) != precision)
+        endpts <- c(min(y.seq), max(y.seq))
+        if(length(breaks) == 1) endpts <- 
+          c(min(y.seq), y.seq[breaks], y.seq[breaks+1],  max(y.seq))
+        if(length(breaks) > 1){
+          for(k in 1:length(breaks)){
+            if(k == 1) endpts <- 
+              c(min(y.seq), y.seq[breaks[k]], y.seq[breaks[k]+1])
+            if(k != 1 & k != length(breaks)) endpts <- 
+              c(endpts, y.seq[breaks[k]+1], y.seq[breaks[k+1]])
+            if(k == length(breaks)) endpts <- 
+              c(endpts, y.seq[breaks[k]], y.seq[breaks[k]+1], max(y.seq))
+          }
+        } 
+        endpts
       })
-
-      out <- do.call(rbind, out)
-      colnames(out) <- c("lwr", "upr")
       out
     }
-
     nonparaconformal <- COPS(newdata)
   }
 

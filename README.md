@@ -28,10 +28,6 @@ the correct model. This example is included in the corresponding paper:
   Preprint available on request (email daniel.eck@yale.edu).
 
 ```r
-library(MASS)
-library(conformal.glm)
-library(parallel)
-
 alpha <- 0.10
 n <- 500
 shape <- 2
@@ -43,8 +39,6 @@ rate <- cbind(1, x) %*% beta * shape
 y <- rgamma(n = n, shape = shape, rate = rate)
 data <- data.frame(y = y, x = x)
 colnames(data)[2] <- c("x1")
-newdata <- matrix(seq(0.01, 0.99, by = 0.01), ncol = 1)
-colnames(newdata) <- c("x1")
 
 fit = glm(y ~ x1, family = Gamma, data = data)
 ```
@@ -52,28 +46,39 @@ fit = glm(y ~ x1, family = Gamma, data = data)
 
 Compute the parametric and nonparametric conformal prediction regions.
 ```r
-system.time(cpred <- conformal.glm(fit, nonparametric = TRUE, bins = 5, 
-  newdata = newdata, cores = 6))
+bins <- 3
+system.time(cpred <- conformal.glm(fit, nonparametric = TRUE, 
+  bins = bins, cores = 6))
 paraCI <- cpred$paraconformal
 nonparaCI <- cpred$nonparaconformal
 ```
 
 
-Compute the least squares conformal prediction region from the conformalInference package.
+Compute the least squares (LS) conformal prediction region from the conformalInference package.
 ```r
+## least squares conformal prediction region
 library(conformalInference)
 funs <- lm.funs(intercept = TRUE)
 train.fun <- funs$train.fun
 predict.fun <- funs$predict.fun
-system.time(p1.tibs <- conformal.pred(x = x, y = y, x0 = newdata, 
+mad.train.fun <- function(x, y, out = NULL){
+  object <- smooth.spline(x[, 1], y)
+  object
+}
+mad.predict.fun <- function(out, newx){
+  predict(out, newx[, 1])$y
+}
+system.time(p1.tibs <- conformal.pred(x = cbind(x,x^2,x^3), y = y, 
+  x0 = cbind(x,x^2,x^3), 
   train.fun = train.fun, predict.fun = predict.fun, 
-  alpha = alpha, grid.method = "linear",
-  num.grid.pts = 999))
+  mad.train.fun = mad.train.fun,
+  mad.predict.fun = mad.predict.fun,
+  alpha = alpha))
 cresid = cbind(p1.tibs$lo, p1.tibs$up)
 ```
 
 
-Compute the highest density region.
+Compute the highest density (HD) prediction region.
 ```r
 library(HDInterval)
 betaMLE <- coefficients(fit)
@@ -94,44 +99,70 @@ nonparametric conformal prediction region (right panel).  The bin width was
 specified as 1/3 for these conformal prediction regions.  The bottom row 
 depicts the least squares conformal prediction region (left panel) and the 
 highest density region (right panel).  We see that the parametric conformal 
-prediction region is a close discretization of the highest density region, the 
+prediction region is a close discretization of the HD region, the 
 nonparametric conformal prediction region is quite jagged and unnatural, and 
-the least squares conformal prediction region exhibits undercoverage for small 
-x, exhibits overcoverage for large x, and includes negative response values 
-of large magnitude. 
+the LS conformal prediction region includes negative response 
+values and systematically over (under) includes small (large) values of the 
+response across x. 
 
 ```r
+#########################################
+## make plot
 par(mfrow = c(2,2), oma = c(4,4,0,0), mar = c(1,1,1,1))
 
 # parametric conformal prediction region
+ix <- sort(x, index.return = TRUE)$ix
 plot.new()
 plot.window(xlim = c(0,1), ylim = c(0,max(y)))
 points(x, y, pch = 19, col = "gray")
-lines(newdata, paraCI[, 1], type = "l", col = "red")
-lines(newdata, paraCI[, 2], type = "l", col = "red")
+lines(x[ix], paraCI[ix, 1], type = "l", col = "red")
+lines(x[ix], paraCI[ix, 2], type = "l", col = "red")
 axis(2)
 
 # nonparametric conformal prediction region
-plot.new()
-plot.window(xlim = c(0,1), ylim = c(0,max(y)))
-points(x, y, pch = 19, col = "gray")
-lines(newdata, nonparaCI[, 1], type = "l", col = "red")
-lines(newdata, nonparaCI[, 2], type = "l", col = "red")
+plot.nonpar <- function(region){
+  if(class(region) != "list"){ 
+    stop("Only appropriate for nonparametric conformal prediction region")
+  }
+  plot.new()
+  plot.window(xlim = c(0,1), ylim = c(0,max(y)))
+  points(x, y, pch = 19, col = "gray")
+  for(i in 1:bins){ 
+    foo <- nonparaCI[[i]]
+    odd <- which(1:length(foo) %% 2 == 1) 
+    even <- which(1:length(foo) %% 2 == 0)
+    segments(x0 = 1/bins * (i-1), y0 = foo, x1 =1/bins * i, 
+      col = "red")
+    if(i == 1) segments(x0 = 0, y0 = foo[odd] , y1 = foo[even],
+      col = "red")
+    if(i != 1){ 
+      bar <- nonparaCI[[i-1]]
+      baz <- sort(c(foo,bar))
+      odd2 <- which(1:length(baz) %% 2 == 1) 
+      even2 <- which(1:length(baz) %% 2 == 0)
+      segments(x0 = 1/bins * (i-1), y0 = baz[odd2], 
+        y1 = baz[even2], col = "red")
+    }
+    if(i == bins) segments(x0 = 1, y0 = foo[odd], 
+      y1 = foo[even], col = "red")
+  }
+}    
+plot.nonpar(nonparaCI)
 
 # least squares conformal prediction region
 plot.new()
 plot.window(xlim = c(0,1), ylim = c(0,max(y)))
 points(x, y, pch = 19, col = "gray")
-lines(newdata, cresid[, 1], type = "l", col = "red")
-lines(newdata, cresid[, 2], type = "l", col = "red")
+lines(x[ix], cresid[ix, 1], type = "l", col = "red")
+lines(x[ix], cresid[ix, 2], type = "l", col = "red")
 axis(1); axis(2)
 
 # highest density region
 plot.new()
 plot.window(xlim = c(0,1), ylim = c(0,max(y)))
 points(x, y, pch = 19, col = "gray")
-lines(newdata, minlength[, 1], type = "l", col = "red")
-lines(newdata, minlength[, 2], type = "l", col = "red")
+lines(x[ix], minlength[ix, 1], type = "l", col = "red")
+lines(x[ix], minlength[ix, 2], type = "l", col = "red")
 axis(1)
 
 # axis labels
@@ -145,70 +176,76 @@ mtext("y", side = 2, line = 2.5, outer = TRUE, cex = 2)
 
 ## Coverage properties and estimated area of all prediction regions
 
-All of the presented prediction regions exhibit finite-sample marginal 
-validity.  However, the least squares conformal prediction region does not 
-exhibit finite-sample local validity with bins of (0,1/3], (1/3, 2/3], 
-(2/3, 1] used to assess local validity.  The highest density prediction 
-region is the smallest in size with an estimated area of 2.28.  The parametric 
-conformal prediction region is close in size with an estimated area of 2.35.  
-The nonparametric conformal prediction region has an estimated area of 2.62 
-and the least square conformal prediction region has an estimated area of 
-2.94.  Under correct model specification, the parametric conformal prediction 
+All of the presented prediction regions exhibit close to finite-sample 
+marginal validity and local validity with respect to bining.  However, 
+the LS conformal prediction region and the HD prediction region do not exhibit 
+finite-sample local validity in the second bin and the HD prediction region 
+does not quite possess finite-sample marginal validity.  The parametric 
+conformal prediction region is smallest in size with an estimated area of 
+2.20.  The HD prediction region is a close second with an estimated area of 
+2.21.  LS conformal prediction region has an estimated area of 2.57 and 
+The nonparametric conformal prediction region has an estimated area of 2.69.  
+Under correct model specification, the parametric conformal prediction 
 region is similar in performance to that of the highest density prediction 
 region.
 
 
 ```r
+#########################################
+## area and coverage
+
 ## parametric conformal prediction region
-paraCI <- cpred$paraconformal
 # estimated area
 mean(apply(paraCI, 1, diff))
 # local coverage
 p <- length(beta) - 1
-local.coverage(region = paraCI, 
-      data = data, newdata = newdata, k = p, bins = 5, 
-      at.data = "FALSE")
+local.coverage(region = paraCI, data = data, k = p, 
+  bins = bins, at.data = "TRUE")
 # marginal coverage
-local.coverage(region = paraCI, 
-      data = data, newdata = newdata, k = p, bins = 1, 
-      at.data = "FALSE")
+local.coverage(region = paraCI, data = data,  k = p, 
+  bins = 1, at.data = "TRUE")
 
 ## nonparametric conformal prediction region
-nonparaCI <- cpred$nonparaconformal
 # estimated area
-mean(apply(nonparaCI, 1, diff))
+area.nonpar <- function(region){
+  if(class(region) != "list"){ 
+    stop("Only appropriate for nonparametric conformal prediction region")
+  }
+  bins <- length(region); wn <- 1 / bins
+  area <- 0
+  for(i in 1:bins){
+    foo <- region[[i]]
+    area <- area + wn * as.numeric(rep(c(-1,1), length(foo)/2) %*% foo)
+  }
+  area
+}
+area.nonpar(nonparaCI)
 # local coverage
-local.coverage(region = nonparaCI, 
-      data = data, newdata = newdata, k = p, bins = 5, 
-      at.data = "FALSE")
+local.coverage(region = nonparaCI, data = data, k = p, 
+  nonparametric = "TRUE", bins = bins, at.data = "TRUE")
 # marginal coverage
-local.coverage(region = nonparaCI, 
-      data = data, newdata = newdata, k = p, bins = 1, 
-      at.data = "FALSE")
+local.coverage(region = nonparaCI, data = data, k = p, 
+  nonparametric = "TRUE", bins = 1, at.data = "TRUE")
 
 ## least squares conformal prediction region
 # estimated area
 mean(apply(cresid, 1, diff))
 # local coverage
-local.coverage(region = cresid, 
-      data = data, newdata = newdata, k = p, bins = 5, 
-      at.data = "FALSE")
+local.coverage(region = cresid, data = data, k = p, 
+  bins = bins, at.data = "TRUE")
 # marginal coverage
-local.coverage(region = cresid, 
-      data = data, newdata = newdata, k = p, bins = 1, 
-      at.data = "FALSE")
+local.coverage(region = cresid, data = data,  k = p, 
+  bins = 1, at.data = "TRUE")
 
 ## highest density region
 # estimated area
 mean(apply(minlength, 1, diff))
 # local coverage
-local.coverage(region = minlength, 
-      data = data, newdata = newdata, k = p, bins = 5, 
-      at.data = "FALSE")
+local.coverage(region = minlength, data = data, k = p, 
+  bins = bins, at.data = "TRUE")
 # marginal coverage
-local.coverage(region = minlength, 
-      data = data, newdata = newdata, k = p, bins = 1, 
-      at.data = "FALSE")
+local.coverage(region = minlength, data = data,  k = p, 
+  bins = 1, at.data = "TRUE")
 ```
 
 To cite this package:

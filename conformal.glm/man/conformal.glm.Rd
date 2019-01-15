@@ -20,7 +20,7 @@
 \usage{
   conformal.glm(object, ..., newdata = NULL, alpha = 0.10, 
   	cores = 1, bins = NULL, parametric = TRUE, intercept = TRUE, 
-  	nonparametric = FALSE, h = NULL)
+  	nonparametric = FALSE, h = NULL, precision = 0.001)
 }
 \arguments{
   \item{object}{an object of class \code{"glm"}.}
@@ -53,6 +53,7 @@
   \item{h}{The bandwidth corresponding to the estimated density to form the 
     nonparametric conformal prediction region.  The default value is 
     \code{1/bins}.}
+  \item{precision}{the precision of the internal line search.}
 }
 \details{
   This function calls on the \code{\link{regions}} function to compute all of 

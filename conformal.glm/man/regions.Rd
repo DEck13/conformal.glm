@@ -20,7 +20,7 @@
 \usage{
   regions(formula, data, newdata, family = "gaussian", link, alpha = 0.10, 
     cores = 1, bins = NULL, parametric = TRUE, nonparametric = FALSE, 
-    h = NULL)
+    h = NULL, precision = 0.001)
 }
 \arguments{
   \item{formula}{an object of class \code{"\link{formula}"} (or one that
@@ -64,6 +64,7 @@
   \item{h}{The bandwidth corresponding to the estimated density to form the 
     nonparametric conformal prediction region.  The default value is 
     \code{1/bins}.}
+  \item{precision}{the precision of the line search.}
 }
 \details{
   The function which computes all of the prediction regions outlined in the 
