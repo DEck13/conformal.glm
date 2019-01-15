@@ -83,9 +83,9 @@ Compute the highest density (HD) prediction region.
 library(HDInterval)
 betaMLE <- coefficients(fit)
 shapeMLE <- as.numeric(gamma.shape(fit)[1])
-rateMLE <- cbind(1, newdata) %*% betaMLE * shapeMLE
+rateMLE <- cbind(1, x) %*% betaMLE * shapeMLE
 minlength <- do.call(rbind, 
-  lapply(1:nrow(newdata), function(j){ 
+  lapply(1:nrow(x), function(j){ 
     hdi(qgamma, 0.90, shape = shapeMLE, rate = rateMLE[j, 1])
   }))
 ```
@@ -120,7 +120,7 @@ lines(x[ix], paraCI[ix, 2], type = "l", col = "red")
 axis(2)
 
 # nonparametric conformal prediction region
-plot.nonpar <- function(region){
+plot.nonparametric <- function(region){
   if(class(region) != "list"){ 
     stop("Only appropriate for nonparametric conformal prediction region")
   }
@@ -133,8 +133,6 @@ plot.nonpar <- function(region){
     even <- which(1:length(foo) %% 2 == 0)
     segments(x0 = 1/bins * (i-1), y0 = foo, x1 =1/bins * i, 
       col = "red")
-    if(i == 1) segments(x0 = 0, y0 = foo[odd] , y1 = foo[even],
-      col = "red")
     if(i != 1){ 
       bar <- nonparaCI[[i-1]]
       baz <- sort(c(foo,bar))
@@ -143,11 +141,9 @@ plot.nonpar <- function(region){
       segments(x0 = 1/bins * (i-1), y0 = baz[odd2], 
         y1 = baz[even2], col = "red")
     }
-    if(i == bins) segments(x0 = 1, y0 = foo[odd], 
-      y1 = foo[even], col = "red")
   }
 }    
-plot.nonpar(nonparaCI)
+plot.nonparametric(nonparaCI)
 
 # least squares conformal prediction region
 plot.new()
@@ -207,7 +203,7 @@ local.coverage(region = paraCI, data = data,  k = p,
 
 ## nonparametric conformal prediction region
 # estimated area
-area.nonpar <- function(region){
+area.nonparametric <- function(region){
   if(class(region) != "list"){ 
     stop("Only appropriate for nonparametric conformal prediction region")
   }
@@ -219,7 +215,7 @@ area.nonpar <- function(region){
   }
   area
 }
-area.nonpar(nonparaCI)
+area.nonparametric(nonparaCI)
 # local coverage
 local.coverage(region = nonparaCI, data = data, k = p, 
   nonparametric = "TRUE", bins = bins, at.data = "TRUE")
