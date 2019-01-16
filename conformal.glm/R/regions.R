@@ -336,76 +336,6 @@ regions <- function(formula, data, newdata, family = "gaussian", link,
     ## desired predictor combination 
     ## ignores the intercept of the newdata matrix
     if(class(h) == "NULL") h <- wn
-    
-    #COPS <- function(newdata){ 
-    #  out <- mclapply(1:n.pred, mc.cores = cores, FUN = function(j){
-    #    index.bin <- which(index == index.pred[j])
-    #    nk <- length(index.bin)
-    #    Yk <- Y[index.bin]
-
-    #    ## initial check for enough data within bin
-    #    nk.tilde <- floor(alpha * (nk + 1))
-    #   if(nk.tilde == 0) stop("bin width is too small")
-
-    #    ## nonparametric density
-    #    phatxy <- function(y){                
-    #      out <- which(unlist(lapply(1:nk, FUN = function(j){
-    #       Yknotj <- Yk[-j]
-    #        Ykj <- Yk[j]
-    #        sum(dnorm(Yknotj, mean = y, sd = h) 
-    #          - dnorm(Yknotj, mean = Ykj, sd = h))
-    #      })) >= 0)
-    #      if(length(out) == 0) out <- -1
-    #      length(out) >= nk.tilde
-    #    }
-
-    #    ## set up a lower (upper lower bound) and upper bound 
-    #    ## (lower upper bound) to start two line searchs in order to 
-    #    ## construct the nonparametric conformal prediction region
-    #    quant.Yk <- quantile(Yk, probs = c(2 * alpha, 1 - 2 * alpha ))
-    #    y.lwr <- y.min <- as.numeric(quant.Yk[1])
-    #    y.upr <- y.max <- as.numeric(quant.Yk[2])
-
-    #    # lower line search
-    #    prec <- max( min(diff(sort(Yk[Yk <= y.min]))), 0.001)      
-    #    steps <- 1
-    #    while(phatxy(y.lwr)){
-    #      y.lwr <- y.lwr - steps * prec
-    #      steps <- steps + 1
-    #    }
-    #    steps <- 1
-    #    prec <- min( min(diff(sort(Yk[Yk <= y.min]))), 0.001)
-    #    if(prec < 0.001) prec <- mean(min(diff(sort(Yk[Yk <= y.min]))), 0.001)
-    #    while(!phatxy(y.lwr)){
-    #      y.lwr <- y.lwr + steps * prec
-    #      steps <- steps + 1
-    #    }
-
-    #    # upper line search
-    #    prec <- max( min(diff(sort(Yk[Yk >= y.max]))), 0.001)
-    #    steps <- 1
-    #    while(phatxy(y.upr)){
-    #      y.upr <- y.upr + steps * prec
-    #      steps <- steps + 1
-    #    }
-    #    steps <- 1
-    #    prec <- min( min(diff(sort(Yk[Yk >= y.max]))), 0.001) 
-    #    if(prec < 0.001) prec <- mean(min(diff(sort(Yk[Yk >= y.max]))), 0.001)
-    #    while(!phatxy(y.upr)){
-    #      y.upr <- y.upr - steps * prec
-    #      steps <- steps + 1
-    #    }
-
-    #    c(y.lwr, y.upr)
-    #  })
-
-    #  out <- do.call(rbind, out)
-    #  colnames(out) <- c("lwr", "upr")
-    #  out
-    #}
-
-    #nonparaconformal <- COPS(newdata)
-
     COPS <- function(newdata){ 
       out <- mclapply(sort(unique(index.pred)), mc.cores = cores, 
         FUN = function(j){
@@ -479,7 +409,7 @@ regions <- function(formula, data, newdata, family = "gaussian", link,
             if(k == 1) endpts <- 
               c(min(y.seq), y.seq[breaks[k]], y.seq[breaks[k]+1])
             if(k != 1 & k != length(breaks)) endpts <- 
-              c(endpts, y.seq[breaks[k]+1], y.seq[breaks[k+1]])
+              c(endpts, y.seq[breaks[k]], y.seq[breaks[k]+1])
             if(k == length(breaks)) endpts <- 
               c(endpts, y.seq[breaks[k]], y.seq[breaks[k]+1], max(y.seq))
           }

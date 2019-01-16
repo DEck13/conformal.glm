@@ -54,7 +54,8 @@ nonparaCI <- cpred$nonparaconformal
 ```
 
 
-Compute the least squares (LS) conformal prediction region from the conformalInference package.
+Compute the least squares (LS) conformal prediction region with local 
+weighting using the conformalInference package.
 ```r
 ## least squares conformal prediction region
 library(conformalInference)
