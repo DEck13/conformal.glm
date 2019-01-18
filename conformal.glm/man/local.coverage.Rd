@@ -6,7 +6,7 @@
 }
 \usage{
   local.coverage(region, nonparametric = "FALSE", data, 
-    at.data = "TRUE", newdata = NULL, k, bins = NULL)
+    at.data = "TRUE", newdata = NULL, d, bins = NULL)
 }
 \arguments{
   \item{region}{a prediction region of interest.}
@@ -25,7 +25,7 @@
     coercible by \code{\link{as.data.frame}} to a data frame) containing
     new observations for which a prediction is desired. Must be provided if 
     \code{at.data = "FALSE"}.}
-  \item{k}{desired dimension of the predictor space corresponding to the 
+  \item{d}{desired dimension of the predictor space corresponding to the 
     model of interest.} 
   \item{bins}{an optional argument for specifying the desired number of 
     bins to use along one dimension of the predictor space. If missing, the 

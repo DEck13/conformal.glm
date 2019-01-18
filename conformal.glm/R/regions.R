@@ -1,17 +1,17 @@
 
-find.index <- function(mat, wn, k){
+find.index <- function(mat, wn, d){
   A <- seq(from = 0, to = 1 - wn, by = wn)
   if(wn == 1) A <- 0
   n.out <- nrow(mat)
   out <- rep(0, n.out)
   for(j in 1:n.out){
     foo <- 0
-    for(i in 1:k){
-      if(i < k){
+    for(i in 1:d){
+      if(i < d){
         foo <- foo + 
-          (max(which(A < mat[j, i])) - 1) * (1/wn)^(k-i)
+          (max(which(A < mat[j, i])) - 1) * (1/wn)^(d-i)
       }
-      if(i == k){
+      if(i == d){
         foo <- foo + 
           max(which(A < mat[j, i]))
       }
@@ -26,48 +26,54 @@ find.index <- function(mat, wn, k){
 
 
 local.coverage <- function(region, nonparametric = "FALSE", data, 
-  at.data = "TRUE", newdata = NULL, k, bins = NULL){
+  at.data = "TRUE", newdata = NULL, d, bins = NULL){
 
   n <- nrow(data)
-  wn <- min(1/ floor(1 / (log(n)/n)^(1/(k+3))), 1/2)
+  wn <- min(1/ floor(1 / (log(n)/n)^(1/(d+3))), 1/2)
   if(class(bins) != "NULL") wn <- 1 / bins
-  index.data <- find.index(as.matrix(data[, 1:k + 1]), wn = wn, k = k)
+  index.data <- find.index(as.matrix(data[, 1:d + 1]), wn = wn, d = d)
 
   # parametric and nonparametric prediction regions are 
   # data is formatted as (y, predictors)
-  output <- NULL
+  output <- rep(NA, bins)
   if(at.data == TRUE){
     if(nonparametric == "FALSE"){
-      x <- as.matrix(data[,1:k + 1], col = k)
-      index.newdata <- find.index(x, wn = wn, k = k)
+      x <- as.matrix(data[,1:d + 1], col = d)
+      index.newdata <- find.index(x, wn = wn, d = d)
       colnames(region) <- c("lwr","upr")
-      output <- unlist(lapply(sort(unique(index.data)), function(j){    
-        y <- data[index.data == j, 1]
-        lwr <- region[index.newdata == j, 1]
-        upr <- region[index.newdata == j, 2]
-        out <- mean(lwr <= y & y <= upr)
-        out
+      output[sort(unique(index.data))] <- 
+        unlist(lapply(sort(unique(index.data)), function(j){    
+          y <- data[index.data == j, 1]
+          lwr <- region[index.newdata == j, 1]
+          upr <- region[index.newdata == j, 2]
+          out <- mean(lwr <= y & y <= upr)
+          out
       }))
     }
     if(nonparametric == "TRUE"){
       n.bins.region <- length(region)
-      x <- as.matrix(data[,1:k + 1], col = k)
-      index.bins.region <- find.index(x, wn = 1/n.bins.region, k = k)
+      x <- as.matrix(data[,1:d + 1], col = d)
+      index.bins.region <- find.index(x, wn = 1/n.bins.region, d = d)
       y <- data[, 1]
       ## put each y value with its corresponding prediction interval
       foo <- lapply(1:n, FUN = function(j){
         c(y[j], region[[index.bins.region[j]]])
       })
 
-      output <- unlist(lapply(sort(unique(index.data)), function(j){
-        index.j <- which(index.data == j)
-        ## indicate which endpoints y is between
-        int <- unlist(lapply(index.j, FUN = function(x){
-          which(foo[[x]][1] > foo[[x]][-1])
-        }))
-        ## only odd numbers correspond to y being in one of the 
-        ## (possibly disjoint) intervals
-        mean(int %% 2 == 1)
+      output[sort(unique(index.data))] <- 
+        unlist(lapply(sort(unique(index.data)), function(j){
+          index.j <- which(index.data == j)
+          ## indicate which endpoints y is between
+          int <- unlist(lapply(index.j, FUN = function(x){
+            bar <- 0
+            if(any(foo[[x]][1] > foo[[x]][-1])){
+              bar <- max(which(foo[[x]][1] > foo[[x]][-1]))
+            }
+            bar
+          }))
+          ## only odd numbers correspond to y being in one of the 
+          ## (possibly disjoint) intervals
+          mean(int %% 2 == 1)
       }))
     }
   }
@@ -76,28 +82,27 @@ local.coverage <- function(region, nonparametric = "FALSE", data,
     ### right now only works for univariate regression
     ### and unimodal regions
     colnames(region) <- c("lwr","upr")
-    index.newdata <- find.index(newdata, wn = wn, k = k)
-    output <- unlist(lapply(sort(unique(index.data)), function(j){
-      input1 <- data[, 1:k + 1]
-      m.lwr <- lm(lwr ~ poly(input1, degree = 3), 
-        data = as.data.frame(cbind(data, region)), 
-        subset = index.newdata == j)
-      m.upr <- lm(upr ~ poly(input1, degree = 3), 
-        data = as.data.frame(cbind(data, region)),
-        subset = index.newdata == j)
+    index.newdata <- find.index(newdata, wn = wn, d = d)
+    output[sort(unique(index.data))] <- 
+      unlist(lapply(sort(unique(index.data)), function(j){
+        input1 <- data[, 1:d + 1]
+        m.lwr <- lm(lwr ~ poly(input1, degree = 3), 
+          data = as.data.frame(cbind(data, region)), 
+          subset = index.newdata == j)
+        m.upr <- lm(upr ~ poly(input1, degree = 3), 
+          data = as.data.frame(cbind(data, region)),
+          subset = index.newdata == j)
 
-      newdat <- as.data.frame(data[index.data == j, 1:k + 1])
-      colnames(newdat) <- paste("input", 1:k, sep = "")
-      p.lwr <- predict(m.lwr, newdata = newdat)
-      p.upr <- predict(m.upr, newdata = newdat)
-      y <- data[index.data == j, 1]
-      out <- mean(p.lwr <= y & y <= p.upr)
+        newdat <- as.data.frame(data[index.data == j, 1:d + 1])
+        colnames(newdat) <- paste("input", 1:d, sep = "")
+        p.lwr <- predict(m.lwr, newdata = newdat)
+        p.upr <- predict(m.upr, newdata = newdat)
+        y <- data[index.data == j, 1]
+        out <- mean(p.lwr <= y & y <= p.upr)
     }))  
   }
   output
 }
-
-
 
 
 
@@ -125,39 +130,45 @@ regions <- function(formula, data, newdata, family = "gaussian", link,
   ## obtain OLS estimate 
   ## calculate important quantities for the gaussian 
   ## distribution 
-  m1 <- lm(formula, data = data, x = TRUE)
-  X <- matrix(m1$x[, -1], nrow = n)
   X.variables <- as.matrix(data[,-which(colnames(data) %in% respname)], 
     nrow = n)
-  k <- ncol(X.variables)
-  betaOLS <- betaMLE <- coefficients(m1)
-  p <- length(betaOLS) - 1
-  sd.res <- summary(m1)$sigma
-
-  ## Get MLEs and plugin interval for gamma gamma distribution 
-  shapeMLE <- rateMLE <- 0
+  d <- ncol(X.variables)
+  m1 <- X <- betaOLS <- NULL; p <- sd.res <- 0
+  if(family == "gaussian"){
+  m1 <- lm(formula, data = data, x = TRUE)
+    X <- matrix(m1$x[, -1], nrow = n)
+    betaOLS <- betaMLE <- coefficients(m1)
+    p <- length(betaOLS) - 1
+    sd.res <- summary(m1)$sigma
+  }
+  ## Get MLEs and plugin interval for gamma distribution 
+  betaMLE <- shapeMLE <- rateMLE <- 0
   if(family == "Gamma"){
-    m1 <- glm(formula, data = data, family = family)
+    m1 <- glm(formula, data = data, family = family, x = TRUE)
+    X <- matrix(m1$x[, -1], nrow = n)
     betaMLE <- coefficients(m1)
+    p <- length(betaMLE) - 1
     shapeMLE <- as.numeric(gamma.shape(m1)[1])
     rateMLE <- cbind(1, X) %*% betaMLE * shapeMLE
   }
 
   ## Get MLEs and plugin interval for Inverse Gaussian Distribution 
   if(family == "inverse.gaussian"){
-    m1 <- glm(formula, data = data, family = family)
+    m1 <- glm(formula, data = data, family = family, x = TRUE)
+    X <- matrix(m1$x[, -1], nrow = n)
     betaMLE <- coefficients(m1)
+    p <- length(betaMLE) - 1
   }
 
   ## set up partition
-  wn <- min(1/ floor(1 / (log(n)/n)^(1/(k+3))), 1/2)
+  wn <- min(1/ floor(1 / (log(n)/n)^(1/(d+3))), 1/2)
   if(class(bins) != "NULL") wn <- 1 / bins
 
   ## important internal quantities for our prediction regions   
   ## create seperate data frames with respect to each partition 
   ## ignores the intercept of the newdata matrix
-  index <- find.index(X.variables, wn = wn, k = k)
-  index.pred <- find.index(matrix(newdata, ncol = k), wn = wn, k = k)
+  index <- find.index(X.variables, wn = wn, d = d)
+  index.pred <- find.index(matrix(newdata, ncol = d), wn = wn, d = d)
   indices.pred <- sort(unique(index.pred))
 
 
@@ -189,7 +200,7 @@ regions <- function(formula, data, newdata, family = "gaussian", link,
       colnames(data.y) <- colnames(data)
 
       out <- mclapply(1:n.pred, mc.cores = cores, FUN = function(j){
-        x.variables <- matrix(newdata.variables[j, ], nrow = 1, ncol = k)
+        x.variables <- matrix(newdata.variables[j, ], nrow = 1, ncol = d)
         x <- matrix(newdata.formula[j, ], nrow = 1, ncol = p)
         index.bin <- which(index == index.pred[j])
         nk <- length(index.bin)
@@ -270,9 +281,6 @@ regions <- function(formula, data, newdata, family = "gaussian", link,
           }
           if(y.min - y.lwr > 0.001){
             prec <- min( min(diff(sort(Yk[Yk <= y.min]))), precision)
-            #if(prec < precision){ 
-            #  prec <- mean(min(diff(sort(Yk[Yk <= y.min]))), 0.0001)
-            #}
           }
           while(rank(phatxy(y.lwr))[nk + 1] < nk.tilde & y.lwr < max(Yk)){
             y.lwr <- y.lwr + steps * prec
@@ -294,9 +302,6 @@ regions <- function(formula, data, newdata, family = "gaussian", link,
         }
         if(y.upr - y.max > precision){
           prec <- min( min(diff(sort(Yk[Yk >= y.max]))), precision)
-          #if(prec < 0.001){ 
-          #  prec <- mean(min(diff(sort(Yk[Yk >= y.max]))), 0.0001)
-          #}
         }        
         while(rank(phatxy(y.upr))[nk + 1] < nk.tilde){
           y.upr <- y.upr - steps * prec

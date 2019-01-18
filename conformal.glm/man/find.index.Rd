@@ -5,14 +5,14 @@
   Assigns bin labels to data points.
 }
 \usage{
-  find.index(mat, wn, k)
+  find.index(mat, wn, d)
 }
 \arguments{
   \item{mat}{a model matrix consisting of predictors, main effects only.}
   \item{wn}{the bin width corresponding to a partition of the 
     predictor space.  The partitions considered are formed by 
     equilateral cubes.  Therefore \code{wn} is a scalar.}
-  \item{k}{desired dimension of the predictor space corresponding to the 
+  \item{d}{desired dimension of the predictor space corresponding to the 
     model of interest.} 
 }
 \details{
