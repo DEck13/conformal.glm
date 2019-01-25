@@ -23,7 +23,7 @@ and the model does not have additive symmetric errors.  We also compare
 conformal prediction regions to the oracle highest density region under 
 the correct model. This example is included in the corresponding paper:  
 
-  Eck, D.J., Crawford, F.W., and Aronow, P.M. (2018+)
+  Eck, D.J., Crawford, F.W., and Aronow, P.M. (2019+)
   Conformal prediction for exponential families and generalized linear models.
   Preprint available on request (email daniel.eck@yale.edu).
 
@@ -182,13 +182,13 @@ mtext("y", side = 2, line = 2.5, outer = TRUE, cex = 2)
 ## Coverage properties and estimated area of all prediction regions
 
 All of the presented prediction regions exhibit close to finite-sample 
-marginal validity and local validity with respect to bining.  However, 
+marginal validity and local validity with respect to binning.  However, 
 the LS conformal prediction region and the HD prediction region do not exhibit 
 finite-sample local validity in the second bin and the HD prediction region 
 does not quite possess finite-sample marginal validity.  The parametric 
 conformal prediction region is smallest in size with an estimated area of 
 2.20.  The HD prediction region is a close second with an estimated area of 
-2.21.  LS conformal prediction region has an estimated area of 2.57 and 
+2.21.  LSLW conformal prediction region has an estimated area of 2.57 and 
 The nonparametric conformal prediction region has an estimated area of 2.69.  
 Under correct model specification, the parametric conformal prediction 
 region is similar in performance to that of the highest density prediction 
@@ -264,7 +264,7 @@ citation("conformal.glm")
 
 For more details on the parametric conformal prediction region, see:
 
-  Eck, D.J., Crawford, F.W., and Aronow, P.M. (2018+)
+  Eck, D.J., Crawford, F.W., and Aronow, P.M. (2019+)
   Conformal prediction for exponential families and generalized linear models.
   Preprint available on request (email daniel.eck@yale.edu).
 
