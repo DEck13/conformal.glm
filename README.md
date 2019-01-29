@@ -171,8 +171,8 @@ lines(x[ix], HDCI[ix, 2], type = "l", col = "red")
 axis(1)
 
 # axis labels
-mtext("x", side = 1, line = 2.5, outer = TRUE, cex = 2)
-mtext("y", side = 2, line = 2.5, outer = TRUE, cex = 2)
+mtext("horizontal axis", side = 1, line = 2.5, outer = TRUE, cex = 1.25)
+mtext("y", side = 2, line = 2.5, outer = TRUE, cex = 1.25)
 ```
 
 
