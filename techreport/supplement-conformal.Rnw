@@ -2023,7 +2023,7 @@ par(mfrow = c(2,2), oma = c(4,4,0,0), mar = c(1,1,1,2))
 shapes <- c(0.5, 0.75, 1, 1.5, 2, 5, 7, 10, 12, 15, 20, 25)
 
 plot.new()
-plot.window(xlim = c(log(min(shapes)), log(max(shapes))), ylim = c(0, 0.5))
+plot.window(xlim = c(log(min(shapes)), log(max(shapes))), ylim = c(0, 0.55))
 lines(log(shapes), para.area.gamma.150, col = "red", lty = 1)
 lines(log(shapes), nonpara.area.gamma.150, col = "green", lty = 2)
 lines(log(shapes), LSLW.area.gamma.150, col = "purple", lty = 1)
@@ -2032,7 +2032,7 @@ lines(log(shapes), HD.area.gamma.150, col = "blue", lty = 4)
 axis(2)
 mtext("area", side = 2, cex = 1, line = 2)
 
-legend(0.40, 0.50, legend=c("parametric conformal", 
+legend(-0.25, 0.55, legend=c("parametric conformal", 
   "nonparametric conformal", "LSLW conformal", "LS conformal", 
   "HD region", "nominal coverage"), col=c("red", "green", "purple", 
   "black", "blue", "grey"), 
@@ -2086,7 +2086,7 @@ par(mfrow = c(2,2), oma = c(4,4,0,0), mar = c(1,1,1,2))
 shapes <- c(0.5, 0.75, 1, 1.5, 2, 5, 7, 10, 12, 15, 20, 25)
 
 plot.new()
-plot.window(xlim = c(log(min(shapes)), log(max(shapes))), ylim = c(0, 0.5))
+plot.window(xlim = c(log(min(shapes)), log(max(shapes))), ylim = c(0, 0.55))
 lines(log(shapes), para.area.gamma.150, col = "red", lty = 1)
 lines(log(shapes), nonpara.area.gamma.150, col = "green", lty = 2)
 lines(log(shapes), LSLW.area.gamma.150, col = "purple", lty = 1)
@@ -2095,7 +2095,7 @@ lines(log(shapes), HD.area.gamma.150, col = "blue", lty = 4)
 axis(2)
 mtext("area", side = 2, cex = 1, line = 2)
 
-legend(0.40, 0.50, legend=c("parametric conformal", 
+legend(-0.25, 0.55, legend=c("parametric conformal", 
   "nonparametric conformal", "LSLW conformal", "LS conformal", 
   "HD region", "nominal coverage"), col=c("red", "green", "purple", 
   "black", "blue", "grey"), 
@@ -2292,12 +2292,11 @@ axis(1)
 mtext("shape = 25", side = 3, cex = 1, line = 2)
 
 plot.new()
-plot.window(xlim = c(log(min(shapes)), log(max(shapes))), 
-  ylim = c(0.90, 0.98))
-legend(0.25, 0.98, legend=c("parametric conformal", 
+plot.window(xlim = c(0,1), ylim = c(0.90, 0.98))
+legend(0, 0.98, legend=c("parametric conformal", 
   "nonparametric conformal", "LSLW conformal", "LS conformal", 
   "HD region", "nominal coverage"), col=c("red", "green", "purple", 
-  "black", "blue", "grey"), 
+  "black", "blue", "grey"), cex = 0.66,
   lty=c(1,2,1,2,4,1), bty = "n")
 
 
@@ -2453,12 +2452,11 @@ axis(1)
 mtext("shape = 25", side = 3, cex = 1, line = 2)
 
 plot.new()
-plot.window(xlim = c(log(min(shapes)), log(max(shapes))), 
-  ylim = c(0.90, 0.98))
-legend(0.25, 0.98, legend=c("parametric conformal", 
+plot.window(xlim = c(0, 1), ylim = c(0.90, 0.98))
+legend(0, 0.96, legend=c("parametric conformal", 
   "nonparametric conformal", "LSLW conformal", "LS conformal", 
   "HD region", "nominal coverage"), col=c("red", "green", "purple", 
-  "black", "blue", "grey"), 
+  "black", "blue", "grey"), cex = 0.66,
   lty=c(1,2,1,2,4,1), bty = "n")
 
 
@@ -2614,9 +2612,8 @@ axis(1); axis(2)
 mtext("coverage in bin 3", side = 2, cex = 1, line = 2)
 
 plot.new()
-plot.window(xlim = c(log(min(shapes)), log(max(shapes))), 
-  ylim = c(0.90, 0.98))
-legend(0.25, 0.96, legend=c("parametric conformal", 
+plot.window(xlim = c(0, 1), ylim = c(0.90, 0.98))
+legend(0, 0.96, legend=c("parametric conformal", 
   "nonparametric conformal", "LSLW conformal", "LS conformal", 
   "HD region", "nominal coverage"), col=c("red", "green", "purple", 
   "black", "blue", "grey"), 
@@ -2780,12 +2777,11 @@ axis(1)
 mtext("shape = 25", side = 3, cex = 1, line = 2)
 
 plot.new()
-plot.window(xlim = c(log(min(shapes)), log(max(shapes))), 
-  ylim = c(0.90, 0.98))
-legend(0.25, 0.98, legend=c("parametric conformal", 
+plot.window(xlim = c(0,1), ylim = c(0.90, 0.98))
+legend(0, 0.98, legend=c("parametric conformal",
   "nonparametric conformal", "LSLW conformal", "LS conformal", 
   "HD region", "nominal coverage"), col=c("red", "green", "purple", 
-  "black", "blue", "grey"), 
+  "black", "blue", "grey"), cex = 0.66,
   lty=c(1,2,1,2,4,1), bty = "n")
 
 mtext("x", side = 1, cex = 1.5, line = 2, outer = TRUE)
@@ -2941,12 +2937,11 @@ axis(1)
 mtext("shape = 25", side = 3, cex = 1, line = 2)
 
 plot.new()
-plot.window(xlim = c(log(min(shapes)), log(max(shapes))), 
-  ylim = c(0.90, 0.98))
-legend(0.25, 0.98, legend=c("parametric conformal", 
+plot.window(xlim = c(0,1), ylim = c(0.90, 0.98))
+legend(0, 0.98, legend=c("parametric conformal",
   "nonparametric conformal", "LSLW conformal", "LS conformal", 
   "HD region", "nominal coverage"), col=c("red", "green", "purple", 
-  "black", "blue", "grey"), 
+  "black", "blue", "grey"), cex = 0.66,
   lty=c(1,2,1,2,4,1), bty = "n")
 
 mtext("x", side = 1, cex = 1.5, line = 2, outer = TRUE)
@@ -3027,9 +3022,8 @@ axis(1); axis(2)
 mtext("coverage in bin 3", side = 2, cex = 1, line = 2)
 
 plot.new()
-plot.window(xlim = c(log(min(shapes)), log(max(shapes))), 
-  ylim = c(0.90, 0.98))
-legend(0.25, 0.96, legend=c("parametric conformal", 
+plot.window(xlim = c(0, 1), ylim = c(0.90, 0.98))
+legend(0, 0.96, legend=c("parametric conformal", 
   "nonparametric conformal", "LSLW conformal", "LS conformal", 
   "HD region", "nominal coverage"), col=c("red", "green", "purple", 
   "black", "blue", "grey"), 
@@ -3104,9 +3098,8 @@ axis(1); axis(2)
 mtext("coverage in bin 3", side = 2, cex = 1, line = 2)
 
 plot.new()
-plot.window(xlim = c(log(min(shapes)), log(max(shapes))), 
-  ylim = c(0.90, 0.98))
-legend(0.25, 0.96, legend=c("parametric conformal", 
+plot.window(xlim = c(0, 1), ylim = c(0.90, 0.98))
+legend(0, 0.96, legend=c("parametric conformal",  
   "nonparametric conformal", "LSLW conformal", "LS conformal", 
   "HD region", "nominal coverage"), col=c("red", "green", "purple", 
   "black", "blue", "grey"), 
@@ -3122,7 +3115,7 @@ mtext("log(shape)", side = 1, cex = 1.5, line = 2, outer = TRUE)
 
 
 
-% local coverage, n = 500
+
 \newpage
 The code that follows constructs Figure~\ref{Fig:gamma.inx.500}.
 
@@ -3270,12 +3263,11 @@ axis(1)
 mtext("shape = 25", side = 3, cex = 1, line = 2)
 
 plot.new()
-plot.window(xlim = c(log(min(shapes)), log(max(shapes))), 
-  ylim = c(0.90, 0.98))
-legend(0.25, 0.98, legend=c("parametric conformal", 
+plot.window(xlim = c(0, 1), ylim = c(0.90, 0.98))
+legend(0, 0.98, legend=c("parametric conformal", 
   "nonparametric conformal", "LSLW conformal", "LS conformal", 
   "HD region", "nominal coverage"), col=c("red", "green", "purple", 
-  "black", "blue", "grey"), 
+  "black", "blue", "grey"), cex = 0.66, 
   lty=c(1,2,1,2,4,1), bty = "n")
 
 
@@ -3432,12 +3424,11 @@ axis(1)
 mtext("shape = 25", side = 3, cex = 1, line = 2)
 
 plot.new()
-plot.window(xlim = c(log(min(shapes)), log(max(shapes))), 
-  ylim = c(0.90, 0.98))
-legend(0.25, 0.98, legend=c("parametric conformal", 
+plot.window(xlim = c(0, 1), ylim = c(0.90, 0.98))
+legend(0, 0.98, legend=c("parametric conformal", 
   "nonparametric conformal", "LSLW conformal", "LS conformal", 
   "HD region", "nominal coverage"), col=c("red", "green", "purple", 
-  "black", "blue", "grey"), 
+  "black", "blue", "grey"), cex = 0.66, 
   lty=c(1,2,1,2,4,1), bty = "n")
 
 
@@ -4695,11 +4686,11 @@ axis(1)
 mtext("shape = 100", side = 3, cex = 1, line = 2)
 
 plot.new()
-plot.window(xlim = c(0, 1), ylim = c(0.80, 0.98))
-legend(0, 0.98, legend=c("misspecified parametric conformal", 
+plot.window(xlim = c(0, 1), ylim = c(0.90, 0.98))
+legend(0, 0.96, legend=c("misspecified parametric conformal", 
   "nonparametric conformal", "LSLW conformal", "LS conformal", 
   "HD region", "nominal coverage"), col=c("red", "green", "purple", 
-  "black", "blue", "grey"), 
+  "black", "blue", "grey"), cex = 0.75,
   lty=c(1,2,1,2,4,1), bty = "n")
 
 mtext("x", side = 1, cex = 1.5, line = 2, outer = TRUE)
@@ -4845,10 +4836,10 @@ mtext("shape = 100", side = 3, cex = 1, line = 2)
 
 plot.new()
 plot.window(xlim = c(0, 1), ylim = c(0.90, 0.98))
-legend(0, 0.98, legend=c("misspecified parametric conformal", 
+legend(0, 0.96, legend=c("misspecified parametric conformal",  
   "nonparametric conformal", "LSLW conformal", "LS conformal", 
   "HD region", "nominal coverage"), col=c("red", "green", "purple", 
-  "black", "blue", "grey"), 
+  "black", "blue", "grey"), cex = 0.75,
   lty=c(1,2,1,2,4,1), bty = "n")
 
 mtext("x", side = 1, cex = 1.5, line = 2, outer = TRUE)
