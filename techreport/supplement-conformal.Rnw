@@ -368,7 +368,7 @@ lines(x[ix], HDCI[ix, 2], type = "l", col = "red")
 axis(1)
 
 # axis labels
-mtext("x", side = 1, line = 2.5, outer = TRUE, cex = 2)
+mtext("horizontal axis", side = 1, line = 2.5, outer = TRUE, cex = 2)
 mtext("y", side = 2, line = 2.5, outer = TRUE, cex = 2)
 @
 
@@ -431,7 +431,7 @@ lines(x[ix], HDCI[ix, 2], type = "l", col = "red")
 axis(1)
 
 # axis labels
-mtext("x", side = 1, line = 2.5, outer = TRUE, cex = 2)
+mtext("horizontal axis", side = 1, line = 2.5, outer = TRUE, cex = 2)
 mtext("y", side = 2, line = 2.5, outer = TRUE, cex = 2)
 @
 \end{center}
@@ -913,8 +913,8 @@ lines(inx, LS.local.coverage.inx, col = "black", lty = 2)
 lines(inx, HD.local.coverage.inx, col = "blue", lty = 4)
 abline(h = 0.90, lty = 1, col = "grey")
 axis(1); axis(2)
-mtext("x", side = 1, cex = 1.5, line = 2, outer = TRUE)
-mtext("coverage probability", side = 2, cex = 1.5, line = 2, outer = TRUE)
+mtext("horizontal axis", side = 1, cex = 1.25, line = 2, outer = TRUE)
+mtext("coverage probability", side = 2, cex = 1.25, line = 2, outer = TRUE)
 
 legend(0.50, 0.80, legend=c("parametric conformal", 
   "nonparametric conformal", "LSLW conformal", "LS conformal", 
@@ -938,8 +938,8 @@ lines(inx, LS.local.coverage.inx, col = "black", lty = 2)
 lines(inx, HD.local.coverage.inx, col = "blue", lty = 4)
 abline(h = 0.90, lty = 1, col = "grey")
 axis(1); axis(2)
-mtext("x", side = 1, cex = 1.5, line = 2, outer = TRUE)
-mtext("coverage probability", side = 2, cex = 1.5, line = 2, outer = TRUE)
+mtext("horizontal axis", side = 1, cex = 1.25, line = 2, outer = TRUE)
+mtext("coverage probability", side = 2, cex = 1.25, line = 2, outer = TRUE)
 
 legend(0.50, 0.80, legend=c("parametric conformal", 
   "nonparametric conformal", "LSLW conformal", "LS conformal", 
@@ -958,6 +958,7 @@ legend(0.50, 0.80, legend=c("parametric conformal",
 
 \newpage
 \section{Additional Gamma simulations}
+\label{sec:Gamma}
 
 For the simulations in this section we generate responses using a gamma 
 regression model with one variable.  We specify the inverse link function 
@@ -2074,7 +2075,7 @@ abline(h = 0.90, lty = 1, col = "grey")
 axis(1); axis(2)
 mtext("coverage in bin 2", side = 2, cex = 1, line = 2)
 
-mtext("log(shape)", side = 1, cex = 1.5, line = 2, outer = TRUE)
+mtext("log(shape)", side = 1, cex = 1.25, line = 2, outer = TRUE)
 @
 
 % Diagnostics, n = 150
@@ -2137,7 +2138,7 @@ abline(h = 0.90, lty = 1, col = "grey")
 axis(1); axis(2)
 mtext("coverage in bin 2", side = 2, cex = 1, line = 2)
 
-mtext("log(shape)", side = 1, cex = 1.5, line = 2, outer = TRUE)
+mtext("log(shape)", side = 1, cex = 1.25, line = 2, outer = TRUE)
 @
 \end{center}
 \caption{Diagnostic plots for prediction regions when the model is correctly 
@@ -2300,8 +2301,8 @@ legend(0, 0.98, legend=c("parametric conformal",
   lty=c(1,2,1,2,4,1), bty = "n")
 
 
-mtext("x", side = 1, cex = 1.5, line = 2, outer = TRUE)
-mtext("coverage", side = 2, cex = 1.5, line = 0, outer = TRUE)
+mtext("horizontal axis", side = 1, cex = 1.25, line = 2, outer = TRUE)
+mtext("coverage", side = 2, cex = 1.25, line = 0, outer = TRUE)
 @
 
 
@@ -2460,8 +2461,8 @@ legend(0, 0.96, legend=c("parametric conformal",
   lty=c(1,2,1,2,4,1), bty = "n")
 
 
-mtext("x", side = 1, cex = 1.5, line = 2, outer = TRUE)
-mtext("coverage", side = 2, cex = 1.5, line = 0, outer = TRUE)
+mtext("horizontal axis", side = 1, cex = 1.25, line = 2, outer = TRUE)
+mtext("coverage", side = 2, cex = 1.25, line = 0, outer = TRUE)
 @
 \end{center}
 \caption{Plot of the estimated coverage probabilities of prediction regions 
@@ -2544,7 +2545,7 @@ legend(0.25, 0.96, legend=c("parametric conformal",
   "black", "blue", "grey"), 
   lty=c(1,2,1,2,4,1), bty = "n")
 
-mtext("log(shape)", side = 1, cex = 1.5, line = 2, outer = TRUE)
+mtext("log(shape)", side = 1, cex = 1.25, line = 2, outer = TRUE)
 @
 
 % Diagnostics, n = 250
@@ -2619,7 +2620,7 @@ legend(0, 0.96, legend=c("parametric conformal",
   "black", "blue", "grey"), 
   lty=c(1,2,1,2,4,1), bty = "n")
 
-mtext("log(shape)", side = 1, cex = 1.5, line = 2, outer = TRUE)
+mtext("log(shape)", side = 1, cex = 1.25, line = 2, outer = TRUE)
 @
 \end{center}
 \caption{Diagnostic plots for prediction regions when the model is correctly 
@@ -2784,8 +2785,8 @@ legend(0, 0.98, legend=c("parametric conformal",
   "black", "blue", "grey"), cex = 0.66,
   lty=c(1,2,1,2,4,1), bty = "n")
 
-mtext("x", side = 1, cex = 1.5, line = 2, outer = TRUE)
-mtext("coverage", side = 2, cex = 1.5, line = 0, outer = TRUE)
+mtext("horizontal axis", side = 1, cex = 1.25, line = 2, outer = TRUE)
+mtext("coverage", side = 2, cex = 1.25, line = 0, outer = TRUE)
 @
 
 
@@ -2944,8 +2945,8 @@ legend(0, 0.98, legend=c("parametric conformal",
   "black", "blue", "grey"), cex = 0.66,
   lty=c(1,2,1,2,4,1), bty = "n")
 
-mtext("x", side = 1, cex = 1.5, line = 2, outer = TRUE)
-mtext("coverage", side = 2, cex = 1.5, line = 0, outer = TRUE)
+mtext("horizontal axis", side = 1, cex = 1.25, line = 2, outer = TRUE)
+mtext("coverage", side = 2, cex = 1.25, line = 0, outer = TRUE)
 @
 \end{center}
 \caption{Plot of the estimated coverage probabilities of prediction regions 
@@ -3029,7 +3030,7 @@ legend(0, 0.96, legend=c("parametric conformal",
   "black", "blue", "grey"), 
   lty=c(1,2,1,2,4,1), bty = "n")
 
-mtext("log(shape)", side = 1, cex = 1.5, line = 2, outer = TRUE)
+mtext("log(shape)", side = 1, cex = 1.25, line = 2, outer = TRUE)
 @
 
 
@@ -3105,7 +3106,7 @@ legend(0, 0.96, legend=c("parametric conformal",
   "black", "blue", "grey"), 
   lty=c(1,2,1,2,4,1), bty = "n")
 
-mtext("log(shape)", side = 1, cex = 1.5, line = 2, outer = TRUE)
+mtext("log(shape)", side = 1, cex = 1.25, line = 2, outer = TRUE)
 @
 \end{center}
 \caption{Diagnostic plots for prediction regions when the model is correctly 
@@ -3271,8 +3272,8 @@ legend(0, 0.98, legend=c("parametric conformal",
   lty=c(1,2,1,2,4,1), bty = "n")
 
 
-mtext("x", side = 1, cex = 1.5, line = 2, outer = TRUE)
-mtext("coverage", side = 2, cex = 1.5, line = 0, outer = TRUE)
+mtext("horizontal axis", side = 1, cex = 1.25, line = 2, outer = TRUE)
+mtext("coverage", side = 2, cex = 1.25, line = 0, outer = TRUE)
 @
 
 
@@ -3432,8 +3433,8 @@ legend(0, 0.98, legend=c("parametric conformal",
   lty=c(1,2,1,2,4,1), bty = "n")
 
 
-mtext("x", side = 1, cex = 1.5, line = 2, outer = TRUE)
-mtext("coverage", side = 2, cex = 1.5, line = 0, outer = TRUE)
+mtext("horizontal axis", side = 1, cex = 1.25, line = 2, outer = TRUE)
+mtext("coverage", side = 2, cex = 1.25, line = 0, outer = TRUE)
 @
 \end{center}
 \caption{Plot of the estimated coverage probabilities of prediction regions 
@@ -3450,6 +3451,7 @@ mtext("coverage", side = 2, cex = 1.5, line = 0, outer = TRUE)
 
 \newpage
 \section{Gamma-Gaussian model misspecification}
+\label{sec:misspec}
 
 In this Section, we compare the parametric conformal prediction 
 region, the nonparametric conformal prediction region, the LSLW conformal 
@@ -4477,7 +4479,7 @@ abline(h = 0.90, lty = 1, col = "grey")
 axis(1); axis(2)
 mtext("coverage in bin 2", side = 2, cex = 1, line = 2)
 
-mtext("log(shape)", side = 1, cex = 1.5, line = 2, outer = TRUE)
+mtext("log(shape)", side = 1, cex = 1.25, line = 2, outer = TRUE)
 @
 
 % Diagnostics, n = 150
@@ -4540,7 +4542,7 @@ abline(h = 0.90, lty = 1, col = "grey")
 axis(1); axis(2)
 mtext("coverage in bin 2", side = 2, cex = 1, line = 2)
 
-mtext("log(shape)", side = 1, cex = 1.5, line = 2, outer = TRUE)
+mtext("log(shape)", side = 1, cex = 1.25, line = 2, outer = TRUE)
 @
 \end{center}
 \caption{Diagnostic plots for prediction regions when the model is 
@@ -4693,8 +4695,8 @@ legend(0, 0.96, legend=c("misspecified parametric conformal",
   "black", "blue", "grey"), cex = 0.75,
   lty=c(1,2,1,2,4,1), bty = "n")
 
-mtext("x", side = 1, cex = 1.5, line = 2, outer = TRUE)
-mtext("coverage", side = 2, cex = 1.5, line = 0, outer = TRUE)
+mtext("horizontal axis", side = 1, cex = 1.25, line = 2, outer = TRUE)
+mtext("coverage", side = 2, cex = 1.25, line = 0, outer = TRUE)
 @
 
 
@@ -4842,8 +4844,8 @@ legend(0, 0.96, legend=c("misspecified parametric conformal",
   "black", "blue", "grey"), cex = 0.75,
   lty=c(1,2,1,2,4,1), bty = "n")
 
-mtext("x", side = 1, cex = 1.5, line = 2, outer = TRUE)
-mtext("coverage", side = 2, cex = 1.5, line = 0, outer = TRUE)
+mtext("horizontal axis", side = 1, cex = 1.25, line = 2, outer = TRUE)
+mtext("coverage", side = 2, cex = 1.25, line = 0, outer = TRUE)
 @
 \end{center}
 \caption{Plot of the estimated coverage probabilities of prediction regions 
@@ -4928,7 +4930,7 @@ legend(0, 0.96, legend=c("misspecified parametric conformal",
   "black", "blue", "grey"), 
   lty=c(1,2,1,2,4,1), bty = "n")
 
-mtext("log(shape)", side = 1, cex = 1.5, line = 2, outer = TRUE)
+mtext("log(shape)", side = 1, cex = 1.25, line = 2, outer = TRUE)
 @
 
 % Diagnostics, n = 250
@@ -5005,7 +5007,7 @@ legend(0, 0.96, legend=c("misspecified parametric conformal",
   "black", "blue", "grey"), 
   lty=c(1,2,1,2,4,1), bty = "n")
 
-mtext("log(shape)", side = 1, cex = 1.5, line = 2, outer = TRUE)
+mtext("log(shape)", side = 1, cex = 1.25, line = 2, outer = TRUE)
 @
 \end{center}
 \caption{Diagnostic plots for prediction regions when the model is 
@@ -5096,8 +5098,8 @@ abline(h = 0.90, lty = 1, col = "grey")
 axis(1); axis(2)
 mtext("shape = 25", side = 3, cex = 1, line = 2)
 
-mtext("x", side = 1, cex = 1.5, line = 2, outer = TRUE)
-mtext("coverage", side = 2, cex = 1.5, line = 0, outer = TRUE)
+mtext("horizontal axis", side = 1, cex = 1.25, line = 2, outer = TRUE)
+mtext("coverage", side = 2, cex = 1.25, line = 0, outer = TRUE)
 @
 
 
@@ -5181,8 +5183,8 @@ abline(h = 0.90, lty = 1, col = "grey")
 axis(1); axis(2)
 mtext("shape = 25", side = 3, cex = 1, line = 2)
 
-mtext("x", side = 1, cex = 1.5, line = 2, outer = TRUE)
-mtext("coverage", side = 2, cex = 1.5, line = 0, outer = TRUE)
+mtext("horizontal axis", side = 1, cex = 1.25, line = 2, outer = TRUE)
+mtext("coverage", side = 2, cex = 1.25, line = 0, outer = TRUE)
 @
 \end{center}
 \caption{Plot of the estimated coverage probabilities of prediction regions 
@@ -5267,7 +5269,7 @@ legend(0, 0.96, legend=c("misspecified parametric conformal",
   "black", "blue", "grey"), 
   lty=c(1,2,1,2,4,1), bty = "n")
 
-mtext("log(shape)", side = 1, cex = 1.5, line = 2, outer = TRUE)
+mtext("log(shape)", side = 1, cex = 1.25, line = 2, outer = TRUE)
 @
 
 
@@ -5344,7 +5346,7 @@ legend(0, 0.96, legend=c("misspecified parametric conformal",
   "black", "blue", "grey"), 
   lty=c(1,2,1,2,4,1), bty = "n")
 
-mtext("log(shape)", side = 1, cex = 1.5, line = 2, outer = TRUE)
+mtext("log(shape)", side = 1, cex = 1.25, line = 2, outer = TRUE)
 @
 \end{center}
 \caption{Diagnostic plots for prediction regions when the model is 
@@ -5435,8 +5437,8 @@ abline(h = 0.90, lty = 1, col = "grey")
 axis(1); axis(2)
 mtext("shape = 25", side = 3, cex = 1, line = 2)
 
-mtext("x", side = 1, cex = 1.5, line = 2, outer = TRUE)
-mtext("coverage", side = 2, cex = 1.5, line = 0, outer = TRUE)
+mtext("horizontal axis", side = 1, cex = 1.25, line = 2, outer = TRUE)
+mtext("coverage", side = 2, cex = 1.25, line = 0, outer = TRUE)
 @
 
 
@@ -5520,8 +5522,8 @@ abline(h = 0.90, lty = 1, col = "grey")
 axis(1); axis(2)
 mtext("shape = 25", side = 3, cex = 1, line = 2)
 
-mtext("x", side = 1, cex = 1.5, line = 2, outer = TRUE)
-mtext("coverage", side = 2, cex = 1.5, line = 0, outer = TRUE)
+mtext("horizontal axis", side = 1, cex = 1.25, line = 2, outer = TRUE)
+mtext("coverage", side = 2, cex = 1.25, line = 0, outer = TRUE)
 @
 \end{center}
 \caption{Plot of the estimated coverage probabilities of prediction regions 
@@ -5533,6 +5535,698 @@ mtext("coverage", side = 2, cex = 1.5, line = 0, outer = TRUE)
 
 
 
+
+
+\newpage
+\section{Example plots of prediction regions}
+
+In this section we construct the prediction regions corresponding to the 
+simulations and results in Sections~\ref{sec:Gamma} and \ref{sec:misspec}.  
+
+
+\subsection{Plots corresponding to Section~\ref{sec:Gamma}}
+
+<<>>=
+makeplots  <- function(n = 500, bins = 3, shape = 1, beta){
+
+  ## generate random data
+  set.seed(13)
+  alpha <- 0.10
+  cores <- 6
+  p <- k <- length(beta) - 1
+  x <- matrix(runif(n), ncol = p)
+  rate <- (cbind(1, x) %*% beta) * shape
+  y <- rgamma(n = n, shape = shape, rate = rate)
+  y <- y / sd(y)
+  data <- data.frame(y = y, x = x)
+  colnames(data)[2:(p+1)] <- paste("x", 1:p, sep = "")
+
+  ## fit the Gamma regression model
+  fit <- glm(y ~ x1, family = "Gamma", data = data)
+  formula <- fit$formula
+  newdata <- data
+  respname <- all.vars(formula)[1]
+  newdata <- newdata[, !(colnames(data) %in% respname)]
+  newdata <- as.matrix(newdata)
+
+  ## obtain parametric and nonparametric conformal 
+  ## prediction regions
+  cpred <- conformal.glm(fit, parametric = TRUE, 
+    nonparametric = FALSE, alpha = alpha,
+    bins = bins, cores = cores)
+  paraCI <- cpred$paraconformal
+
+  cpred <- conformal.glm(fit, parametric = FALSE, 
+    nonparametric = TRUE, alpha = alpha,
+    bins = bins, cores = cores)
+  nonparaCI <- cpred$nonparaconformal
+
+  ## obtain LS conformal prediction region
+  p1.tibs <- conformal.pred(x = cbind(x, x^2, x^3), y = y, 
+    x0 = cbind(x, x^2, x^3), train.fun = train.fun, 
+    predict.fun = predict.fun, alpha = alpha, 
+    grid.method = "linear")
+  LSCI <- cbind(p1.tibs$lo, p1.tibs$up)
+
+  ## obtain LSLW conformal prediction region
+  cubic.model <- lm(y ~ x + I(x^2) + I(x^3))
+  abs.resid <- abs(cubic.model$resid)
+  smooth.call <- smooth.spline(x, abs.resid, 
+    nknots = 10)
+  lambda <- smooth.call$lambda
+  df <- smooth.call$df
+  mad.train.fun <- function(x, y, out = NULL){
+    smooth.spline(x[, 1], y, lambda = lambda, 
+    df = df, nknots = 10)
+  }
+  p2.tibs <- conformal.pred(x = cbind(x,x^2,x^3), y = y, 
+    x0 = cbind(x,x^2,x^3), 
+    train.fun = train.fun, predict.fun = predict.fun, 
+    mad.train.fun = mad.train.fun,
+    mad.predict.fun = mad.predict.fun,
+    alpha = alpha)
+  LSLWCI <- cbind(p2.tibs$lo, p2.tibs$up)  
+
+  ## obtain HD prediction region (functionality for 
+  ## different families and link functions)
+  betaMLE <- coefficients(fit)
+  shapeMLE <- as.numeric(gamma.shape(fit)[1])
+  rateMLE <- cbind(1, newdata) %*% betaMLE * shapeMLE
+  HDCI <- do.call(rbind, lapply(1:nrow(newdata), function(j){ 
+    hdi(qgamma, 1 - alpha, shape = shapeMLE, rate = rateMLE[j, 1])
+  }))
+  
+  ## create plots
+  ix <- sort(x, index.return = TRUE)$ix
+  par(mfrow = c(3,2), oma = c(4,4,0,0), mar = c(1,1,1,1))
+
+  ## parametric conformal
+  plot.new()
+  plot.window(xlim = c(0, 1), ylim = c(-2, max(y)))
+  points(x, y, pch = 19, col = "gray")
+  lines(x[ix], paraCI[ix, 1], col = "red")
+  lines(x[ix], paraCI[ix, 2], col = "red")
+  axis(2)
+
+  ## HD region
+  plot.new()
+  plot.window(xlim = c(0,1), ylim = c(-2, max(y)))
+  points(x, y, pch = 19, col = "gray")
+  lines(x[ix], HDCI[ix, 1], col = "red")
+  lines(x[ix], HDCI[ix, 2], col = "red")
+
+  ## LSLW conformal
+  plot.new()
+  plot.window(xlim = c(0, 1), ylim = c(-2, max(y)))
+  points(x, y, pch = 19, col = "gray")
+  lines(x[ix], LSLWCI[ix, 1], col = "red")
+  lines(x[ix], LSLWCI[ix, 2], col = "red")
+  axis(2)
+
+  ## nonparametric conformal
+  plot.nonparametric <- function(region){
+    if(class(region) != "list"){ 
+      stop("Only appropriate for nonparametric conformal prediction region")
+    }
+    plot.new()
+    plot.window(xlim = c(0,1), ylim = c(-2, max(y)))
+    points(x, y, pch = 19, col = "gray")
+    for(i in 1:bins){ 
+      nonpar.i  <- nonparaCI[[i]]
+      odd <- which(1:length(nonpar.i) %% 2 == 1) 
+      even <- which(1:length(nonpar.i) %% 2 == 0)
+      segments(x0 = 1/bins * (i-1), y0 = nonpar.i, x1 =1/bins * i, 
+        col = "red")
+      if(i != 1){ 
+        nonpar.i.previous <- nonparaCI[[i-1]]
+        nonpar <- sort(c(nonpar.i, nonpar.i.previous))
+        odd2 <- which(1:length(nonpar) %% 2 == 1) 
+        even2 <- which(1:length(nonpar) %% 2 == 0)
+        segments(x0 = 1/bins * (i-1), y0 = nonpar[odd2], 
+          y1 = nonpar[even2], col = "red")
+      }
+    }
+  }    
+  plot.nonparametric(nonparaCI)
+  axis(1)
+
+  ## LS conformal
+  plot.new()
+  plot.window(xlim = c(0, 1), ylim = c(-2, max(y)))
+  points(x, y, pch = 19, col = "gray")
+  lines(x[ix], LSCI[ix, 1], col = "red")
+  lines(x[ix], LSCI[ix, 2], col = "red")
+  axis(1); axis(2)
+
+  mtext("horizontal axis", side = 1, cex = 1.25, line = 2, outer = TRUE)
+  mtext("y", side = 2, cex = 1.25, line = 2, outer = TRUE)
+
+}
+@
+
+
+\newpage
+\begin{figure}[h!]
+\begin{center}
+<<plot-regions-150-2-0-5, cache = TRUE>>=
+beta <- c(1.1, -1)
+makeplots(n = 150, shape = 0.5, bins = 2, beta = beta)
+@
+\end{center}
+\caption{Sim setting: $n = 150$, shape = $0.5$, and bins = $2$. 
+  The regions are depicted as follows: 
+    parametric conformal prediction region (top-left panel),
+    HD prediction region (top-right panel),
+    LSLW conformal prediction region (middle-left panel),
+    nonparametric conformal prediction region (middle-right panel),
+    LS conformal prediction region (bottom-left panel).}
+\label{plot.regions.150.2.0.5}
+\end{figure}
+
+
+\newpage
+\begin{figure}[h!]
+\begin{center}
+<<plot-regions-150-2-0-75, cache = TRUE>>=
+makeplots(n = 150, shape = 0.75, bins = 2, beta = beta)
+@
+\end{center}
+\caption{Sim setting: $n = 150$, shape = $0.75$, and bins = $2$. 
+  The regions are depicted as follows: 
+    parametric conformal prediction region (top-left panel),
+    HD prediction region (top-right panel),
+    LSLW conformal prediction region (middle-left panel),
+    nonparametric conformal prediction region (middle-right panel),
+    LS conformal prediction region (bottom-left panel).}
+\label{plot.regions.150.2.0.75}
+\end{figure}
+
+
+\newpage
+\begin{figure}[h!]
+\begin{center}
+<<plot-regions-150-2-1, cache = TRUE>>=
+makeplots(n = 150, shape = 1, bins = 2, beta = beta)
+@
+\end{center}
+\caption{Sim setting: $n = 150$, shape = $1$, and bins = $2$. 
+  The regions are depicted as follows: 
+    parametric conformal prediction region (top-left panel),
+    HD prediction region (top-right panel),
+    LSLW conformal prediction region (middle-left panel),
+    nonparametric conformal prediction region (middle-right panel),
+    LS conformal prediction region (bottom-left panel).}
+\label{plot.regions.150.2.1}
+\end{figure}
+
+
+\newpage
+\begin{figure}[h!]
+\begin{center}
+<<plot-regions-150-2-2, cache = TRUE>>=
+makeplots(n = 150, shape = 2, bins = 2, beta = beta)
+@
+\end{center}
+\caption{Sim setting: $n = 150$, shape = $2$, and bins = $2$. 
+  The regions are depicted as follows: 
+    parametric conformal prediction region (top-left panel),
+    HD prediction region (top-right panel),
+    LSLW conformal prediction region (middle-left panel),
+    nonparametric conformal prediction region (middle-right panel),
+    LS conformal prediction region (bottom-left panel).}
+\label{plot.regions.150.2.2}
+\end{figure}
+
+
+\newpage
+\begin{figure}[h!]
+\begin{center}
+<<plot-regions-150-2-5, cache = TRUE>>=
+makeplots(n = 150, shape = 5, bins = 2, beta = beta)
+@
+\end{center}
+\caption{Sim setting: $n = 150$, shape = $2$, and bins = $5$. 
+  The regions are depicted as follows: 
+    parametric conformal prediction region (top-left panel),
+    HD prediction region (top-right panel),
+    LSLW conformal prediction region (middle-left panel),
+    nonparametric conformal prediction region (middle-right panel),
+    LS conformal prediction region (bottom-left panel).}
+\label{plot.regions.150.2.5}
+\end{figure}
+
+
+\newpage
+\begin{figure}[h!]
+\begin{center}
+<<plot-regions-150-2-7, cache = TRUE>>=
+makeplots(n = 150, shape = 7, bins = 2, beta = beta)
+@
+\end{center}
+\caption{Sim setting: $n = 150$, shape = $7$, and bins = $2$. 
+  The regions are depicted as follows: 
+    parametric conformal prediction region (top-left panel),
+    HD prediction region (top-right panel),
+    LSLW conformal prediction region (middle-left panel),
+    nonparametric conformal prediction region (middle-right panel),
+    LS conformal prediction region (bottom-left panel).}
+\label{plot.regions.150.2.7}
+\end{figure}
+
+
+\newpage
+\begin{figure}[h!]
+\begin{center}
+<<plot-regions-150-2-10, cache = TRUE>>=
+makeplots(n = 150, shape = 10, bins = 2, beta = beta)
+@
+\end{center}
+\caption{Sim setting: $n = 150$, shape = $10$, and bins = $2$. 
+  The regions are depicted as follows: 
+    parametric conformal prediction region (top-left panel),
+    HD prediction region (top-right panel),
+    LSLW conformal prediction region (middle-left panel),
+    nonparametric conformal prediction region (middle-right panel),
+    LS conformal prediction region (bottom-left panel).}
+\label{plot.regions.150.2.10}
+\end{figure}
+
+
+\newpage
+\begin{figure}[h!]
+\begin{center}
+<<plot-regions-150-2-12, cache = TRUE>>=
+makeplots(n = 150, shape = 12, bins = 2, beta = beta)
+@
+\end{center}
+\caption{Sim setting: $n = 150$, shape = $12$, and bins = $2$. 
+  The regions are depicted as follows: 
+    parametric conformal prediction region (top-left panel),
+    HD prediction region (top-right panel),
+    LSLW conformal prediction region (middle-left panel),
+    nonparametric conformal prediction region (middle-right panel),
+    LS conformal prediction region (bottom-left panel).}
+\label{plot.regions.150.2.12}
+\end{figure}
+
+
+\newpage
+\begin{figure}[h!]
+\begin{center}
+<<plot-regions-150-2-15, cache = TRUE>>=
+makeplots(n = 150, shape = 15, bins = 2, beta = beta)
+@
+\end{center}
+\caption{Sim setting: $n = 150$, shape = $15$, and bins = $2$. 
+  The regions are depicted as follows: 
+    parametric conformal prediction region (top-left panel),
+    HD prediction region (top-right panel),
+    LSLW conformal prediction region (middle-left panel),
+    nonparametric conformal prediction region (middle-right panel),
+    LS conformal prediction region (bottom-left panel).}
+\label{plot.regions.150.2.15}
+\end{figure}
+
+
+\newpage
+\begin{figure}[h!]
+\begin{center}
+<<plot-regions-150-2-20, cache = TRUE>>=
+makeplots(n = 150, shape = 20, bins = 2, beta = beta)
+@
+\end{center}
+\caption{Sim setting: $n = 150$, shape = $20$, and bins = $2$. 
+  The regions are depicted as follows: 
+    parametric conformal prediction region (top-left panel),
+    HD prediction region (top-right panel),
+    LSLW conformal prediction region (middle-left panel),
+    nonparametric conformal prediction region (middle-right panel),
+    LS conformal prediction region (bottom-left panel).}
+\label{plot.regions.150.2.20}
+\end{figure}
+
+
+\newpage
+\begin{figure}[h!]
+\begin{center}
+<<plot-regions-150-2-25, cache = TRUE>>=
+makeplots(n = 150, shape = 25, bins = 2, beta = beta)
+@
+\end{center}
+\caption{Sim setting: $n = 150$, shape = $25$, and bins = $2$. 
+  The regions are depicted as follows: 
+    parametric conformal prediction region (top-left panel),
+    HD prediction region (top-right panel),
+    LSLW conformal prediction region (middle-left panel),
+    nonparametric conformal prediction region (middle-right panel),
+    LS conformal prediction region (bottom-left panel).}
+\label{plot.regions.150.2.25}
+\end{figure}
+
+
+
+
+\newpage
+\subsection{Plots corresponding to Section~\ref{sec:misspec}}
+
+<<>>=
+makeplots.misspec  <- function(n = 500, bins = 3, shape = 1, beta){
+
+  ## generate random data
+  set.seed(13)
+  alpha <- 0.10
+  cores <- 6
+  p <- k <- length(beta) - 1
+  x <- matrix(runif(n), ncol = p)
+  rate <- (cbind(1, x) %*% beta) * shape
+  y <- rgamma(n = n, shape = shape, rate = rate)
+  y <- y / sd(y)
+  data <- data.frame(y = y, x = x)
+  colnames(data)[2:(p+1)] <- paste("x", 1:p, sep = "")
+
+  ## fit the Gamma regression model
+  fit <- glm(y ~ x1 + I(x1^2) + I(x1^2), 
+    family = "gaussian", data = data)
+  formula <- fit$formula
+  newdata <- data
+  respname <- all.vars(formula)[1]
+  newdata <- newdata[, !(colnames(data) %in% respname)]
+  newdata <- as.matrix(newdata)
+
+  ## obtain parametric and nonparametric conformal 
+  ## prediction regions
+  cpred <- conformal.glm(fit, parametric = TRUE, 
+    nonparametric = FALSE, alpha = alpha,
+    bins = bins, cores = cores)
+  paraCI <- cpred$paraconformal
+
+  cpred <- conformal.glm(fit, parametric = FALSE, 
+    nonparametric = TRUE, alpha = alpha,
+    bins = bins, cores = cores)
+  nonparaCI <- cpred$nonparaconformal
+
+  ## obtain LS conformal prediction region
+  p1.tibs <- conformal.pred(x = cbind(x, x^2, x^3), y = y, 
+    x0 = cbind(x, x^2, x^3), train.fun = train.fun, 
+    predict.fun = predict.fun, alpha = alpha, 
+    grid.method = "linear")
+  LSCI <- cbind(p1.tibs$lo, p1.tibs$up)
+
+  ## obtain LSLW conformal prediction region
+  cubic.model <- lm(y ~ x + I(x^2) + I(x^3))
+  abs.resid <- abs(cubic.model$resid)
+  smooth.call <- smooth.spline(x, abs.resid, 
+    nknots = 10)
+  lambda <- smooth.call$lambda
+  df <- smooth.call$df
+  mad.train.fun <- function(x, y, out = NULL){
+    smooth.spline(x[, 1], y, lambda = lambda, 
+    df = df, nknots = 10)
+  }
+  p2.tibs <- conformal.pred(x = cbind(x,x^2,x^3), y = y, 
+    x0 = cbind(x,x^2,x^3), 
+    train.fun = train.fun, predict.fun = predict.fun, 
+    mad.train.fun = mad.train.fun,
+    mad.predict.fun = mad.predict.fun,
+    alpha = alpha)
+  LSLWCI <- cbind(p2.tibs$lo, p2.tibs$up)  
+
+  ## obtain HD prediction region (functionality for 
+  ## different families and link functions)
+  fit = lm(y ~ x1 + I(x1^2) + I(x1^3), data = data)
+  betaMLE <- coefficients(fit)
+  sdMLE <- summary(fit)$sigma
+  meanMLE <- as.numeric(cbind(1, x, x^2, x^3) %*% betaMLE)
+  HDCI <- do.call(rbind, lapply(1:nrow(newdata), function(j){ 
+    hdi(qnorm, 1 - alpha, sd = sdMLE, mean = meanMLE[j])
+  }))
+  
+  ## create plots
+  ix <- sort(x, index.return = TRUE)$ix
+  par(mfrow = c(3,2), oma = c(4,4,0,0), mar = c(1,1,1,1))
+
+  ## parametric conformal
+  plot.new()
+  plot.window(xlim = c(0, 1), ylim = c(min(y)-1, max(y)+1))
+  points(x, y, pch = 19, col = "gray")
+  lines(x[ix], paraCI[ix, 1], col = "red")
+  lines(x[ix], paraCI[ix, 2], col = "red")
+  axis(2)
+
+  ## LSLW conformal
+  plot.new()
+  plot.window(xlim = c(0, 1), ylim = c(min(y)-1, max(y)+1))
+  points(x, y, pch = 19, col = "gray")
+  lines(x[ix], LSLWCI[ix, 1], col = "red")
+  lines(x[ix], LSLWCI[ix, 2], col = "red")
+
+  ## HD region
+  plot.new()
+  plot.window(xlim = c(0, 1), ylim = c(min(y)-1, max(y)+1))
+  points(x, y, pch = 19, col = "gray")
+  lines(x[ix], HDCI[ix, 1], col = "red")
+  lines(x[ix], HDCI[ix, 2], col = "red")
+  axis(2)
+
+  ## nonparametric conformal
+  plot.nonparametric <- function(region){
+    if(class(region) != "list"){ 
+      stop("Only appropriate for nonparametric conformal prediction region")
+    }
+    plot.new()
+    plot.window(xlim = c(0, 1), ylim = c(min(y)-1, max(y)+1))
+    points(x, y, pch = 19, col = "gray")
+    for(i in 1:bins){ 
+      nonpar.i  <- nonparaCI[[i]]
+      odd <- which(1:length(nonpar.i) %% 2 == 1) 
+      even <- which(1:length(nonpar.i) %% 2 == 0)
+      segments(x0 = 1/bins * (i-1), y0 = nonpar.i, x1 =1/bins * i, 
+        col = "red")
+      if(i != 1){ 
+        nonpar.i.previous <- nonparaCI[[i-1]]
+        nonpar <- sort(c(nonpar.i, nonpar.i.previous))
+        odd2 <- which(1:length(nonpar) %% 2 == 1) 
+        even2 <- which(1:length(nonpar) %% 2 == 0)
+        segments(x0 = 1/bins * (i-1), y0 = nonpar[odd2], 
+          y1 = nonpar[even2], col = "red")
+      }
+    }
+  }    
+  plot.nonparametric(nonparaCI)
+  axis(1)
+
+  ## LS conformal
+  plot.new()
+  plot.window(xlim = c(0, 1), ylim = c(min(y)-1, max(y)+1))
+  points(x, y, pch = 19, col = "gray")
+  lines(x[ix], LSCI[ix, 1], col = "red")
+  lines(x[ix], LSCI[ix, 2], col = "red")
+  axis(1); axis(2)
+
+  mtext("horizontal axis", side = 1, cex = 1.25, line = 2, outer = TRUE)
+  mtext("y", side = 2, cex = 1.25, line = 2, outer = TRUE)
+
+}
+@
+
+
+\newpage
+\begin{figure}[h!]
+\begin{center}
+<<plot-misspec-150-2-5, cache = TRUE>>=
+beta <- c(0.5, 1)
+makeplots.misspec(n = 150, shape = 5, bins = 2, beta = beta)
+@
+\end{center}
+\caption{Sim setting: $n = 150$, shape = $5$, and bins = $2$. 
+  The regions are depicted as follows: 
+    parametric conformal prediction region (top-left panel),
+    HD prediction region (top-right panel),
+    LSLW conformal prediction region (middle-left panel),
+    nonparametric conformal prediction region (middle-right panel),
+    LS conformal prediction region (bottom-left panel).}
+\label{plot.misspec.150.2.5}
+\end{figure}
+
+
+\newpage
+\begin{figure}[h!]
+\begin{center}
+<<plot-misspec-150-2-10, cache = TRUE>>=
+makeplots.misspec(n = 150, shape = 10, bins = 2, beta = beta)
+@
+\end{center}
+\caption{Sim setting: $n = 150$, shape = $10$, and bins = $2$. 
+  The regions are depicted as follows: 
+    parametric conformal prediction region (top-left panel),
+    HD prediction region (top-right panel),
+    LSLW conformal prediction region (middle-left panel),
+    nonparametric conformal prediction region (middle-right panel),
+    LS conformal prediction region (bottom-left panel).}
+\label{plot.misspec.150.2.10}
+\end{figure}
+
+
+\newpage
+\begin{figure}[h!]
+\begin{center}
+<<plot-misspec-150-2-20, cache = TRUE>>=
+makeplots.misspec(n = 150, shape = 20, bins = 2, beta = beta)
+@
+\end{center}
+\caption{Sim setting: $n = 150$, shape = $20$, and bins = $2$. 
+  The regions are depicted as follows: 
+    parametric conformal prediction region (top-left panel),
+    HD prediction region (top-right panel),
+    LSLW conformal prediction region (middle-left panel),
+    nonparametric conformal prediction region (middle-right panel),
+    LS conformal prediction region (bottom-left panel).}
+\label{plot.misspec.150.2.20}
+\end{figure}
+
+
+\newpage
+\begin{figure}[h!]
+\begin{center}
+<<plot-misspec-150-2-30, cache = TRUE>>=
+makeplots.misspec(n = 150, shape = 30, bins = 2, beta = beta)
+@
+\end{center}
+\caption{Sim setting: $n = 150$, shape = $30$, and bins = $2$. 
+  The regions are depicted as follows: 
+    parametric conformal prediction region (top-left panel),
+    HD prediction region (top-right panel),
+    LSLW conformal prediction region (middle-left panel),
+    nonparametric conformal prediction region (middle-right panel),
+    LS conformal prediction region (bottom-left panel).}
+\label{plot.misspec.150.2.30}
+\end{figure}
+
+
+\newpage
+\begin{figure}[h!]
+\begin{center}
+<<plot-misspec-150-2-40, cache = TRUE>>=
+makeplots.misspec(n = 150, shape = 40, bins = 2, beta = beta)
+@
+\end{center}
+\caption{Sim setting: $n = 150$, shape = $40$, and bins = $2$. 
+  The regions are depicted as follows: 
+    parametric conformal prediction region (top-left panel),
+    HD prediction region (top-right panel),
+    LSLW conformal prediction region (middle-left panel),
+    nonparametric conformal prediction region (middle-right panel),
+    LS conformal prediction region (bottom-left panel).}
+\label{plot.misspec.150.2.40}
+\end{figure}
+
+
+\newpage
+\begin{figure}[h!]
+\begin{center}
+<<plot-misspec-150-2-50, cache = TRUE>>=
+makeplots.misspec(n = 150, shape = 50, bins = 2, beta = beta)
+@
+\end{center}
+\caption{Sim setting: $n = 150$, shape = $50$, and bins = $2$. 
+  The regions are depicted as follows: 
+    parametric conformal prediction region (top-left panel),
+    HD prediction region (top-right panel),
+    LSLW conformal prediction region (middle-left panel),
+    nonparametric conformal prediction region (middle-right panel),
+    LS conformal prediction region (bottom-left panel).}
+\label{plot.misspec.150.2.50}
+\end{figure}
+
+
+\newpage
+\begin{figure}[h!]
+\begin{center}
+<<plot-misspec-150-2-60, cache = TRUE>>=
+makeplots.misspec(n = 150, shape = 60, bins = 2, beta = beta)
+@
+\end{center}
+\caption{Sim setting: $n = 150$, shape = $60$, and bins = $2$. 
+  The regions are depicted as follows: 
+    parametric conformal prediction region (top-left panel),
+    HD prediction region (top-right panel),
+    LSLW conformal prediction region (middle-left panel),
+    nonparametric conformal prediction region (middle-right panel),
+    LS conformal prediction region (bottom-left panel).}
+\label{plot.misspec.150.2.60}
+\end{figure}
+
+
+\newpage
+\begin{figure}[h!]
+\begin{center}
+<<plot-misspec-150-2-70, cache = TRUE>>=
+makeplots.misspec(n = 150, shape = 70, bins = 2, beta = beta)
+@
+\end{center}
+\caption{Sim setting: $n = 150$, shape = $70$, and bins = $2$. 
+  The regions are depicted as follows: 
+    parametric conformal prediction region (top-left panel),
+    HD prediction region (top-right panel),
+    LSLW conformal prediction region (middle-left panel),
+    nonparametric conformal prediction region (middle-right panel),
+    LS conformal prediction region (bottom-left panel).}
+\label{plot.misspec.150.2.70}
+\end{figure}
+
+
+\newpage
+\begin{figure}[h!]
+\begin{center}
+<<plot-misspec-150-2-80, cache = TRUE>>=
+makeplots.misspec(n = 150, shape = 80, bins = 2, beta = beta)
+@
+\end{center}
+\caption{Sim setting: $n = 150$, shape = $80$, and bins = $2$. 
+  The regions are depicted as follows: 
+    parametric conformal prediction region (top-left panel),
+    HD prediction region (top-right panel),
+    LSLW conformal prediction region (middle-left panel),
+    nonparametric conformal prediction region (middle-right panel),
+    LS conformal prediction region (bottom-left panel).}
+\label{plot.misspec.150.2.80}
+\end{figure}
+
+
+\newpage
+\begin{figure}[h!]
+\begin{center}
+<<plot-misspec-150-2-90, cache = TRUE>>=
+makeplots.misspec(n = 150, shape = 90, bins = 2, beta = beta)
+@
+\end{center}
+\caption{Sim setting: $n = 150$, shape = $90$, and bins = $2$. 
+  The regions are depicted as follows: 
+    parametric conformal prediction region (top-left panel),
+    HD prediction region (top-right panel),
+    LSLW conformal prediction region (middle-left panel),
+    nonparametric conformal prediction region (middle-right panel),
+    LS conformal prediction region (bottom-left panel).}
+\label{plot.misspec.150.2.90}
+\end{figure}
+
+
+\newpage
+\begin{figure}[h!]
+\begin{center}
+<<plot-misspec-150-2-100, cache = TRUE>>=
+makeplots.misspec(n = 150, shape = 100, bins = 2, beta = beta)
+@
+\end{center}
+\caption{Sim setting: $n = 150$, shape = $100$, and bins = $2$. 
+  The regions are depicted as follows: 
+    parametric conformal prediction region (top-left panel),
+    HD prediction region (top-right panel),
+    LSLW conformal prediction region (middle-left panel),
+    nonparametric conformal prediction region (middle-right panel),
+    LS conformal prediction region (bottom-left panel).}
+\label{plot.misspec.150.2.100}
+\end{figure}
 
 
 
