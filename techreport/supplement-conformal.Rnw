@@ -769,37 +769,25 @@ system.time(local.500.3.2 <- do.call(cbind, lapply(1:B,
 })))
 @
 
-
-Reorganize the output.
-
-
 <<>>=
-para.marginal <- mean(local.500.3.2[1, ])
-para.local.coverage <- rowMeans(local.500.3.2[2:4, ])
-para.local.coverage.inx <- rowMeans(local.500.3.2[5:29, ])
-para.area <- mean(local.500.3.2[30, ])
-para.error <- mean(local.500.3.2[31, ])
-nonpara.marginal <- mean(local.500.3.2[32, ])
-nonpara.local.coverage <- rowMeans(local.500.3.2[33:35, ])
-nonpara.local.coverage.inx <- rowMeans(local.500.3.2[36:60, ])
-nonpara.area <- mean(local.500.3.2[61, ])
-nonpara.error <- mean(local.500.3.2[62, ])
-LS.marginal <- mean(local.500.3.2[63, ])
-LS.local.coverage <- rowMeans(local.500.3.2[64:66, ])
-LS.local.coverage.inx <- rowMeans(local.500.3.2[67:91, ])
-LS.area <- mean(local.500.3.2[92, ])
-LS.error <- mean(local.500.3.2[93, ])
-LSLW.marginal <- mean(local.500.3.2[94, ])
-LSLW.local.coverage <- rowMeans(local.500.3.2[95:97, ])
-LSLW.local.coverage.inx <- rowMeans(local.500.3.2[98:122, ])
-LSLW.area <- mean(local.500.3.2[123, ])
-LSLW.error <- mean(local.500.3.2[124, ])
-HD.marginal <- mean(local.500.3.2[125, ])
-HD.local.coverage <- rowMeans(local.500.3.2[126:128, ])
-HD.local.coverage.inx <- rowMeans(local.500.3.2[129:153, ])
-HD.area <- mean(local.500.3.2[154, ])
-HD.error <- mean(local.500.3.2[155, ])
+local.gamma.500.3.2 <- cbind( 
+  rowMeans(local.500.3.2, na.rm = TRUE),  
+  apply(local.500.3.2, 1, 
+  FUN = function(x){ 
+    sds <- sd(x, na.rm = TRUE)
+    lengths <- length(which(!is.na(x)))
+    sds / sqrt(lengths)
+  }))
+
+options(scipen = 999)
+local.gamma.500.3.2[, 1] <- round(local.gamma.500.3.2[, 1], 3)
+local.gamma.500.3.2[, 2] <- round(local.gamma.500.3.2[, 2], 4)
 @
+
+
+
+
+
 
 %Describe the table
 Diagnostics for each of the five prediction regions are given in Table 1 and 
@@ -827,33 +815,76 @@ is small and large overcoverage when the predictor is large.  This is best
 evidenced by Figure~\ref{Fig:coverageinx500.3}.
 
 
-<<results="asis">>=
-library(xtable)
-tab <- round(rbind(c(para.area, para.error, para.marginal, 
-    para.local.coverage), 
-  c(nonpara.area, nonpara.error, nonpara.marginal, 
-    nonpara.local.coverage),
-  c(LS.area, LS.error, LS.marginal, LS.local.coverage),
-  c(LSLW.area, LSLW.error, LSLW.marginal, LSLW.local.coverage),
-  c(HD.area, HD.error, HD.marginal, HD.local.coverage)), 3)
-rownames(tab) <- c("parametric conformal", "nonparametric conformal", 
-  "LS conformal", "LSLW conformal", "HD region")
-colnames(tab) <- c("area", "error", "marginal", "bin1", "bin2", "bin3")
-print(xtable(tab, align = c("l","c","c","c","c","c","c"), 
-  digits = 3, caption = "Diagnostics of prediction regions. This table gives 
+
+\begin{table}[t!]
+\tiny
+\begin{center}
+\begin{tabular}{lccccc}
+  & parametric conformal & nonparametric conformal & LS conformal & 
+    LSLW conformal & HD region \\ 
+    marginal coverage & 
+  $\Sexpr{local.gamma.500.3.2[1, 1]} \; (\Sexpr{local.gamma.500.3.2[1, 2]})$ & 
+  $\Sexpr{local.gamma.500.3.2[32, 1]} \; (\Sexpr{local.gamma.500.3.2[32, 2]})$ & 
+  $\Sexpr{local.gamma.500.3.2[63, 1]} \; (\Sexpr{local.gamma.500.3.2[63, 2]})$ & 
+  $\Sexpr{local.gamma.500.3.2[94, 1]} \; (\Sexpr{local.gamma.500.3.2[94, 2]})$ & 
+  $\Sexpr{local.gamma.500.3.2[125, 1]} \; (\Sexpr{local.gamma.500.3.2[125, 2]})$ \\
+    local coverage in bin 1 & 
+  $\Sexpr{local.gamma.500.3.2[2, 1]} \; (\Sexpr{local.gamma.500.3.2[2, 2]})$ & 
+  $\Sexpr{local.gamma.500.3.2[33, 1]} \; (\Sexpr{local.gamma.500.3.2[33, 2]})$ & 
+  $\Sexpr{local.gamma.500.3.2[64, 1]} \; (\Sexpr{local.gamma.500.3.2[64, 2]})$ & 
+  $\Sexpr{local.gamma.500.3.2[95, 1]} \; (\Sexpr{local.gamma.500.3.2[95, 2]})$ & 
+  $\Sexpr{local.gamma.500.3.2[126, 1]} \; (\Sexpr{local.gamma.500.3.2[126, 2]})$ \\
+    local coverage in bin 2 & 
+  $\Sexpr{local.gamma.500.3.2[3, 1]} \; (\Sexpr{local.gamma.500.3.2[3, 2]})$ & 
+  $\Sexpr{local.gamma.500.3.2[34, 1]} \; (\Sexpr{local.gamma.500.3.2[34, 2]})$ & 
+  $\Sexpr{local.gamma.500.3.2[65, 1]} \; (\Sexpr{local.gamma.500.3.2[65, 2]})$ & 
+  $\Sexpr{local.gamma.500.3.2[96, 1]} \; (\Sexpr{local.gamma.500.3.2[96, 2]})$ & 
+  $\Sexpr{local.gamma.500.3.2[127, 1]} \; (\Sexpr{local.gamma.500.3.2[127, 2]})$ \\
+    local coverage in bin 3 & 
+  $\Sexpr{local.gamma.500.3.2[4, 1]} \; (\Sexpr{local.gamma.500.3.2[4, 2]})$ & 
+  $\Sexpr{local.gamma.500.3.2[35, 1]} \; (\Sexpr{local.gamma.500.3.2[35, 2]})$ & 
+  $\Sexpr{local.gamma.500.3.2[66, 1]} \; (\Sexpr{local.gamma.500.3.2[66, 2]})$ & 
+  $\Sexpr{local.gamma.500.3.2[97, 1]} \; (\Sexpr{local.gamma.500.3.2[97, 2]})$ & 
+  $\Sexpr{local.gamma.500.3.2[128, 1]} \; (\Sexpr{local.gamma.500.3.2[128, 2]})$ \\
+    area & 
+  $\Sexpr{local.gamma.500.3.2[30, 1]} \; (\Sexpr{local.gamma.500.3.2[30, 2]})$ & 
+  $\Sexpr{local.gamma.500.3.2[61, 1]} \; (\Sexpr{local.gamma.500.3.2[61, 2]})$ & 
+  $\Sexpr{local.gamma.500.3.2[92, 1]} \; (\Sexpr{local.gamma.500.3.2[92, 2]})$ & 
+  $\Sexpr{local.gamma.500.3.2[123, 1]} \; (\Sexpr{local.gamma.500.3.2[123, 2]})$ & 
+  $\Sexpr{local.gamma.500.3.2[154, 1]} \; (\Sexpr{local.gamma.500.3.2[154, 2]})$ \\
+    prediction error & 
+  $\Sexpr{local.gamma.500.3.2[31, 1]} \; (\Sexpr{local.gamma.500.3.2[31, 2]})$ & 
+  $\Sexpr{local.gamma.500.3.2[62, 1]} \; (\Sexpr{local.gamma.500.3.2[62, 2]})$ & 
+  $\Sexpr{local.gamma.500.3.2[93, 1]} \; (\Sexpr{local.gamma.500.3.2[93, 2]})$ & 
+  $\Sexpr{local.gamma.500.3.2[124, 1]} \; (\Sexpr{local.gamma.500.3.2[124, 2]})$ & 
+  $\Sexpr{local.gamma.500.3.2[155, 1]} \; (\Sexpr{local.gamma.500.3.2[155, 2]})$ 
+\end{tabular}
+\end{center}
+\caption{Diagnostics of prediction regions. This table gives 
     the area, prediction error, marginal coverage, and local coverages with 
     respect to our binning scheme for the parametric, nonparametric, LS, and 
-    LSLW conformal prediction regions and the HD prediction region."))
-@
+    LSLW conformal prediction regions and the HD prediction region.}
+\label{Tab:gamma-results}
+\end{table}
+
+
+
 
 
 \begin{figure}[h!]
 \begin{center}
-<<echo = FALSE>>=
+<<echo = FALSE, fig.height = 4, fig.width = 4>>=
 par(mfrow = c(1,1), oma = c(4,4,0,0), mar = c(1,1,1,1))
+
 inx <- 0.02 + 0:24 * 0.04
+para.local.coverage.inx <- local.gamma.500.3.2[5:29, 1]
+nonpara.local.coverage.inx <- local.gamma.500.3.2[36:60, 1]
+LS.local.coverage.inx <- local.gamma.500.3.2[67:91, 1]
+LSLW.local.coverage.inx <- local.gamma.500.3.2[98:122, 1]
+HD.local.coverage.inx <- local.gamma.500.3.2[129:153, 1]
+
 plot.new()
-plot.window(xlim = c(0, 1), ylim = c(0.50, 1.00))
+plot.window(xlim = c(0, 1), ylim = c(0.40, 1.00))
 lines(inx, para.local.coverage.inx, col = "red", lty = 1)
 lines(inx, nonpara.local.coverage.inx, col = "green", lty = 2)
 lines(inx, LSLW.local.coverage.inx, col = "purple", lty = 1)
@@ -861,14 +892,14 @@ lines(inx, LS.local.coverage.inx, col = "black", lty = 2)
 lines(inx, HD.local.coverage.inx, col = "blue", lty = 4)
 abline(h = 0.90, lty = 1, col = "grey")
 axis(1); axis(2)
-mtext("x", side = 1, cex = 1.25, line = 2, outer = TRUE)
-mtext("coverage probability", side = 2, cex = 1.25, line = 2, outer = TRUE)
+mtext("x", side = 1, cex = 1, line = 2, outer = TRUE)
+mtext("coverage probability", side = 2, cex = 1, line = 2, outer = TRUE)
 
-legend(0.50, 0.80, legend=c("parametric conformal", 
+legend(0.30, 0.75, legend=c("parametric conformal", 
   "nonparametric conformal", "LSLW conformal", "LS conformal", 
   "HD region", "nominal coverage"), col=c("red", "green", "purple", 
   "black", "blue", "grey"), 
-  lty=c(1,2,1,2,4,1), bty = "n")
+  lty=c(1,2,1,2,4,1), bty = "n", cex = 0.75)
 @
 \end{center}
 \caption{Plot of the estimated coverage probabilities of prediction regions 
@@ -886,7 +917,7 @@ legend(0.50, 0.80, legend=c("parametric conformal",
 For the simulations in this section we generate responses using a gamma 
 regression model with one variable.  We specify the inverse link function 
 (the defualt in the \texttt{glm} function) and we set 
-$\beta = (1.1, -1)^T$.  This value of $\beta$ is chosen so that the generated 
+$\beta = (1.25, -1)^T$.  This value of $\beta$ is chosen so that the generated 
 Gamma data is increasing, on average, in $x$ and exhibits increasing 
 variability in $x$.  We investigate the performance of the five prediction 
 regions across different sample size and shape parameter combinations.  We 
@@ -1920,15 +1951,20 @@ Figures~\ref{Fig:gamma.inx.150}, \ref{Fig:gamma.inx.250}, and
 \ref{Fig:gamma.inx.500} for $n = 150$, $250$, and $500$ respectively.
 
 From these simulations we see that the parametric conformal prediction region 
-is similar to the HD prediciton region in area and prediction error.  
-Moreover, the parametric conformal prediction region possess finite-sample, 
-albeit slightly conservative, local validity with respect to binning.  
+is similar to the HD prediciton region in area, prediction error, and 
+appearance (as seen in Section~\ref{sec:gammaplots}).  Moreover, the 
+parametric conformal prediction region possess finite-sample, albeit slightly 
+conservative, local validity with respect to binning and possess nominal 
+finite-sample conditional coverage over most of the support. 
 The LSLW conformal prediction region is smaller than than both the parametric 
-conformal prediction region and the HD prediction region, it has higher 
-prediciton error than these regions, and it is more conservative than the 
-parametric conformal prediction region for most of the settings.  
-However, it does not guarantee finit-sample local validity with respect to 
-binning as seen in Figures~\ref{Fig:gamma.250} and \ref{Fig:gamma.500}.
+conformal prediction region and the HD prediction region.  However, it has a 
+higher prediciton error than these regions and it is more conservative than 
+the parametric conformal prediction region in most of our simulation 
+settings.  It also does not fit the data well when the deviations about the 
+estimated mean function are clearly not symmetric as evidenced by 
+Figures~\ref{plot.regions.150.2.0.5}-\ref{plot.regions.150.2.2} in 
+Section~\ref{sec:gammaplots}.  These figures correspond to data generated 
+from a Gamma distribution with small shape parameter values.  
 The nonparametric conformal prediction region gives closer to nominal 
 coverage and it possesses finite-sample local validity with respect to 
 binning.  However, this prediction region is larger and gives higher 
@@ -3633,19 +3669,25 @@ perform well.  The model misspecification is modest, the Gamma data
 appears to be almost symmetric, albeit heterogenous, about a cubic mean 
 function.  From these simulations we see that the parametric conformal 
 prediction region is similar to the LSLW prediciton region in area and 
-prediction error.  
-Moreover, the parametric conformal prediction region possess finite-sample, 
-albeit slightly conservative, local validity with respect to binning.  
+prediction error.  Both the parametric and LSLW conformal 
+prediction regions possess finite-sample, albeit slightly conservative, 
+local validity with respect to binning and they both give almost nominal 
+finite-sample conditional validity across the support.
+Moreover, these prediciton regions visually fit the data well as seen in 
+Section~\ref{sec:misspecplots}.
 The nonparametric conformal prediction region gives closer to nominal 
 coverage than both the parametric and LSLW conformal prediction regions, 
 and it possesses finite-sample local validity with respect to 
-binning.  However, this prediction region is larger and gives higher 
+binning.  However, this prediction region is larger, gives higher 
 prediciton error than the parametric and LSLW conformal prediction 
-regions.  The misspecified HD and LS conformal prediction regions  
-provide extreme undercoverage at small values of $x$ and extreme 
-overcoverage at large values of $x$.  These prediction regions are also 
-larger and they give higher prediciton error than the parametric and LSLW 
-conformal prediction regions.
+regions, and does not visually fit the data well for most simulation settings 
+as seen in Section~\ref{sec:misspecplots}.  The misspecified HD and LS 
+conformal prediction regions  provide extreme undercoverage at small values 
+of $x$ and extreme overcoverage at large values of $x$.  These prediction 
+regions are also larger, they give higher prediciton error than the 
+parametric and LSLW conformal prediction regions, and the LS conformal 
+prediction region does not visually fit the data well for most simulation 
+settings as seen in Section~\ref{sec:misspecplots}. 
 
 
 
@@ -3973,7 +4015,7 @@ lines(inx, LS.inx.misspec.250[1:25], col = "black", lty = 2)
 lines(inx, HD.inx.misspec.250[1:25], col = "blue", lty = 4)
 abline(h = 0.90, lty = 1, col = "grey")
 axis(2)
-mtext("shape = 0.5", side = 3, cex = 1, line = 2)
+mtext("shape = 5", side = 3, cex = 1, line = 2)
 
 plot.new()
 plot.window(xlim = c(0, 1), ylim = c(0.90, 0.98))
@@ -3992,7 +4034,7 @@ lines(inx, LS.inx.misspec.250[26:50], col = "black", lty = 2)
 lines(inx, HD.inx.misspec.250[26:50], col = "blue", lty = 4)
 abline(h = 0.90, lty = 1, col = "grey")
 axis(2)
-mtext("shape = 1", side = 3, cex = 1, line = 2)
+mtext("shape = 20", side = 3, cex = 1, line = 2)
 
 plot.new()
 plot.window(xlim = c(0, 1), ylim = c(0.25, 1.00))
@@ -4002,7 +4044,7 @@ lines(inx, LSLW.inx.misspec.250[51:75], col = "purple", lty = 1)
 lines(inx, LS.inx.misspec.250[51:75], col = "black", lty = 2)
 lines(inx, HD.inx.misspec.250[51:75], col = "blue", lty = 4)
 abline(h = 0.90, lty = 1, col = "grey")
-mtext("shape = 2", side = 3, cex = 1, line = 2)
+mtext("shape = 40", side = 3, cex = 1, line = 2)
 
 plot.new()
 plot.window(xlim = c(0, 1), ylim = c(0.25, 1.00))
@@ -4013,7 +4055,7 @@ lines(inx, LS.inx.misspec.250[76:100], col = "black", lty = 2)
 lines(inx, HD.inx.misspec.250[76:100], col = "blue", lty = 4)
 abline(h = 0.90, lty = 1, col = "grey")
 axis(2)
-mtext("shape = 5", side = 3, cex = 1, line = 2)
+mtext("shape = 60", side = 3, cex = 1, line = 2)
 
 plot.new()
 plot.window(xlim = c(0, 1), ylim = c(0.25, 1.00))
@@ -4024,7 +4066,7 @@ lines(inx, LS.inx.misspec.250[101:125], col = "black", lty = 2)
 lines(inx, HD.inx.misspec.250[101:125], col = "blue", lty = 4)
 abline(h = 0.90, lty = 1, col = "grey")
 axis(1)
-mtext("shape = 10", side = 3, cex = 1, line = 2)
+mtext("shape = 80", side = 3, cex = 1, line = 2)
 
 plot.new()
 plot.window(xlim = c(0, 1), ylim = c(0.25, 1.00))
@@ -4035,7 +4077,7 @@ lines(inx, LS.inx.misspec.250[126:150], col = "black", lty = 2)
 lines(inx, HD.inx.misspec.250[126:150], col = "blue", lty = 4)
 abline(h = 0.90, lty = 1, col = "grey")
 axis(1); axis(2)
-mtext("shape = 25", side = 3, cex = 1, line = 2)
+mtext("shape = 100", side = 3, cex = 1, line = 2)
 
 mtext("x", side = 1, cex = 1.25, line = 2, outer = TRUE)
 mtext("coverage", side = 2, cex = 1.25, line = 0, outer = TRUE)
@@ -4148,7 +4190,7 @@ lines(inx, LS.inx.misspec.500[1:25], col = "black", lty = 2)
 lines(inx, HD.inx.misspec.500[1:25], col = "blue", lty = 4)
 abline(h = 0.90, lty = 1, col = "grey")
 axis(2)
-mtext("shape = 0.5", side = 3, cex = 1, line = 2)
+mtext("shape = 5", side = 3, cex = 1, line = 2)
 
 plot.new()
 plot.window(xlim = c(0, 1), ylim = c(0.80, 0.98))
@@ -4167,7 +4209,7 @@ lines(inx, LS.inx.misspec.500[26:50], col = "black", lty = 2)
 lines(inx, HD.inx.misspec.500[26:50], col = "blue", lty = 4)
 abline(h = 0.90, lty = 1, col = "grey")
 axis(2)
-mtext("shape = 1", side = 3, cex = 1, line = 2)
+mtext("shape = 20", side = 3, cex = 1, line = 2)
 
 plot.new()
 plot.window(xlim = c(0, 1), ylim = c(0.25, 1.00))
@@ -4177,7 +4219,7 @@ lines(inx, LSLW.inx.misspec.500[51:75], col = "purple", lty = 1)
 lines(inx, LS.inx.misspec.500[51:75], col = "black", lty = 2)
 lines(inx, HD.inx.misspec.500[51:75], col = "blue", lty = 4)
 abline(h = 0.90, lty = 1, col = "grey")
-mtext("shape = 2", side = 3, cex = 1, line = 2)
+mtext("shape = 40", side = 3, cex = 1, line = 2)
 
 plot.new()
 plot.window(xlim = c(0, 1), ylim = c(0.25, 1.00))
@@ -4188,7 +4230,7 @@ lines(inx, LS.inx.misspec.500[76:100], col = "black", lty = 2)
 lines(inx, HD.inx.misspec.500[76:100], col = "blue", lty = 4)
 abline(h = 0.90, lty = 1, col = "grey")
 axis(2)
-mtext("shape = 5", side = 3, cex = 1, line = 2)
+mtext("shape = 60", side = 3, cex = 1, line = 2)
 
 plot.new()
 plot.window(xlim = c(0, 1), ylim = c(0.25, 1.00))
@@ -4199,7 +4241,7 @@ lines(inx, LS.inx.misspec.500[101:125], col = "black", lty = 2)
 lines(inx, HD.inx.misspec.500[101:125], col = "blue", lty = 4)
 abline(h = 0.90, lty = 1, col = "grey")
 axis(1)
-mtext("shape = 10", side = 3, cex = 1, line = 2)
+mtext("shape = 80", side = 3, cex = 1, line = 2)
 
 plot.new()
 plot.window(xlim = c(0, 1), ylim = c(0.25, 1.00))
@@ -4210,7 +4252,7 @@ lines(inx, LS.inx.misspec.500[126:150], col = "black", lty = 2)
 lines(inx, HD.inx.misspec.500[126:150], col = "blue", lty = 4)
 abline(h = 0.90, lty = 1, col = "grey")
 axis(1); axis(2)
-mtext("shape = 25", side = 3, cex = 1, line = 2)
+mtext("shape = 100", side = 3, cex = 1, line = 2)
 
 mtext("x", side = 1, cex = 1.25, line = 2, outer = TRUE)
 mtext("coverage", side = 2, cex = 1.25, line = 0, outer = TRUE)
@@ -4484,6 +4526,27 @@ regression.500.3 <- cbind(
 
 \subsection{Results}
 
+Results form our simulations are depicted in 
+Table~\ref{Tab:regression-results} and Figure~\ref{Fig:regresion.inx}.  
+This table and figure depicts the estimatated area, prediction 
+error, and local coverage probabilities for all five considered prediction 
+regions. 
+
+In these simulations, errors about the estimated mean function are symmetric 
+and homogeneous across the support.  We therefore expect for the LS and LSLW 
+conformal prediction regions to perform nearly as well as the oracle HD 
+prediction region.  These prediction regions also exhibit finite-sample 
+marginal validity, local validity with respect to binning, and near 
+conditional validity across the support.  The parametric conformal prediction 
+region is similar to the LS and LSLW conformal prediciton regions and the HD 
+prediction region in area, prediction error, finite-sample coverage 
+properties, and appearance.  However, the parametric conformal prediciton 
+region is slightly larger and gives more conservative coverage that these 
+other prediction regions.  The nonparametric conformal prediciton region 
+is larger and gives larger prediciton errors than the other prediciton 
+regions.  It also appears to not visually fit the data well while the others 
+do as seen in Section~\ref{sec:regressionplots}.
+
 
 <<echo = FALSE>>=
 regression.150.2[, 1] <- round(regression.150.2[, 1], 3)
@@ -4492,7 +4555,6 @@ regression.500.3[, 1] <- round(regression.500.3[, 1], 3)
 regression.150.2[, 2] <- round(regression.150.2[, 2], 4)
 regression.250.3[, 2] <- round(regression.250.3[, 2], 4)
 regression.500.3[, 2] <- round(regression.500.3[, 2], 4)
-options(scipen = 999)
 @
 
 
@@ -4629,11 +4691,11 @@ options(scipen = 999)
 \newpage
 \begin{figure}[h!]
 \begin{center}
-<<Fig-regression-inx-500, echo = FALSE>>=
-par(mfrow = c(1,4), oma = c(4,4,1,0), mar = c(1,3,3,0))
+<<Fig-regression-inx-500, echo = FALSE, fig.height = 3>>=
+par(mfrow = c(1,3), oma = c(4,4,1,0), mar = c(1,3,3,0))
 
 plot.new()
-plot.window(xlim = c(0, 1), ylim = c(0.80, 1.00))
+plot.window(xlim = c(0, 1), ylim = c(0.60, 1.00))
 lines(inx, regression.150.2[4:28, 1], col = "red", lty = 1)
 lines(inx, regression.150.2[34:58, 1], col = "green", lty = 2)
 lines(inx, regression.150.2[64:88, 1], col = "purple", lty = 1)
@@ -4644,7 +4706,7 @@ axis(1); axis(2)
 mtext("n = 150", side = 3, cex = 1, line = 2)
 
 plot.new()
-plot.window(xlim = c(0, 1), ylim = c(0.80, 1.00))
+plot.window(xlim = c(0, 1), ylim = c(0.60, 1.00))
 lines(inx, regression.250.3[5:29, 1], col = "red", lty = 1)
 lines(inx, regression.250.3[36:60, 1], col = "green", lty = 2)
 lines(inx, regression.250.3[67:91, 1], col = "purple", lty = 1)
@@ -4654,8 +4716,16 @@ abline(h = 0.90, lty = 1, col = "grey")
 axis(1)
 mtext("n = 250", side = 3, cex = 1, line = 2)
 
+#plot.new()
+#plot.window(xlim = c(0, 1), ylim = c(0.60, 1.00))
+legend(0.15, 0.80, legend=c("parametric conformal", 
+  "nonparametric conformal", "LSLW conformal", "LS conformal", 
+  "HD region", "nominal coverage"), col=c("red", "green", "purple", 
+  "black", "blue", "grey"), cex = 0.80,
+  lty=c(1,2,1,2,4,1), bty = "n")
+
 plot.new()
-plot.window(xlim = c(0, 1), ylim = c(0.80, 1.00))
+plot.window(xlim = c(0, 1), ylim = c(0.60, 1.00))
 lines(inx, regression.500.3[5:29, 1], col = "red", lty = 1)
 lines(inx, regression.500.3[36:60, 1], col = "green", lty = 2)
 lines(inx, regression.500.3[67:91, 1], col = "purple", lty = 1)
@@ -4665,13 +4735,6 @@ abline(h = 0.90, lty = 1, col = "grey")
 axis(1)
 mtext("n = 500", side = 3, cex = 1, line = 2)
 
-plot.new()
-plot.window(xlim = c(0, 1), ylim = c(0.80, 1.00))
-legend(0, 0.95, legend=c("parametric conformal", 
-  "nonparametric conformal", "LSLW conformal", "LS conformal", 
-  "HD region", "nominal coverage"), col=c("red", "green", "purple", 
-  "black", "blue", "grey"), 
-  lty=c(1,2,1,2,4,1), bty = "n")
 
 mtext("x", side = 1, cex = 1, line = 2, outer = TRUE)
 mtext("coverage", side = 2, cex = 1, line = 0, outer = TRUE)
@@ -5483,6 +5546,8 @@ makeplots.regression(n = 500, sd = 1, bins = 3, beta = beta)
 
 
 \newpage
+\section{Depiction of conformal prediction regions that appears in \citet{eck2019conformal}}
+
 \begin{figure}[h!]
 \begin{center}
 <<conformal-plots, fig.height = 7, cache = TRUE, echo = FALSE>>=
