@@ -907,7 +907,7 @@ mtext("coverage probability", side = 2, cex = 1.25, line = 2, outer = TRUE)
 legend(0.20, 0.75, legend=c("parametric", 
   "nonparametric", "LSLW", "LS", 
   "HD", "nominal coverage"), col=c("red", "green", "purple", 
-  "black", "blue", "grey"), cex = 1.25, 
+  "black", "blue", "grey"), cex = 1, 
   lty=c(1,2,1,2,4,1), bty = "n")
 @
 \end{center}
@@ -2251,28 +2251,8 @@ mtext("Simulation Setting A", side = 3, cex = 1.5, line = 2, outer = TRUE)
 <<Fig-gamma-inx-150, echo = FALSE>>=
 par(mfrow = c(4,4), oma = c(4,4,1,0), mar = c(1,3,3,0))
 
-# shape = 0.50
-inx <- 0.02 + 0:24 * 0.04
-plot.new()
-plot.window(xlim = c(0, 1), ylim = c(0.25, 1.00))
-lines(inx, para.inx.gamma.150[1:25], col = "red", lty = 1, lwd = 1.5)
-lines(inx, nonpara.inx.gamma.150[1:25], col = "green", lty = 2, lwd = 1.5)
-lines(inx, LSLW.inx.gamma.150[1:25], col = "purple", lty = 1, lwd = 1.5)
-lines(inx, LS.inx.gamma.150[1:25], col = "black", lty = 2, lwd = 1.5)
-lines(inx, HD.inx.gamma.150[1:25], col = "blue", lty = 4, lwd = 1.5)
-abline(h = 0.90, lty = 1, col = "grey", lwd = 1.5)
-axis(2)
-mtext("shape = 0.5", side = 3, cex = 1, line = 2)
-
-plot.new()
-plot.window(xlim = c(0,1), ylim = c(0.90, 0.98))
-legend(-0.1, 0.98, legend=c("parametric", 
-  "nonparametric", "LSLW", "LS", 
-  "HD", "nominal coverage"), col=c("red", "green", "purple", 
-  "black", "blue", "grey"), cex = 1,
-  lty=c(1,2,1,2,4,1), bty = "n")
-
 # shape = 0.75
+inx <- 0.02 + 0:24 * 0.04
 plot.new()
 plot.window(xlim = c(0, 1), ylim = c(0.25, 1.00))
 lines(inx, para.inx.gamma.150[26:50], col = "red", lty = 1, lwd = 1.5)
@@ -2281,7 +2261,16 @@ lines(inx, LSLW.inx.gamma.150[26:50], col = "purple", lty = 1, lwd = 1.5)
 lines(inx, LS.inx.gamma.150[26:50], col = "black", lty = 2, lwd = 1.5)
 lines(inx, HD.inx.gamma.150[26:50], col = "blue", lty = 4, lwd = 1.5)
 abline(h = 0.90, lty = 1, col = "grey", lwd = 1.5)
+axis(2)
 mtext("shape = 0.75", side = 3, cex = 1, line = 2)
+
+plot.new()
+plot.window(xlim = c(0,1), ylim = c(0.90, 0.98))
+legend(-0.1, 0.98, legend=c("parametric", 
+  "nonparametric", "LSLW", "LS", 
+  "HD", "nominal coverage"), col=c("red", "green", "purple", 
+  "black", "blue", "grey"), cex = 1,
+  lty=c(1,2,1,2,4,1), bty = "n")
 
 # shape = 1
 plot.new()
@@ -2293,18 +2282,6 @@ lines(inx, LS.inx.gamma.150[51:75], col = "black", lty = 2, lwd = 1.5)
 lines(inx, HD.inx.gamma.150[51:75], col = "blue", lty = 4, lwd = 1.5)
 abline(h = 0.90, lty = 1, col = "grey", lwd = 1.5)
 mtext("shape = 1", side = 3, cex = 1, line = 2)
-
-# shape = 1.5
-plot.new()
-plot.window(xlim = c(0, 1), ylim = c(0.25, 1.00))
-lines(inx, para.inx.gamma.150[76:100], col = "red", lty = 1, lwd = 1.5)
-lines(inx, nonpara.inx.gamma.150[76:100], col = "green", lty = 2, lwd = 1.5)
-lines(inx, LSLW.inx.gamma.150[76:100], col = "purple", lty = 1, lwd = 1.5)
-lines(inx, LS.inx.gamma.150[76:100], col = "black", lty = 2, lwd = 1.5)
-lines(inx, HD.inx.gamma.150[76:100], col = "blue", lty = 4, lwd = 1.5)
-abline(h = 0.90, lty = 1, col = "grey", lwd = 1.5)
-axis(2)
-mtext("shape = 1.5", side = 3, cex = 1, line = 2)
 
 # shape = 2
 plot.new()
@@ -2326,6 +2303,7 @@ lines(inx, LSLW.inx.gamma.150[126:150], col = "purple", lty = 1, lwd = 1.5)
 lines(inx, LS.inx.gamma.150[126:150], col = "black", lty = 2, lwd = 1.5)
 lines(inx, HD.inx.gamma.150[126:150], col = "blue", lty = 4, lwd = 1.5)
 abline(h = 0.90, lty = 1, col = "grey", lwd = 1.5)
+axis(2)
 mtext("shape = 5", side = 3, cex = 1, line = 2)
 
 # shape = 7
@@ -2348,7 +2326,6 @@ lines(inx, LSLW.inx.gamma.150[176:200], col = "purple", lty = 1, lwd = 1.5)
 lines(inx, LS.inx.gamma.150[176:200], col = "black", lty = 2, lwd = 1.5)
 lines(inx, HD.inx.gamma.150[176:200], col = "blue", lty = 4, lwd = 1.5)
 abline(h = 0.90, lty = 1, col = "grey", lwd = 1.5)
-axis(2)
 mtext("shape = 10", side = 3, cex = 1, line = 2)
 
 # shape = 12
@@ -2371,6 +2348,7 @@ lines(inx, LSLW.inx.gamma.150[226:250], col = "purple", lty = 1, lwd = 1.5)
 lines(inx, LS.inx.gamma.150[226:250], col = "black", lty = 2, lwd = 1.5)
 lines(inx, HD.inx.gamma.150[226:250], col = "blue", lty = 4, lwd = 1.5)
 abline(h = 0.90, lty = 1, col = "grey", lwd = 1.5)
+axis(2)
 mtext("shape = 15", side = 3, cex = 1, line = 2)
 
 # shape = 20
@@ -2393,7 +2371,6 @@ lines(inx, LSLW.inx.gamma.150[276:300], col = "purple", lty = 1, lwd = 1.5)
 lines(inx, LS.inx.gamma.150[276:300], col = "black", lty = 2, lwd = 1.5)
 lines(inx, HD.inx.gamma.150[276:300], col = "blue", lty = 4, lwd = 1.5)
 abline(h = 0.90, lty = 1, col = "grey", lwd = 1.5)
-axis(1); axis(2)
 mtext("shape = 25", side = 3, cex = 1, line = 2)
 
 # shape = 30
@@ -2405,7 +2382,6 @@ lines(inx, LSLW.inx.gamma.150[301:325], col = "purple", lty = 1, lwd = 1.5)
 lines(inx, LS.inx.gamma.150[301:325], col = "black", lty = 2, lwd = 1.5)
 lines(inx, HD.inx.gamma.150[301:325], col = "blue", lty = 4, lwd = 1.5)
 abline(h = 0.90, lty = 1, col = "grey", lwd = 1.5)
-axis(1)
 mtext("shape = 30", side = 3, cex = 1, line = 2)
 
 # shape = 40
@@ -2417,7 +2393,7 @@ lines(inx, LSLW.inx.gamma.150[326:350], col = "purple", lty = 1, lwd = 1.5)
 lines(inx, LS.inx.gamma.150[326:350], col = "black", lty = 2, lwd = 1.5)
 lines(inx, HD.inx.gamma.150[326:350], col = "blue", lty = 4, lwd = 1.5)
 abline(h = 0.90, lty = 1, col = "grey", lwd = 1.5)
-axis(1)
+axis(1); axis(2)
 mtext("shape = 40", side = 3, cex = 1, line = 2)
 
 # shape = 50
@@ -2431,6 +2407,30 @@ lines(inx, HD.inx.gamma.150[351:375], col = "blue", lty = 4, lwd = 1.5)
 abline(h = 0.90, lty = 1, col = "grey", lwd = 1.5)
 axis(1)
 mtext("shape = 50", side = 3, cex = 1, line = 2)
+
+# shape = 60
+plot.new()
+plot.window(xlim = c(0, 1), ylim = c(0.25, 1.00))
+lines(inx, para.inx.gamma.150[376:400], col = "red", lty = 1, lwd = 1.5)
+lines(inx, nonpara.inx.gamma.150[376:400], col = "green", lty = 2, lwd = 1.5)
+lines(inx, LSLW.inx.gamma.150[376:400], col = "purple", lty = 1, lwd = 1.5)
+lines(inx, LS.inx.gamma.150[376:400], col = "black", lty = 2, lwd = 1.5)
+lines(inx, HD.inx.gamma.150[376:400], col = "blue", lty = 4, lwd = 1.5)
+abline(h = 0.90, lty = 1, col = "grey", lwd = 1.5)
+axis(1)
+mtext("shape = 60", side = 3, cex = 1, line = 2)
+
+# shape = 70
+plot.new()
+plot.window(xlim = c(0, 1), ylim = c(0.25, 1.00))
+lines(inx, para.inx.gamma.150[401:425], col = "red", lty = 1, lwd = 1.5)
+lines(inx, nonpara.inx.gamma.150[401:425], col = "green", lty = 2, lwd = 1.5)
+lines(inx, LSLW.inx.gamma.150[401:425], col = "purple", lty = 1, lwd = 1.5)
+lines(inx, LS.inx.gamma.150[401:425], col = "black", lty = 2, lwd = 1.5)
+lines(inx, HD.inx.gamma.150[401:425], col = "blue", lty = 4, lwd = 1.5)
+abline(h = 0.90, lty = 1, col = "grey", lwd = 1.5)
+axis(1)
+mtext("shape = 70", side = 3, cex = 1, line = 2)
 
 
 mtext("x", side = 1, cex = 1.25, line = 2, outer = TRUE)
