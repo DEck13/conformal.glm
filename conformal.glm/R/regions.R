@@ -103,7 +103,8 @@ local.coverage <- function(region, nonparametric = "FALSE", data,
         ## with response removed
         index.factor.variables <- which(f) - 1
         index.numeric.variables <- which(!f)[-1] - 1
-        factors <- lapply(index.factor.variables, function(j) as.numeric(as.factor(X[, j])))
+        factors <- lapply(index.factor.variables, 
+          function(j) as.numeric(as.factor(X[, j])))
 
         ## split model matrix by factor level combinations
         split.X.factors <- split(X, factors, drop = TRUE)
@@ -143,7 +144,7 @@ local.coverage <- function(region, nonparametric = "FALSE", data,
             })
           })
         })))
-        
+
       }
     }
   }
