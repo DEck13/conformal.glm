@@ -51,38 +51,100 @@ local.coverage <- function(region, nonparametric = "FALSE", data,
       colnames(region) <- c("lwr","upr")
       output[sort(unique(index.data))] <- 
         unlist(lapply(sort(unique(index.data)), function(j){    
-          y <- data[index.data == j, 1]
+          Y <- data[index.data == j, 1]
           lwr <- region[index.newdata == j, 1]
           upr <- region[index.newdata == j, 2]
-          out <- mean(lwr <= y & y <= upr)
+          out <- mean(lwr <= Y & Y <= upr)
           out
       }))
     }
     if(nonparametric == "TRUE"){
-      n.bins.region <- length(region)
-      x <- as.matrix(data[,1:d + 1], col = d)
-      index.bins.region <- find.index(x, wn = 1/n.bins.region, d = d)
-      y <- data[, 1]
-      ## put each y value with its corresponding prediction interval
-      foo <- lapply(1:n, FUN = function(j){
-        c(y[j], region[[index.bins.region[j]]])
-      })
 
-      output[sort(unique(index.data))] <- 
-        unlist(lapply(sort(unique(index.data)), function(j){
-          index.j <- which(index.data == j)
-          ## indicate which endpoints y is between
-          int <- unlist(lapply(index.j, FUN = function(x){
-            bar <- 0
-            if(any(foo[[x]][1] > foo[[x]][-1])){
-              bar <- max(which(foo[[x]][1] > foo[[x]][-1]))
-            }
-            bar
-          }))
-          ## only odd numbers correspond to y being in one of the 
-          ## (possibly disjoint) intervals
-          mean(int %% 2 == 1)
-      }))
+      f <- sapply(data, is.factor)
+      any.factors <- !all(f == FALSE)
+
+      ## when there are no factors
+      if(!any.factors){
+        n.bins.region <- length(region)
+        x <- as.matrix(data[,1:d + 1], col = d)
+        index.bins.region <- find.index(x, wn = 1/n.bins.region, d = d)
+        Y <- data[, 1]
+        ## put each y value with its corresponding prediction interval
+        foo <- lapply(1:n, FUN = function(j){
+          c(Y[j], region[[index.bins.region[j]]])
+        })
+
+        output[sort(unique(index.data))] <- 
+          unlist(lapply(sort(unique(index.data)), function(j){
+            index.j <- which(index.data == j)
+            ## indicate which endpoints y is between
+            int <- unlist(lapply(index.j, FUN = function(x){
+              bar <- 0
+              if(any(foo[[x]][1] > foo[[x]][-1])){
+                bar <- max(which(foo[[x]][1] > foo[[x]][-1]))
+              }
+              bar
+            }))
+            ## only odd numbers correspond to y being in one of the 
+            ## (possibly disjoint) intervals
+            mean(int %% 2 == 1)
+        }))
+      }
+
+      ## when there are factors
+      if(any.factors){
+        n.factor.combinations <- length(region)
+        d <- ncol(data) - 1
+        ## data assumed to be of the form (response, predictors)
+        X <- as.matrix(data[,1:d + 1], col = d)
+        Y <- data[, 1]
+
+        ## location of factor and numeric variables in dataframe 
+        ## with response removed
+        index.factor.variables <- which(f) - 1
+        index.numeric.variables <- which(!f)[-1] - 1
+        factors <- lapply(index.factor.variables, function(j) as.numeric(as.factor(X[, j])))
+
+        ## split model matrix by factor level combinations
+        split.X.factors <- split(X, factors, drop = TRUE)
+
+        ## split bin indices by factor level combinations
+        bin.index.by.factors <- lapply(split.X.factors, function(x){ 
+          mat <- matrix(x, ncol = ncol(X))
+          colnames(mat) <- colnames(X)
+          mat <- mat[, index.numeric.variables]
+          find.index(mat = mat, wn = wn, d = ncol(mat))
+        })
+
+        ## split response by factor level combinations
+        split.Y.factors <- split(Y, factors, drop = TRUE)
+        resps.by.factors <- lapply(split.Y.factors, as.numeric)
+
+        ## compute coverage probability
+        output <- mean(unlist(lapply(1:n.factor.combinations, function(i){
+          sapply(unique(bin.index.by.factors[[i]]), function(j){
+            Y.int <- resps.by.factors[[i]][bin.index.by.factors[[i]] == j]
+            region.int <- region[[i]][[j]]
+            sapply(Y.int, function(y){
+              inclusion <- 0
+              if(any(y - region.int == 0)){
+                inclusion <- 1
+                return(inclusion)
+              }
+              inclusion.index <- y - region.int > 0
+              if(!any(inclusion.index)){ 
+                return(inclusion)
+              }
+              if(max(which(inclusion.index)) %% 2 == 1){ 
+                inclusion <- 1
+                return(inclusion)
+              }
+              return(inclusion)         
+            })
+          })
+        })))
+        
+      }
     }
   }
 
