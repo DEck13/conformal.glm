@@ -35,13 +35,10 @@ beta <- c(1/4, 2)
 
 set.seed(13)
 x <- matrix(runif(n), ncol = 1)
-rate <- cbind(1, x) %*% beta * shape
-y <- rgamma(n = n, shape = shape, rate = rate)
-data.readme <- data.frame(y = y, x = x)
-colnames(data.readme)[2] <- c("x1")
+y <- rgamma(n = n, shape = shape, rate = cbind(1, x) %*% beta * shape)
+data.readme <- data.frame(y = y, x1 = x)
 
 fit.readme = glm(y ~ x1, family = Gamma, data = data.readme)
-summary(fit.readme)
 ```
 
 

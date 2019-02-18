@@ -1,11 +1,11 @@
 
 
 conformal.glm <- function(object, ..., newdata = NULL, alpha = 0.10, 
-	cores = 1, bins = NULL, parametric = TRUE, intercept = TRUE, 
-	nonparametric = FALSE, h = NULL, precision = 0.001){
+	cores = 1, bins = 1, parametric = TRUE, intercept = TRUE, 
+	nonparametric = FALSE, h = 1/2, precision = 0.01){
 
   out <- NULL 
-  if(any(attr(object$terms, "dataClasses")[-1] != "factor")){
+  if(!any(attr(object$terms, "dataClasses")[-1] == "factor")){
 
     ## some important quantities
     call <- object$call
