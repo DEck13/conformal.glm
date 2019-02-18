@@ -1,24 +1,32 @@
 
 find.index <- function(mat, wn, d){
-  A <- seq(from = 0, to = 1 - wn, by = wn)
-  if(wn == 1) A <- 0
   n.out <- nrow(mat)
-  out <- rep(0, n.out)
-  for(j in 1:n.out){
-    foo <- 0
-    for(i in 1:d){
-      if(i < d){
-        foo <- foo + 
-          (max(which(A < mat[j, i])) - 1) * (1/wn)^(d-i)
+  indices <- rep(1, n.out)  
+  if(wn < 1){ 
+    A <- seq(from = 0, to = 1 - wn, by = wn)
+    mat <- apply(mat, 2, function(x){
+      if(min(x) < 0 || max(x) > 0){
+        x <- x - min(x) + 0.0001
+        x <- x / (sign(max(x)) * max(x)) - 0.0001
       }
-      if(i == d){
-        foo <- foo + 
-          max(which(A < mat[j, i]))
+      x
+    })    
+    for(j in 1:n.out){
+      foo <- 0
+      for(i in 1:d){
+        if(i < d){
+          foo <- foo + 
+            (max(which(A < mat[j, i])) - 1) * (1/wn)^(d-i)
+        }
+        if(i == d){
+          foo <- foo + 
+            max(which(A < mat[j, i]))
+        }
       }
+      indices[j] <- foo
     }
-    out[j] <- foo
   }
-  out
+  indices
 }
 
 
@@ -117,7 +125,6 @@ regions <- function(formula, data, newdata, family = "gaussian", link,
   Y <- data[, colnames(data) %in% respname]
   n <- length(Y)
   n.pred <- nrow(newdata)
-  convergence <- 0
 
   if(is.null(newdata)){ 
     newdata <- data
@@ -215,18 +222,24 @@ regions <- function(formula, data, newdata, family = "gaussian", link,
           data.y <- as.data.frame(data.y)
 
           if(family == "Gamma"){
-            m1.y <- glm(formula, data = data.y, family = family)
-            shapeMLE.y <- as.numeric(gamma.shape(m1.y)[1])
-
             if(link == "identity"){
+              m1.y <- glm(formula, data = data.y, family = Gamma(link = identity), 
+                control = list(maxit = 1e4))
+              shapeMLE.y <- as.numeric(gamma.shape(m1.y)[1])              
               rateMLE.y <- 1 / (cbind(1, rbind(Xk, x)) %*% 
                 coefficients(m1.y)) * shapeMLE.y
             }
             if(link == "inverse"){
+              m1.y <- glm(formula, data = data.y, family = Gamma(link = inverse), 
+                control = list(maxit = 1e4))
+              shapeMLE.y <- as.numeric(gamma.shape(m1.y)[1])              
               rateMLE.y <- (cbind(1, rbind(Xk, x)) %*% 
                 coefficients(m1.y)) * shapeMLE.y
             }
             if(link == "log"){
+              m1.y <- glm(formula, data = data.y, family = Gamma(link = log), 
+                control = list(maxit = 1e4))
+              shapeMLE.y <- as.numeric(gamma.shape(m1.y)[1])              
               rateMLE.y <- (1 / exp(cbind(1, rbind(Xk, x)) %*% 
                 coefficients(m1.y))) * shapeMLE.y
             }
@@ -249,78 +262,89 @@ regions <- function(formula, data, newdata, family = "gaussian", link,
           out
         }
 
+        ## declare output variable
+        interval <- NULL
+        
         ## initial check for enough data within bin
         nk.tilde <- floor(alpha * (nk + 1))
-        if(nk.tilde == 0) stop("bin width is too small")
+        if(nk.tilde <= 1){ 
+           interval <- c(min(Yk), max(Yk))
+        }
 
         ## set up a lower (upper lower bound) and upper bound 
         ## (lower upper bound) to start two line searchs in order to 
         ## construct the parametric conformal prediction region
-        quant.Yk <- quantile(Yk, probs = c(alpha, 1 - alpha ))
-        y.lwr <- y.min <- as.numeric(quant.Yk[1])
-        y.upr <- y.max <- as.numeric(quant.Yk[2])
+        if(nk.tilde > 1){
+          quant.Yk <- quantile(Yk, probs = c(alpha, 1 - alpha ))
+          y.lwr <- y.min <- as.numeric(quant.Yk[1])
+          y.upr <- y.max <- as.numeric(quant.Yk[2])
 
-        ## lower line search
-        prec <- max( min(diff(sort(Yk[Yk <= y.min]))), precision)      
-        steps <- 1
-        flag <- FALSE
-        while(rank(phatxy(y.lwr))[nk + 1] >= nk.tilde & flag == FALSE){
-          y.lwr <- y.lwr - steps * prec
-          if(family != "gaussian"){ 
-            if(y.lwr <= 0.00001){ 
-              y.lwr <- 0.00001
-              flag <- TRUE
-            }
-          }
-          steps <- steps + 1
-        }
-        if(flag == FALSE){
+          ## lower line search
+          prec <- max( min(diff(sort(Yk[Yk <= y.min]))), precision)      
           steps <- 1
-          if(y.min - y.lwr <= 0.001){ 
-            prec <- min( min(diff(sort(Yk[Yk <= y.min]))), precision) / 2
-          }
-          if(y.min - y.lwr > 0.001){
-            prec <- min( min(diff(sort(Yk[Yk <= y.min]))), precision)
-          }
-          while(rank(phatxy(y.lwr))[nk + 1] < nk.tilde & y.lwr < max(Yk)){
-            y.lwr <- y.lwr + steps * prec
+          flag <- FALSE
+          while(rank(phatxy(y.lwr))[nk + 1] >= nk.tilde & flag == FALSE){
+            y.lwr <- y.lwr - steps * prec
+            if(family != "gaussian"){ 
+              if(y.lwr <= 0.0001){ 
+                y.lwr <- 0.0001
+                flag <- TRUE
+              }
+            }
             steps <- steps + 1
           }
-        }
-
-        ## upper line search
-        if(y.lwr >= y.upr) y.upr <- 2^sign(max(Yk)) * max(Yk)
-        prec <- max( min(diff(sort(Yk[Yk >= y.max]))), precision)
-        steps <- 1
-        while(rank(phatxy(y.upr))[nk + 1] >= nk.tilde){
-          y.upr <- y.upr + steps * prec
-          steps <- steps + 1
-        }
-        steps <- 1
-        if(y.upr - y.max <= precision){ 
-          prec <- min( min(diff(sort(Yk[Yk >= y.max]))), precision)
-        }
-        if(y.upr - y.max > precision){
-          prec <- min( min(diff(sort(Yk[Yk >= y.max]))), precision)
-        }        
-        while(rank(phatxy(y.upr))[nk + 1] < nk.tilde){
-          y.upr <- y.upr - steps * prec
-          if(family != "gaussian"){ 
-            if(y.upr < 0.00001){ 
-              y.upr <- 0.00001
-              break
+          if(flag == FALSE){
+            steps <- 1
+            if(y.min - y.lwr <= 0.001){ 
+              prec <- min( min(diff(sort(Yk[Yk <= y.min]))), precision) / 2
+              if(prec == 0) prec <- precision / 2
+            }
+            if(y.min - y.lwr > 0.001){
+              prec <- min( min(diff(sort(Yk[Yk <= y.min]))), precision)
+              if(prec == 0) prec <- precision
+            }
+            while(rank(phatxy(y.lwr))[nk + 1] < nk.tilde & y.lwr < max(Yk)){
+              y.lwr <- y.lwr + steps * prec
+              steps <- steps + 1
             }
           }
-          steps <- steps + 1
-        }          
-        if(abs(y.lwr - y.upr) < 0.002) y.lwr <- 0.00001
-        if(y.lwr > y.upr){
-          quant.Yk2 <- quantile(Yk, probs = c(alpha/2, 1 - alpha/2))
-          y.lwr <- as.numeric(quant.Yk2[1])
-          y.upr <- as.numeric(quant.Yk2[2])
-        }
 
-        c(y.lwr, y.upr)
+          ## upper line search
+          if(y.lwr >= y.upr) y.upr <- 2^sign(max(Yk)) * max(Yk)
+          prec <- max( min(diff(sort(Yk[Yk >= y.max]))), precision)
+          steps <- 1
+          while(rank(phatxy(y.upr))[nk + 1] >= nk.tilde){
+            y.upr <- y.upr + steps * prec
+            steps <- steps + 1
+          }
+          steps <- 1
+          if(y.upr - y.max <= precision){ 
+            prec <- min( min(diff(sort(Yk[Yk >= y.max]))), precision) / 2
+            if(prec == 0) prec <- precision / 2
+          }
+          if(y.upr - y.max > precision){
+            prec <- min( min(diff(sort(Yk[Yk >= y.max]))), precision)
+            if(prec == 0) prec <- precision
+          }        
+          while(rank(phatxy(y.upr))[nk + 1] < nk.tilde){
+            y.upr <- y.upr - steps * prec
+            if(family != "gaussian"){ 
+              if(y.upr <= 0.0001){ 
+                y.upr <- 0.0001
+                break
+              }
+            }
+            steps <- steps + 1
+          }          
+          if(abs(y.lwr - y.upr) < 0.002) y.lwr <- 0.00001
+          if(y.lwr > y.upr){
+            quant.Yk2 <- quantile(Yk, probs = c(alpha/2, 1 - alpha/2))
+            y.lwr <- as.numeric(quant.Yk2[1])
+            y.upr <- as.numeric(quant.Yk2[2])
+          }
+          interval <- c(y.lwr, y.upr)
+        }
+        interval  
       })
 
       #out <- t(out)
@@ -337,12 +361,10 @@ regions <- function(formula, data, newdata, family = "gaussian", link,
   if(nonparametric == TRUE){
 
     # ---- The nonparametric conformal implementation -------
-    ## Nonparametric conformal prediction region for each 
-    ## desired predictor combination 
-    ## ignores the intercept of the newdata matrix
+    ## Nonparametric conformal prediction region 
     if(class(h) == "NULL") h <- wn
-    COPS <- function(newdata){ 
-      out <- mclapply(sort(unique(index.pred)), mc.cores = cores, 
+    COPS <- function(index){ 
+      out <- mclapply(sort(unique(index)), mc.cores = cores, 
         FUN = function(j){
 
         index.bin <- which(index == j)
@@ -358,9 +380,9 @@ regions <- function(formula, data, newdata, family = "gaussian", link,
           int <- which(unlist(lapply(1:nk, FUN = function(j){
             Yknotj <- Yk[-j]
             Ykj <- Yk[j]
-            sum(dnorm(Yknotj, mean = y, sd = h) 
-              - dnorm(Yknotj, mean = Ykj, sd = h))
-          })) >= 0)
+            round(sum(dnorm(Yknotj, mean = y, sd = h) 
+              - dnorm(Yknotj, mean = Ykj, sd = h)), 6)
+          })) > 0)
           if(length(int) == 0) int <- -1
           out <- length(int) >= nk.tilde
           out
@@ -423,7 +445,7 @@ regions <- function(formula, data, newdata, family = "gaussian", link,
       })
       out
     }
-    nonparaconformal <- COPS(newdata)
+    nonparaconformal <- COPS(index.pred)
   }
 
   out = list(paraconformal = paraconformal, 
