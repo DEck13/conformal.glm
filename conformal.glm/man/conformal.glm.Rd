@@ -19,8 +19,8 @@
 }
 \usage{
   conformal.glm(object, ..., newdata = NULL, alpha = 0.10, 
-  	cores = 1, bins = NULL, parametric = TRUE, intercept = TRUE, 
-  	nonparametric = FALSE, h = NULL, precision = 0.001)
+  	cores = 1, bins = 1, parametric = TRUE, intercept = TRUE, 
+  	nonparametric = FALSE, h = NULL, precision = 0.005)
 }
 \arguments{
   \item{object}{an object of class \code{"glm"}.}

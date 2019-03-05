@@ -19,8 +19,8 @@
 }
 \usage{
   regions(formula, data, newdata, family = "gaussian", link, alpha = 0.10, 
-    cores = 1, bins = NULL, parametric = TRUE, nonparametric = FALSE, 
-    h = NULL, precision = 0.001)
+    cores = 1, bins = 1, parametric = TRUE, nonparametric = FALSE, 
+    h = NULL, precision = 0.005)
 }
 \arguments{
   \item{formula}{an object of class \code{"\link{formula}"} (or one that

@@ -1,33 +1,36 @@
 
-find.index <- function(mat, wn, d){
-  n.out <- nrow(mat)
-  indices <- rep(1, n.out)  
-  if(wn < 1){ 
-    A <- seq(from = 0, to = 1 - wn, by = wn)
-    mat <- apply(mat, 2, function(x){
-      if(min(x) < 0 || max(x) > 0){
-        x <- x - min(x) + 0.0001
-        x <- x / (sign(max(x)) * max(x)) - 0.0001
-      }
-      x
-    })    
-    for(j in 1:n.out){
-      foo <- 0
-      for(i in 1:d){
-        if(i < d){
-          foo <- foo + 
-            (max(which(A < mat[j, i])) - 1) * (1/wn)^(d-i)
+find.index <- function (mat, wn, d) 
+{
+    n.out <- nrow(mat)
+    indices <- rep(1, n.out)
+    if (wn < 1) {
+        A <- seq(from = 0, to = 1 - wn, by = wn)
+        mat <- apply(mat, 2, function(x) {
+            if (min(x) < 0 || max(x) > 1) {
+                x <- (x - min(x)) + 1e-04
+                x <- x/(sign(max(x)) * max(x)) 
+            }
+            x
+        })
+        for (j in 1:n.out) {
+            foo <- 0
+            for (i in 1:d) {
+                if (i < d) {
+                  foo <- foo + (max(which(A < mat[j, i])) - 1) * 
+                    (1/wn)^(d - i)
+                }
+                if (i == d) {
+                  foo <- foo + max(which(A < mat[j, i]))
+                }
+            }
+            indices[j] <- foo
         }
-        if(i == d){
-          foo <- foo + 
-            max(which(A < mat[j, i]))
-        }
-      }
-      indices[j] <- foo
     }
-  }
-  indices
+    indices
 }
+
+
+
 
 
 
@@ -180,8 +183,8 @@ local.coverage <- function(region, nonparametric = "FALSE", data,
 
 
 regions <- function(formula, data, newdata, family = "gaussian", link, 
-  alpha = 0.10, cores = 1, bins = NULL, parametric = TRUE, 
-  nonparametric = FALSE, h = NULL, precision = 0.001){
+  alpha = 0.10, cores = 1, bins = 1, parametric = TRUE, 
+  nonparametric = FALSE, h = NULL, precision = 0.005){
 
   ## initial quantities
   respname <- all.vars(formula)[1]

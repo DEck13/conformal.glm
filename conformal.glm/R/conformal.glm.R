@@ -2,7 +2,7 @@
 
 conformal.glm <- function(object, ..., newdata = NULL, alpha = 0.10, 
 	cores = 1, bins = 1, parametric = TRUE, intercept = TRUE, 
-	nonparametric = FALSE, h = 1/2, precision = 0.01){
+	nonparametric = FALSE, h = NULL, precision = 0.005){
 
   out <- NULL 
   if(!any(attr(object$terms, "dataClasses")[-1] == "factor")){
@@ -80,7 +80,9 @@ conformal.glm <- function(object, ..., newdata = NULL, alpha = 0.10,
     ## newdata is exactly the same as data but the first column is removed
     index.factor.variables <- which(attr(terms(object), "dataClasses") == "factor") - 1
     index.numeric.variables <- which(attr(terms(object), "dataClasses") == "numeric")[-1] - 1
-    factors.newdata <- lapply(index.factor.variables, function(j) as.numeric(as.factor(newdata[, j])))
+    index.newdata.factor.variables <- which(colnames(newdata) %in% names(index.factor.variables))
+    index.newdata.numeric.variables <- which(colnames(newdata) %in% names(index.numeric.variables))
+    factors.newdata <- lapply(index.newdata.factor.variables, function(j) as.numeric(as.factor(newdata[, j])))
     split.newdata.factors <- split(newdata, factors.newdata, drop = FALSE)
     #preds.newdata.by.factors <- lapply(split.X.newdata.factors, function(x){ 
     #  mat <- matrix(x, ncol = ncol(X))
@@ -93,9 +95,9 @@ conformal.glm <- function(object, ..., newdata = NULL, alpha = 0.10,
 
     ## split newdata bin indices by factor level combinations
     newdata.bin.index.by.factors <- lapply(newdata.by.factors, function(x){ 
-      mat <- as.matrix(x, ncol = ncol(newdata))
-      colnames(mat) <- colnames(newdata)
-      mat <- as.matrix(mat[, index.numeric.variables])
+      if(nrow(x) == 0) return(0)
+      mat <- as.matrix(x[, index.newdata.numeric.variables], ncol = length(index.newdata.numeric.variables))
+      #colnames(mat) <- colnames(newdata[index.newdata.numeric.variables])
       output <- find.index(mat = mat, wn = wn, d = ncol(mat))
       output
     })
@@ -106,7 +108,7 @@ conformal.glm <- function(object, ..., newdata = NULL, alpha = 0.10,
       paste(str_extract_all(x, "\\(?[0-9,]+\\)?")[[1]], collapse = "")    
     }))
     index.newdata <- unlist(lapply(1:nrow(newdata), function(x){ 
-      index <- paste(as.numeric(newdata[x, index.factor.variables]), collapse = "")
+      index <- paste(as.numeric(newdata[x, index.newdata.factor.variables]), collapse = "")
       which(factor.code == index)
     }))
 
@@ -132,7 +134,9 @@ conformal.glm <- function(object, ..., newdata = NULL, alpha = 0.10,
 
     index.factor.variables <- which(attr(terms(object), "dataClasses") == "factor")
     index.numeric.variables <- which(attr(terms(object), "dataClasses") == "numeric")
-    factors <- lapply(index.factor.variables, function(j) as.numeric(as.factor(data[, j])))
+    index.data.factor.variables <- which(colnames(data) %in% names(index.factor.variables))
+    index.data.numeric.variables <- which(colnames(data) %in% names(index.numeric.variables))    
+    factors <- lapply(index.data.factor.variables, function(j) as.numeric(as.factor(data[, j])))
 
     ## split model matrix by factor level combinations
     split.X.factors <- split(X, factors, drop = FALSE)
@@ -150,21 +154,21 @@ conformal.glm <- function(object, ..., newdata = NULL, alpha = 0.10,
       mat[, index.numeric.variables]
     })
 
-    ## split bin indices by factor level combinations
-    bin.index.by.factors <- lapply(split.X.factors, function(x){ 
-      mat <- matrix(x, ncol = ncol(X))
-      colnames(mat) <- colnames(X)
-      mat <- mat[, index.numeric.variables]
-      find.index(mat = mat, wn = wn, d = ncol(mat))
-    })
-
     ## split response by factor level combinations
     split.Y.factors <- split(Y, factors, drop = FALSE)
     resps.by.factors <- lapply(split.Y.factors, as.numeric)
 
     ## split data frame by factor level combinations
     data.by.factors <- split(data, factors, drop = FALSE)
-  
+
+    ## split bin indices by factor level combinations
+    bin.index.by.factors <- lapply(data.by.factors, function(x){ 
+      if(nrow(x) == 0) return(0)
+      mat <- as.matrix(x[, index.data.numeric.variables[-1]], 
+        ncol = length(index.data.numeric.variables[-1]))
+      find.index(mat = mat, wn = wn, d = ncol(mat))
+    })
+
     ## get binning structure
     nks <- as.numeric(lengths(resps.by.factors))
  
