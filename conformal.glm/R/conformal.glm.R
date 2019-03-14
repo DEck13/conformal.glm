@@ -301,6 +301,13 @@ conformal.glm <- function(object, ..., newdata = NULL, alpha = 0.10,
           ## lower line search
           prec <- max( min(diff(sort(Yk[Yk <= y.min]))), precision)      
           steps <- 1
+          suppressWarnings(try.lwr <- try(phatxy(y.lwr), silent = TRUE))
+          while(class(try.lwr) == "try-error"){
+            y.lwr <- y.lwr + steps * prec
+            suppressWarnings(try.lwr <- try(phatxy(y.lwr), silent = TRUE))
+            steps <- steps + 1
+          }
+          steps <- 1          
           flag <- FALSE
           while(rank(phatxy(y.lwr))[nk + 1] >= nk.tilde & flag == FALSE){
             y.lwr <- y.lwr - steps * prec
@@ -331,6 +338,13 @@ conformal.glm <- function(object, ..., newdata = NULL, alpha = 0.10,
           ## upper line search
           if(y.lwr >= y.upr) y.upr <- 2^sign(max(Yk)) * max(Yk)
           prec <- max( min(diff(sort(Yk[Yk >= y.max]))), precision)
+          steps <- 1
+          suppressWarnings(try.upr <- try(phatxy(y.upr), silent = TRUE))
+          while(class(try.upr) == "try-error"){
+            y.upr <- y.upr - steps * prec
+            suppressWarnings(try.upr <- try(phatxy(y.upr), silent = TRUE))
+            steps <- steps + 1
+          }
           steps <- 1
           while(rank(phatxy(y.upr))[nk + 1] >= nk.tilde){
             y.upr <- y.upr + steps * prec
