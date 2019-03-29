@@ -1,0 +1,18 @@
+\contentsline {section}{\numberline {1}Introduction/Summary of simulation results}{2}
+\contentsline {section}{\numberline {2}Illustrative example from the README file}{3}
+\contentsline {section}{\numberline {3}Extension of the illustrative example from the README file}{8}
+\contentsline {subsection}{\numberline {3.1}Diagnostic measures}{8}
+\contentsline {section}{\numberline {4}Additional Gamma simulations}{16}
+\contentsline {subsection}{\numberline {4.1}Simulations}{16}
+\contentsline {subsection}{\numberline {4.2}Results}{41}
+\contentsline {section}{\numberline {5}Gamma-Gaussian model misspecification}{48}
+\contentsline {subsection}{\numberline {5.1}Simulations}{48}
+\contentsline {subsection}{\numberline {5.2}Results}{71}
+\contentsline {section}{\numberline {6}Linear Regression Simulations}{78}
+\contentsline {subsection}{\numberline {6.1}Simulations}{78}
+\contentsline {subsection}{\numberline {6.2}Results}{83}
+\contentsline {section}{\numberline {7}Example plots of prediction regions}{85}
+\contentsline {subsection}{\numberline {7.1}Plots corresponding to Section\nobreakspace {}4\hbox {}}{87}
+\contentsline {subsection}{\numberline {7.2}Plots corresponding to Section\nobreakspace {}5\hbox {}}{90}
+\contentsline {subsection}{\numberline {7.3}Plots corresponding to Section\nobreakspace {}6\hbox {}}{93}
+\contentsline {section}{\numberline {8}Creating this Document}{93}
