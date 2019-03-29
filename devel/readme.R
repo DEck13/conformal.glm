@@ -5,7 +5,7 @@ library(conformal.glm)
 library(parallel)
 
 alpha <- 0.10
-n <- 200
+n <- 500
 shape <- 2
 beta <- c(1/4, 2)
 
@@ -13,34 +13,56 @@ set.seed(13)
 x <- matrix(runif(n), ncol = 1)
 rate <- cbind(1, x) %*% beta * shape
 y <- rgamma(n = n, shape = shape, rate = rate)
-data <- data.frame(y = y, x = x)
-colnames(data)[2] <- c("x1")
-newdata <- matrix(seq(0.01, 0.99, by = 0.01), ncol = 1)
-colnames(newdata) <- c("x1")
-fit = glm(y ~ x1, family = Gamma, data = data) 
+data.readme <- data.frame(y = y, x = x)
+colnames(data.readme)[2] <- c("x1")
+
+fit.readme = glm(y ~ x1, family = Gamma, data = data.readme)
+summary(fit.readme)
+
 
 ## parametric and nonparametric conformal prediction region
-system.time(cpred <- conformal.glm(fit, nonparametric = TRUE, bins = 3, 
-	newdata = newdata, cores = 6))
+bins <- 3
+system.time(cpred <- conformal.glm(fit.readme, 
+  nonparametric = TRUE, bins = bins, cores = 6))
+paraCI <- cpred$paraconformal
+nonparaCI <- cpred$nonparaconformal
+
 
 ## least squares conformal prediction region
 library(conformalInference)
 funs <- lm.funs(intercept = TRUE)
 train.fun <- funs$train.fun
 predict.fun <- funs$predict.fun
-system.time(p1.tibs <- conformal.pred(x = x, y = y, x0 = newdata, 
+
+cubic.model <- lm(y ~ x + I(x^2) + I(x^3))
+abs.resid <- abs(cubic.model$resid)
+smooth.call <- smooth.spline(x, abs.resid, 
+  nknots = 10)
+lambda <- smooth.call$lambda
+df <- smooth.call$df
+mad.train.fun <- function(x, y, out = NULL){
+  smooth.spline(x[, 1], y, lambda = lambda, 
+    df = df, nknots = 10)
+}
+mad.predict.fun <- function(out, newx){
+  predict(out, newx[, 1])$y
+}
+system.time(p1.tibs <- conformal.pred(x = cbind(x,x^2,x^3), 
+  y = y, x0 = cbind(x,x^2,x^3), 
   train.fun = train.fun, predict.fun = predict.fun, 
-  alpha = alpha, grid.method = "linear",
-  num.grid.pts = 999))
-cresid = cbind(p1.tibs$lo, p1.tibs$up)
+  mad.train.fun = mad.train.fun,
+  mad.predict.fun = mad.predict.fun,
+  alpha = alpha))
+LSLW = cbind(p1.tibs$lo, p1.tibs$up)
+
 
 ## highest density region
 library(HDInterval)
-betaMLE <- coefficients(fit)
-shapeMLE <- as.numeric(gamma.shape(fit)[1])
-rateMLE <- cbind(1, newdata) %*% betaMLE * shapeMLE
-minlength <- do.call(rbind, 
-  lapply(1:nrow(newdata), function(j){ 
+betaMLE <- coefficients(fit.readme)
+shapeMLE <- as.numeric(gamma.shape(fit.readme)[1])
+rateMLE <- cbind(1, x) %*% betaMLE * shapeMLE
+HDCI <- do.call(rbind, 
+  lapply(1:nrow(x), function(j){ 
     hdi(qgamma, 0.90, shape = shapeMLE, rate = rateMLE[j, 1])
   }))
 
@@ -50,96 +72,190 @@ minlength <- do.call(rbind,
 ## area and coverage
 
 ## parametric conformal prediction region
-paraCI <- cpred$paraconformal
 # estimated area
 mean(apply(paraCI, 1, diff))
 # local coverage
 p <- length(beta) - 1
-local.coverage(region = paraCI, 
-  	  data = data, newdata = newdata, k = p, bins = 3, 
-      at.data = "FALSE")
+local.coverage(region = paraCI, data = data.readme, d = p, 
+  bins = bins, at.data = "TRUE")
 # marginal coverage
-local.coverage(region = paraCI, 
-  	  data = data, newdata = newdata, k = p, bins = 1, 
-      at.data = "FALSE")
+local.coverage(region = paraCI, data = data.readme, d = p, 
+  bins = 1, at.data = "TRUE")
 
 ## nonparametric conformal prediction region
-nonparaCI <- cpred$nonparaconformal
 # estimated area
-mean(apply(nonparaCI, 1, diff))
+area.nonparametric <- function(region){
+  if(class(region) != "list"){ 
+    stop("Only appropriate for nonparametric conformal prediction region")
+  }
+  bins <- length(region); wn <- 1 / bins
+  area <- 0
+  for(i in 1:bins){
+    nonpar.region <- region[[i]]
+    area <- area + wn * as.numeric(rep(c(-1,1), 
+      length(nonpar.region)/2) %*% nonpar.region)
+  }
+  area
+}
+area.nonparametric(nonparaCI)
 # local coverage
-local.coverage(region = nonparaCI, 
-  	  data = data, newdata = newdata, k = p, bins = 3, 
-      at.data = "FALSE")
+local.coverage(region = nonparaCI, data = data.readme, d = p, 
+  nonparametric = "TRUE", bins = bins, at.data = "TRUE")
 # marginal coverage
-local.coverage(region = nonparaCI, 
-  	  data = data, newdata = newdata, k = p, bins = 1, 
-      at.data = "FALSE")
+local.coverage(region = nonparaCI, data = data.readme, d = p, 
+  nonparametric = "TRUE", bins = 1, at.data = "TRUE")
 
-## least squares conformal prediction region
+## LSLW conformal prediction region
 # estimated area
-mean(apply(cresid, 1, diff))
+mean(apply(LSLW, 1, diff))
 # local coverage
-local.coverage(region = cresid, 
-  	  data = data, newdata = newdata, k = p, bins = 3, 
-      at.data = "FALSE")
+local.coverage(region = LSLW, data = data.readme, d = p, 
+  bins = bins, at.data = "TRUE")
 # marginal coverage
-local.coverage(region = cresid, 
-  	  data = data, newdata = newdata, k = p, bins = 1, 
-      at.data = "FALSE")
+local.coverage(region = LSLW, data = data.readme, d = p, 
+  bins = 1, at.data = "TRUE")
 
-## highest density region
+## HD region
 # estimated area
-mean(apply(minlength, 1, diff))
+mean(apply(HDCI, 1, diff))
 # local coverage
-local.coverage(region = minlength, 
-  	  data = data, newdata = newdata, k = p, bins = 3, 
-      at.data = "FALSE")
+local.coverage(region = HDCI, data = data.readme, d = p, 
+  bins = bins, at.data = "TRUE")
 # marginal coverage
-local.coverage(region = minlength, 
-  	  data = data, newdata = newdata, k = p, bins = 1, 
-      at.data = "FALSE")
+local.coverage(region = HDCI, data = data.readme, d = p, 
+  bins = 1, at.data = "TRUE")
+
+
 
 
 #########################################
-## make plot
+## make plot (.png)
+png(filename="gammasimexample.png")
 par(mfrow = c(2,2), oma = c(4,4,0,0), mar = c(1,1,1,1))
 
 # parametric conformal prediction region
+ix <- sort(x, index.return = TRUE)$ix
 plot.new()
-plot.window(xlim = c(0,1), ylim = c(0,max(y)))
+plot.window(xlim = c(0,1), ylim = c(min(y), max(y)))
 points(x, y, pch = 19, col = "gray")
-lines(newdata, paraCI[, 1], type = "l", col = "red")
-lines(newdata, paraCI[, 2], type = "l", col = "red")
+lines(x[ix], paraCI[ix, 1], type = "l", col = "red")
+lines(x[ix], paraCI[ix, 2], type = "l", col = "red")
 axis(2)
 
 # nonparametric conformal prediction region
-plot.new()
-plot.window(xlim = c(0,1), ylim = c(0,max(y)))
-points(x, y, pch = 19, col = "gray")
-lines(newdata, nonparaCI[, 1], type = "l", col = "red")
-lines(newdata, nonparaCI[, 2], type = "l", col = "red")
+plot.nonparametric <- function(region, x, y, bins){
+  if(class(region) != "list"){ 
+    stop("Only appropriate for nonparametric conformal prediction region")
+  }
+  plot.new()
+  plot.window(xlim = c(0,1), ylim = c(min(y), max(y)))
+  points(x, y, pch = 19, col = "gray")
+  for(i in 1:bins){ 
+    nonpar.i  <- nonparaCI[[i]]
+    odd <- which(1:length(nonpar.i) %% 2 == 1) 
+    even <- which(1:length(nonpar.i) %% 2 == 0)
+    segments(x0 = 1/bins * (i-1), y0 = nonpar.i, x1 =1/bins * i, 
+      col = "red")
+    if(i != 1){ 
+      nonpar.i.previous <- nonparaCI[[i-1]]
+      nonpar <- sort(c(nonpar.i, nonpar.i.previous))
+      odd2 <- which(1:length(nonpar) %% 2 == 1) 
+      even2 <- which(1:length(nonpar) %% 2 == 0)
+      segments(x0 = 1/bins * (i-1), y0 = nonpar[odd2], 
+        y1 = nonpar[even2], col = "red")
+    }
+  }
+}    
+plot.nonparametric(nonparaCI, x = x, y = y, bins = bins)
 
 # least squares conformal prediction region
 plot.new()
 plot.window(xlim = c(0,1), ylim = c(0,max(y)))
 points(x, y, pch = 19, col = "gray")
-lines(newdata, cresid[, 1], type = "l", col = "red")
-lines(newdata, cresid[, 2], type = "l", col = "red")
+lines(x[ix], LSLW[ix, 1], type = "l", col = "red")
+lines(x[ix], LSLW[ix, 2], type = "l", col = "red")
 axis(1); axis(2)
 
 # highest density region
 plot.new()
 plot.window(xlim = c(0,1), ylim = c(0,max(y)))
 points(x, y, pch = 19, col = "gray")
-lines(newdata, minlength[, 1], type = "l", col = "red")
-lines(newdata, minlength[, 2], type = "l", col = "red")
+lines(x[ix], HDCI[ix, 1], type = "l", col = "red")
+lines(x[ix], HDCI[ix, 2], type = "l", col = "red")
 axis(1)
 
 # axis labels
-mtext("x", side = 1, line = 2.5, outer = TRUE, cex = 2)
-mtext("y", side = 2, line = 2.5, outer = TRUE, cex = 2)
+mtext("x", side = 1, line = 2.5, outer = TRUE, cex = 1.25)
+mtext("y", side = 2, line = 2.5, outer = TRUE, cex = 1.25)
 
+
+dev.off()
+
+
+
+
+#########################################
+## make plot (.pdf)
+pdf(file="gammasimexample.pdf")
+par(mfrow = c(2,2), oma = c(4,4,0,0), mar = c(1,1,1,1))
+
+# parametric conformal prediction region
+ix <- sort(x, index.return = TRUE)$ix
+plot.new()
+plot.window(xlim = c(0,1), ylim = c(min(y), max(y)))
+points(x, y, pch = 19, col = "gray")
+lines(x[ix], paraCI[ix, 1], type = "l", col = "red")
+lines(x[ix], paraCI[ix, 2], type = "l", col = "red")
+axis(2)
+
+# nonparametric conformal prediction region
+plot.nonparametric <- function(region, x, y, bins){
+  if(class(region) != "list"){ 
+    stop("Only appropriate for nonparametric conformal prediction region")
+  }
+  plot.new()
+  plot.window(xlim = c(0,1), ylim = c(min(y), max(y)))
+  points(x, y, pch = 19, col = "gray")
+  for(i in 1:bins){ 
+    nonpar.i  <- nonparaCI[[i]]
+    odd <- which(1:length(nonpar.i) %% 2 == 1) 
+    even <- which(1:length(nonpar.i) %% 2 == 0)
+    segments(x0 = 1/bins * (i-1), y0 = nonpar.i, x1 =1/bins * i, 
+      col = "red")
+    if(i != 1){ 
+      nonpar.i.previous <- nonparaCI[[i-1]]
+      nonpar <- sort(c(nonpar.i, nonpar.i.previous))
+      odd2 <- which(1:length(nonpar) %% 2 == 1) 
+      even2 <- which(1:length(nonpar) %% 2 == 0)
+      segments(x0 = 1/bins * (i-1), y0 = nonpar[odd2], 
+        y1 = nonpar[even2], col = "red")
+    }
+  }
+}    
+plot.nonparametric(nonparaCI, x = x, y = y, bins = bins)
+
+# least squares conformal prediction region
+plot.new()
+plot.window(xlim = c(0,1), ylim = c(0,max(y)))
+points(x, y, pch = 19, col = "gray")
+lines(x[ix], LSLW[ix, 1], type = "l", col = "red")
+lines(x[ix], LSLW[ix, 2], type = "l", col = "red")
+axis(1); axis(2)
+
+# highest density region
+plot.new()
+plot.window(xlim = c(0,1), ylim = c(0,max(y)))
+points(x, y, pch = 19, col = "gray")
+lines(x[ix], HDCI[ix, 1], type = "l", col = "red")
+lines(x[ix], HDCI[ix, 2], type = "l", col = "red")
+axis(1)
+
+# axis labels
+mtext("x", side = 1, line = 2.5, outer = TRUE, cex = 1.25)
+mtext("y", side = 2, line = 2.5, outer = TRUE, cex = 1.25)
+
+
+dev.off()
 
 
 
