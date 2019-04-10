@@ -137,7 +137,7 @@ par(mfrow = c(2,2), oma = c(4,4,0,0), mar = c(1,1,1,1))
 ix <- sort(x, index.return = TRUE)$ix
 plot.new()
 plot.window(xlim = c(0,1), ylim = c(min(y), max(y)))
-points(x, y, pch = 19, col = "gray")
+points(x, y, pch = 19, col = rgb(0,0,0,alpha=0.2))
 lines(x[ix], paraCI[ix, 1], type = "l", col = "red")
 lines(x[ix], paraCI[ix, 2], type = "l", col = "red")
 axis(2)
@@ -149,7 +149,7 @@ plot.nonparametric <- function(region, x, y, bins){
   }
   plot.new()
   plot.window(xlim = c(0,1), ylim = c(min(y), max(y)))
-  points(x, y, pch = 19, col = "gray")
+  points(x, y, pch = 19, col = rgb(0,0,0,alpha=0.2))
   for(i in 1:bins){ 
     nonpar.i  <- nonparaCI[[i]]
     odd <- which(1:length(nonpar.i) %% 2 == 1) 
@@ -171,7 +171,7 @@ plot.nonparametric(nonparaCI, x = x, y = y, bins = bins)
 # least squares conformal prediction region
 plot.new()
 plot.window(xlim = c(0,1), ylim = c(0,max(y)))
-points(x, y, pch = 19, col = "gray")
+points(x, y, pch = 19, col = rgb(0,0,0,alpha=0.2))
 lines(x[ix], LSLW[ix, 1], type = "l", col = "red")
 lines(x[ix], LSLW[ix, 2], type = "l", col = "red")
 axis(1); axis(2)
@@ -179,7 +179,7 @@ axis(1); axis(2)
 # highest density region
 plot.new()
 plot.window(xlim = c(0,1), ylim = c(0,max(y)))
-points(x, y, pch = 19, col = "gray")
+points(x, y, pch = 19, col = rgb(0,0,0,alpha=0.2))
 lines(x[ix], HDCI[ix, 1], type = "l", col = "red")
 lines(x[ix], HDCI[ix, 2], type = "l", col = "red")
 axis(1)
@@ -203,7 +203,7 @@ par(mfrow = c(2,2), oma = c(4,4,0,0), mar = c(1,1,1,1))
 ix <- sort(x, index.return = TRUE)$ix
 plot.new()
 plot.window(xlim = c(0,1), ylim = c(min(y), max(y)))
-points(x, y, pch = 19, col = "gray")
+points(x, y, pch = 19, col = rgb(0,0,0,alpha=0.2))
 lines(x[ix], paraCI[ix, 1], type = "l", col = "red")
 lines(x[ix], paraCI[ix, 2], type = "l", col = "red")
 axis(2)
@@ -215,7 +215,7 @@ plot.nonparametric <- function(region, x, y, bins){
   }
   plot.new()
   plot.window(xlim = c(0,1), ylim = c(min(y), max(y)))
-  points(x, y, pch = 19, col = "gray")
+  points(x, y, pch = 19, col = rgb(0,0,0,alpha=0.2))
   for(i in 1:bins){ 
     nonpar.i  <- nonparaCI[[i]]
     odd <- which(1:length(nonpar.i) %% 2 == 1) 
@@ -237,7 +237,7 @@ plot.nonparametric(nonparaCI, x = x, y = y, bins = bins)
 # least squares conformal prediction region
 plot.new()
 plot.window(xlim = c(0,1), ylim = c(0,max(y)))
-points(x, y, pch = 19, col = "gray")
+points(x, y, pch = 19, col = rgb(0,0,0,alpha=0.2))
 lines(x[ix], LSLW[ix, 1], type = "l", col = "red")
 lines(x[ix], LSLW[ix, 2], type = "l", col = "red")
 axis(1); axis(2)
@@ -245,7 +245,7 @@ axis(1); axis(2)
 # highest density region
 plot.new()
 plot.window(xlim = c(0,1), ylim = c(0,max(y)))
-points(x, y, pch = 19, col = "gray")
+points(x, y, pch = 19, col = rgb(0,0,0,alpha=0.2))
 lines(x[ix], HDCI[ix, 1], type = "l", col = "red")
 lines(x[ix], HDCI[ix, 2], type = "l", col = "red")
 axis(1)
