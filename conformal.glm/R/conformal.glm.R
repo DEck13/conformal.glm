@@ -213,9 +213,12 @@ conformal.glm <- function(object, ..., newdata = NULL, alpha = 0.10,
       shapeMLE.y <- shapeMLE; rateMLE.y <- rbind(rateMLE, 1); betaMLE.y <- betaMLE
       sd.y <- sd.res
       object.y <- object
-      data.y <- matrix(0, nrow = nrow(data) + 1, ncol = ncol(data))
-      colnames(data.y) <- colnames(data)
-      data.y <- as.data.frame(data.y)
+      #data.y <- matrix(0, nrow = nrow(data) + 1, ncol = ncol(data))
+      #colnames(data.y) <- colnames(data)
+      #data.y <- as.data.frame(data.y)
+      #data.y <- data
+      #data.y <- rbind(data.y, 0)
+      data.y <- rbind(data, data[1, ])
 
       ## conformal script
       out <- mclapply(1:n.pred, mc.cores = cores, FUN = function(j){
@@ -224,8 +227,8 @@ conformal.glm <- function(object, ..., newdata = NULL, alpha = 0.10,
         internal.index <- index.newdata[j]
 
         # important quantities
-        x.variables <- newdata[j, ]
-        x <- X.newdata[j, ]
+        xnew <- newdata[j, ]
+        xnew.modmat <- X.newdata[j, ]
         index.bin.data <- bin.index.by.factors[[internal.index]]
         index.bin <- which(index.bin.data == index.bin.newdata[j])
         Xk <- preds.by.factors[[internal.index]][index.bin, ]
@@ -233,52 +236,9 @@ conformal.glm <- function(object, ..., newdata = NULL, alpha = 0.10,
         nk <- length(Yk)
 
         ## conformal scores (density estimator)
-        phatxy <- function(z){
-
-          out <- rateMLE.y <- NULL
-          data.y[, colnames(data) %in% respname] <- c(Y, z)
-          data.y[, !(colnames(data) %in% respname)] <- rbind(newdata, x.variables)
-
-          if(family == "Gamma"){
-            if(link == "identity"){
-              m1.y <- glm(formula, data = data.y, family = Gamma(link = identity), 
-                control = list(maxit = 1e4))
-              shapeMLE.y <- as.numeric(gamma.shape(m1.y)[1])
-              rateMLE.y <- 1 / (cbind(1, rbind(Xk, x)) %*% 
-                coefficients(m1.y)) * shapeMLE.y
-            }
-            if(link == "inverse"){
-              m1.y <- glm(formula, data = data.y, family = Gamma(link = inverse), 
-                control = list(maxit = 1e4))
-              shapeMLE.y <- as.numeric(gamma.shape(m1.y)[1])              
-              rateMLE.y <- (cbind(1, rbind(Xk, x)) %*% 
-                coefficients(m1.y)) * shapeMLE.y
-            }
-            if(link == "log"){
-              m1.y <- glm(formula, data = data.y, family = Gamma(link = log), 
-                control = list(maxit = 1e4))
-              shapeMLE.y <- as.numeric(gamma.shape(m1.y)[1])              
-              rateMLE.y <- (1 / exp(cbind(1, rbind(Xk, x)) %*% 
-                coefficients(m1.y))) * shapeMLE.y
-            }
-
-            out <- dgamma(c(Yk, z), rate = rateMLE.y, shape = shapeMLE.y)
-          }
-
-          if(family == "gaussian"){
-            m1.y <- lm(formula, data = data.y[-nrow(data.y), ])
-            out <- dnorm(c(Yk, z), mean = as.numeric(cbind(1, rbind(Xk, x)) %*% 
-              coefficients(m1.y)), sd = summary(m1.y)$sigma)
-          }
-
-          if(family == "inverse.gaussian"){
-            m1.y <- glm(formula, data = data.y, family = family, 
-              control = list(maxit = 1e4))
-            out <- dinvgauss(c(Yk, z), mean = 1 / sqrt(cbind(1, rbind(Xk, x)) %*% 
-              coefficients(m1.y)))
-          }
-
-          out
+        density_scores <- function(ynew){
+          phatxy(ynew, xnew = xnew, Yk = Yk, Xk = Xk, xnew.modmat = xnew.modmat, 
+            data = data, formula = formula, family = family, link = link)
         }
     
         ## declare output variable
@@ -301,7 +261,7 @@ conformal.glm <- function(object, ..., newdata = NULL, alpha = 0.10,
           ## lower line search
           prec <- max( min(diff(sort(Yk[Yk <= y.min]))), precision)      
           steps <- 1
-          suppressWarnings(try.lwr <- try(phatxy(y.lwr), silent = TRUE))
+          suppressWarnings(try.lwr <- try(density_scores(y.lwr), silent = TRUE))
           while(class(try.lwr) == "try-error"){
             y.lwr <- y.lwr + steps * prec
             suppressWarnings(try.lwr <- try(phatxy(y.lwr), silent = TRUE))
@@ -309,7 +269,7 @@ conformal.glm <- function(object, ..., newdata = NULL, alpha = 0.10,
           }
           steps <- 1          
           flag <- FALSE
-          while(rank(phatxy(y.lwr))[nk + 1] >= nk.tilde & flag == FALSE){
+          while(rank(density_scores(y.lwr))[nk + 1] >= nk.tilde & flag == FALSE){
             y.lwr <- y.lwr - steps * prec
             if(family != "gaussian"){ 
               if(y.lwr <= 0.0001){ 
@@ -329,7 +289,7 @@ conformal.glm <- function(object, ..., newdata = NULL, alpha = 0.10,
               prec <- min( min(diff(sort(Yk[Yk <= y.min]))), precision)
               if(prec == 0) prec <- precision
             }
-            while(rank(phatxy(y.lwr))[nk + 1] < nk.tilde & y.lwr < max(Yk)){
+            while(rank(density_scores(y.lwr))[nk + 1] < nk.tilde & y.lwr < max(Yk)){
               y.lwr <- y.lwr + steps * prec
               steps <- steps + 1
             }
@@ -339,14 +299,14 @@ conformal.glm <- function(object, ..., newdata = NULL, alpha = 0.10,
           if(y.lwr >= y.upr) y.upr <- 2^sign(max(Yk)) * max(Yk)
           prec <- max( min(diff(sort(Yk[Yk >= y.max]))), precision)
           steps <- 1
-          suppressWarnings(try.upr <- try(phatxy(y.upr), silent = TRUE))
+          suppressWarnings(try.upr <- try(density_scores(y.upr), silent = TRUE))
           while(class(try.upr) == "try-error"){
             y.upr <- y.upr - steps * prec
-            suppressWarnings(try.upr <- try(phatxy(y.upr), silent = TRUE))
+            suppressWarnings(try.upr <- try(density_scores(y.upr), silent = TRUE))
             steps <- steps + 1
           }
           steps <- 1
-          while(rank(phatxy(y.upr))[nk + 1] >= nk.tilde){
+          while(rank(density_scores(y.upr))[nk + 1] >= nk.tilde){
             y.upr <- y.upr + steps * prec
             steps <- steps + 1
           }
@@ -359,7 +319,7 @@ conformal.glm <- function(object, ..., newdata = NULL, alpha = 0.10,
             prec <- min( min(diff(sort(Yk[Yk >= y.max]))), precision)
             if(prec == 0) prec <- precision
           }        
-          while(rank(phatxy(y.upr))[nk + 1] < nk.tilde){
+          while(rank(density_scores(y.upr))[nk + 1] < nk.tilde){
             y.upr <- y.upr - steps * prec
             if(family != "gaussian"){ 
               if(y.upr <= 0.0001){ 
@@ -495,4 +455,8 @@ conformal.glm <- function(object, ..., newdata = NULL, alpha = 0.10,
 
   return(out)
 }
+
+
+
+
 

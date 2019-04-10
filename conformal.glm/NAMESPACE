@@ -1,4 +1,4 @@
-export(find.index, local.coverage, regions, conformal.glm)
+export(find.index, phatxy, local.coverage, regions, conformal.glm)
 
 importFrom(stats, lm)
 importFrom(stats, glm)

@@ -181,6 +181,60 @@ local.coverage <- function(region, nonparametric = "FALSE", data,
 
 
 
+## conformal scores
+phatxy <- function(ynew, xnew, Yk, Xk, xnew.modmat, 
+  data, formula, family, link){
+
+  out <- rateMLE.y <- shapeMLE.y <- NULL
+  data.y <- rbind(data, data[1, ])
+  n <- nrow(data)
+  data.y[n+1,] <- cbind(ynew, xnew)
+
+  if(family == "Gamma"){
+    if(link == "identity"){
+      m1.y <- glm(formula, data = data.y, family = Gamma(link = identity), 
+        control = list(maxit = 1e4))
+      shapeMLE.y <- as.numeric(gamma.shape(m1.y)[1])              
+      rateMLE.y <- 1 / (cbind(1, rbind(Xk, xnew.modmat)) %*% 
+        coefficients(m1.y)) * shapeMLE.y
+    }
+    if(link == "inverse"){
+      m1.y <- glm(formula, data = data.y, family = Gamma(link = inverse), 
+        control = list(maxit = 1e4))
+      shapeMLE.y <- as.numeric(gamma.shape(m1.y)[1])              
+      rateMLE.y <- (cbind(1, rbind(Xk, xnew.modmat)) %*% 
+        coefficients(m1.y)) * shapeMLE.y
+    }
+    if(link == "log"){
+      m1.y <- glm(formula, data = data.y, family = Gamma(link = log), 
+        control = list(maxit = 1e4))
+      shapeMLE.y <- as.numeric(gamma.shape(m1.y)[1])              
+      rateMLE.y <- (1 / exp(cbind(1, rbind(Xk, xnew.modmat)) %*% 
+        coefficients(m1.y))) * shapeMLE.y
+    }
+
+    out <- dgamma(c(Yk, ynew), rate = rateMLE.y, shape = shapeMLE.y)
+  }
+
+  if(family == "gaussian"){
+    m1.y <- lm(formula, data = data.y)
+    out <- dnorm(c(Yk, ynew), mean = as.numeric(cbind(1, rbind(Xk, xnew.modmat)) %*% 
+      coefficients(m1.y)), sd = summary(m1.y)$sigma)
+  }
+
+  if(family == "inverse.gaussian"){
+    m1.y <- glm(formula, data = data.y, family = family)
+    out <- dinvgauss(c(Yk, ynew), mean = 1 / sqrt(cbind(1, rbind(Xk, xnew.modmat)) %*% 
+      coefficients(m1.y)))
+  }
+
+  out
+}
+
+
+
+
+
 
 regions <- function(formula, data, newdata, family = "gaussian", link, 
   alpha = 0.10, cores = 1, bins = 1, parametric = TRUE, 
@@ -273,59 +327,17 @@ regions <- function(formula, data, newdata, family = "gaussian", link,
       colnames(data.y) <- colnames(data)
 
       out <- mclapply(1:n.pred, mc.cores = cores, FUN = function(j){
-        x.variables <- matrix(newdata.variables[j, ], nrow = 1, ncol = d)
-        x <- matrix(newdata.formula[j, ], nrow = 1, ncol = p)
+        xnew <- matrix(newdata.variables[j, ], nrow = 1, ncol = d)
+        xnew.modmat <- matrix(newdata.formula[j, ], nrow = 1, ncol = p)
         index.bin <- which(index == index.pred[j])
         nk <- length(index.bin)
         Xk <- matrix(X[index.bin, ], ncol = p)
         Yk <- Y[index.bin]
 
-        ## conformal scores
-        phatxy <- function(z){
-          out <- rateMLE.y <- NULL
-          data.y[, colnames(data) %in% respname] <- c(Y, z)
-          data.y[, !(colnames(data) %in% respname)] <- rbind(X.variables, x.variables)
-          data.y <- as.data.frame(data.y)
-
-          if(family == "Gamma"){
-            if(link == "identity"){
-              m1.y <- glm(formula, data = data.y, family = Gamma(link = identity), 
-                control = list(maxit = 1e4))
-              shapeMLE.y <- as.numeric(gamma.shape(m1.y)[1])              
-              rateMLE.y <- 1 / (cbind(1, rbind(Xk, x)) %*% 
-                coefficients(m1.y)) * shapeMLE.y
-            }
-            if(link == "inverse"){
-              m1.y <- glm(formula, data = data.y, family = Gamma(link = inverse), 
-                control = list(maxit = 1e4))
-              shapeMLE.y <- as.numeric(gamma.shape(m1.y)[1])              
-              rateMLE.y <- (cbind(1, rbind(Xk, x)) %*% 
-                coefficients(m1.y)) * shapeMLE.y
-            }
-            if(link == "log"){
-              m1.y <- glm(formula, data = data.y, family = Gamma(link = log), 
-                control = list(maxit = 1e4))
-              shapeMLE.y <- as.numeric(gamma.shape(m1.y)[1])              
-              rateMLE.y <- (1 / exp(cbind(1, rbind(Xk, x)) %*% 
-                coefficients(m1.y))) * shapeMLE.y
-            }
-
-            out <- dgamma(c(Yk, z), rate = rateMLE.y, shape = shapeMLE.y)
-          }
-
-          if(family == "gaussian"){
-            m1.y <- lm(formula, data = data.y)
-            out <- dnorm(c(Yk, z), mean = as.numeric(cbind(1, rbind(Xk, x)) %*% 
-              coefficients(m1.y)), sd = summary(m1.y)$sigma)
-          }
-
-          if(family == "inverse.gaussian"){
-            m1.y <- glm(formula, data = data.y, family = family)
-            out <- dinvgauss(c(Yk, z), mean = 1 / sqrt(cbind(1, rbind(Xk, x)) %*% 
-              coefficients(m1.y)))
-          }
-
-          out
+        ## conformal scores (density estimator)
+        density_scores <- function(ynew){
+          phatxy(ynew, xnew = xnew, Yk = Yk, Xk = Xk, xnew.modmat = xnew.modmat, 
+            data = data, formula = formula, family = family, link = link)
         }
 
         ## declare output variable
@@ -349,7 +361,7 @@ regions <- function(formula, data, newdata, family = "gaussian", link,
           prec <- max( min(diff(sort(Yk[Yk <= y.min]))), precision)      
           steps <- 1
           flag <- FALSE
-          while(rank(phatxy(y.lwr))[nk + 1] >= nk.tilde & flag == FALSE){
+          while(rank(density_scores(y.lwr))[nk + 1] >= nk.tilde & flag == FALSE){
             y.lwr <- y.lwr - steps * prec
             if(family != "gaussian"){ 
               if(y.lwr <= 0.0001){ 
@@ -369,7 +381,7 @@ regions <- function(formula, data, newdata, family = "gaussian", link,
               prec <- min( min(diff(sort(Yk[Yk <= y.min]))), precision)
               if(prec == 0) prec <- precision
             }
-            while(rank(phatxy(y.lwr))[nk + 1] < nk.tilde & y.lwr < max(Yk)){
+            while(rank(density_scores(y.lwr))[nk + 1] < nk.tilde & y.lwr < max(Yk)){
               y.lwr <- y.lwr + steps * prec
               steps <- steps + 1
             }
@@ -379,7 +391,7 @@ regions <- function(formula, data, newdata, family = "gaussian", link,
           if(y.lwr >= y.upr) y.upr <- 2^sign(max(Yk)) * max(Yk)
           prec <- max( min(diff(sort(Yk[Yk >= y.max]))), precision)
           steps <- 1
-          while(rank(phatxy(y.upr))[nk + 1] >= nk.tilde){
+          while(rank(density_scores(y.upr))[nk + 1] >= nk.tilde){
             y.upr <- y.upr + steps * prec
             steps <- steps + 1
           }
@@ -392,7 +404,7 @@ regions <- function(formula, data, newdata, family = "gaussian", link,
             prec <- min( min(diff(sort(Yk[Yk >= y.max]))), precision)
             if(prec == 0) prec <- precision
           }        
-          while(rank(phatxy(y.upr))[nk + 1] < nk.tilde){
+          while(rank(density_scores(y.upr))[nk + 1] < nk.tilde){
             y.upr <- y.upr - steps * prec
             if(family != "gaussian"){ 
               if(y.upr <= 0.0001){ 
