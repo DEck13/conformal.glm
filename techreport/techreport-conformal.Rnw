@@ -5422,7 +5422,8 @@ points(x, y, pch = 19, col = rgb(0,0,0,alpha=0.2))
 lines(x[ix], paraCI[ix, 1], col = "red", lwd = 1.5)
 lines(x[ix], paraCI[ix, 2], col = "red", lwd = 1.5)
 axis(2)
-mtext("parametric", side = 3, cex = 1, line = 1)
+mtext("Parametric \n conformal", side = 3, cex = 1, line = 0)
+mtext("A", side = 2, cex = 1, line = 2, at = 5)
 
 ## LSLW conformal
 plot.new()
@@ -5430,12 +5431,12 @@ plot.window(xlim = c(0,1), ylim = c(min(y)-1, max(y)+1))
 points(x, y, pch = 19, col = rgb(0,0,0,alpha=0.2))
 lines(x[ix], LSLWCI[ix, 1], col = "red", lwd = 1.5)
 lines(x[ix], LSLWCI[ix, 2], col = "red", lwd = 1.5)
-mtext("LSLW", side = 3, cex = 1, line = 1)
+mtext("LSLW \n conformal", side = 3, cex = 1, line = 0)
 
 ## nonparametric conformal
 plot.nonparametric(region = nonparaCI, x = x, 
   y = y, bins = bins)
-mtext("nonparametric", side = 3, cex = 1, line = 1)
+mtext("Nonparametric \n conformal", side = 3, cex = 1, line = 0)
 
 ## LS conformal
 plot.new()
@@ -5443,7 +5444,7 @@ plot.window(xlim = c(0,1), ylim = c(min(y)-1, max(y)+1))
 points(x, y, pch = 19, col = rgb(0,0,0,alpha=0.2))
 lines(x[ix], LSCI[ix, 1], col = "red", lwd = 1.5)
 lines(x[ix], LSCI[ix, 2], col = "red", lwd = 1.5)
-mtext("LS", side = 3, cex = 1, line = 1)
+mtext("LS \n conformal", side = 3, cex = 1, line = 0)
 
 ######### Sim setting B ####################
 ## generate gamma regression model (misspecified parametric conformal)
@@ -5508,6 +5509,7 @@ points(x, y, pch = 19, col = rgb(0,0,0,alpha=0.2))
 lines(x[ix], paraCI[ix, 1], col = "red", lwd = 1.5)
 lines(x[ix], paraCI[ix, 2], col = "red", lwd = 1.5)
 axis(2)
+mtext("B", side = 2, cex = 1, line = 2, at = 5)
 
 ## LSLW conformal
 plot.new()
@@ -5588,6 +5590,7 @@ points(x, y, pch = 19, col = rgb(0,0,0,alpha=0.2))
 lines(x[ix], paraCI[ix, 1], col = "red", lwd = 1.5)
 lines(x[ix], paraCI[ix, 2], col = "red", lwd = 1.5)
 axis(1); axis(2)
+mtext("C", side = 2, cex = 1, line = 2, at = 4.5)
 
 ## LSLW conformal
 plot.new()
@@ -5618,7 +5621,7 @@ mtext("y", side = 2, cex = 1, line = 2, outer = TRUE)
   appears in \citet{eck2019conformal}.  The rows display conformal prediction 
   regions across simulation settings.  The columns display the different 
   conformal prediction regions.  The top, middle, and bottom rows correspond 
-  to simulation setting a with shape parameter equal to 2, simulation setting 
+  to simulation setting a with shape parameter equal to 1, simulation setting 
   b with shape parameter equal to 10, and simulation setting c respectively.  
   The first column displays the parametric conformal prediction region which 
   is misspecified in row 2, the second column displays the least squares 
@@ -5722,7 +5725,7 @@ points(x, y, pch = 19, col = rgb(0,0,0,alpha=0.2))
 lines(x[ix], paraCI[ix, 1], col = "red", lwd = 1.5)
 lines(x[ix], paraCI[ix, 2], col = "red", lwd = 1.5)
 axis(2)
-mtext("parametric", side = 3, cex = 1, line = 1)
+mtext("Parametric \n conformal", side = 3, cex = 1, line = 0)
 mtext("shape = 0.75", side = 2, cex = 1, line = 2)
 
 ## LSLW conformal
@@ -5731,12 +5734,12 @@ plot.window(xlim = c(0,1), ylim = c(min(y)-1, max(y)+1))
 points(x, y, pch = 19, col = rgb(0,0,0,alpha=0.2))
 lines(x[ix], LSLWCI[ix, 1], col = "red", lwd = 1.5)
 lines(x[ix], LSLWCI[ix, 2], col = "red", lwd = 1.5)
-mtext("LSLW", side = 3, cex = 1, line = 1)
+mtext("LSLW\n conformal", side = 3, cex = 1, line = 0)
 
 ## nonparametric conformal
 plot.nonparametric(region = nonparaCI, x = x, 
   y = y, bins = bins)
-mtext("nonparametric", side = 3, cex = 1, line = 1)
+mtext("nonparametric\n conformal", side = 3, cex = 1, line = 0)
 
 ## LS conformal
 plot.new()
@@ -5744,7 +5747,7 @@ plot.window(xlim = c(0,1), ylim = c(min(y)-1, max(y)+1))
 points(x, y, pch = 19, col = rgb(0,0,0,alpha=0.2))
 lines(x[ix], LSCI[ix, 1], col = "red", lwd = 1.5)
 lines(x[ix], LSCI[ix, 2], col = "red", lwd = 1.5)
-mtext("LS", side = 3, cex = 1, line = 1)
+mtext("LS\n conformal", side = 3, cex = 1, line = 0)
 
 
 ############ shape = 2 ################
@@ -6099,7 +6102,7 @@ points(x, y, pch = 19, col = rgb(0,0,0,alpha=0.2))
 lines(x[ix], paraCI[ix, 1], col = "red", lwd = 1.5)
 lines(x[ix], paraCI[ix, 2], col = "red", lwd = 1.5)
 axis(2)
-mtext("parametric", side = 3, cex = 1, line = 1)
+mtext("Parametric\n conformal", side = 3, cex = 1, line = 0)
 mtext("shape = 0.75", side = 2, cex = 1, line = 2)
 
 ## LSLW conformal
@@ -6108,12 +6111,12 @@ plot.window(xlim = c(0,1), ylim = c(min(y)-1, max(y)+1))
 points(x, y, pch = 19, col = rgb(0,0,0,alpha=0.2))
 lines(x[ix], LSLWCI[ix, 1], col = "red", lwd = 1.5)
 lines(x[ix], LSLWCI[ix, 2], col = "red", lwd = 1.5)
-mtext("LSLW", side = 3, cex = 1, line = 1)
+mtext("LSLW\n conformal", side = 3, cex = 1, line = 0)
 
 ## nonparametric conformal
 plot.nonparametric(region = nonparaCI, x = x, 
   y = y, bins = bins)
-mtext("nonparametric", side = 3, cex = 1, line = 1)
+mtext("Nonparametric\n conformal", side = 3, cex = 1, line = 0)
 
 ## LS conformal
 plot.new()
@@ -6121,7 +6124,7 @@ plot.window(xlim = c(0,1), ylim = c(min(y)-1, max(y)+1))
 points(x, y, pch = 19, col = rgb(0,0,0,alpha=0.2))
 lines(x[ix], LSCI[ix, 1], col = "red", lwd = 1.5)
 lines(x[ix], LSCI[ix, 2], col = "red", lwd = 1.5)
-mtext("LS", side = 3, cex = 1, line = 1)
+mtext("LS\n conformal", side = 3, cex = 1, line = 0)
 
 
 ############ shape = 2 ################
@@ -6473,7 +6476,7 @@ points(x, y, pch = 19, col = rgb(0,0,0,alpha=0.2))
 lines(x[ix], paraCI[ix, 1], col = "red", lwd = 1.5)
 lines(x[ix], paraCI[ix, 2], col = "red", lwd = 1.5)
 axis(2)
-mtext("parametric", side = 3, cex = 1, line = 1)
+mtext("Parametric\n conformal", side = 3, cex = 1, line = 0)
 mtext("shape = 0.75", side = 2, cex = 1, line = 2)
 
 ## LSLW conformal
@@ -6482,12 +6485,12 @@ plot.window(xlim = c(0,1), ylim = c(min(y)-1, max(y)+1))
 points(x, y, pch = 19, col = rgb(0,0,0,alpha=0.2))
 lines(x[ix], LSLWCI[ix, 1], col = "red", lwd = 1.5)
 lines(x[ix], LSLWCI[ix, 2], col = "red", lwd = 1.5)
-mtext("LSLW", side = 3, cex = 1, line = 1)
+mtext("LSLW\n conformal", side = 3, cex = 1, line = 0)
 
 ## nonparametric conformal
 plot.nonparametric(region = nonparaCI, x = x, 
   y = y, bins = bins)
-mtext("nonparametric", side = 3, cex = 1, line = 1)
+mtext("Nonparametric\n conformal", side = 3, cex = 1, line = 0)
 
 ## LS conformal
 plot.new()
@@ -6495,7 +6498,7 @@ plot.window(xlim = c(0,1), ylim = c(min(y)-1, max(y)+1))
 points(x, y, pch = 19, col = rgb(0,0,0,alpha=0.2))
 lines(x[ix], LSCI[ix, 1], col = "red", lwd = 1.5)
 lines(x[ix], LSCI[ix, 2], col = "red", lwd = 1.5)
-mtext("LS", side = 3, cex = 1, line = 1)
+mtext("LS\n conformal", side = 3, cex = 1, line = 0)
 
 
 ############ shape = 2 ################
@@ -6851,7 +6854,7 @@ points(x, y, pch = 19, col = rgb(0,0,0,alpha=0.2))
 lines(x[ix], paraCI[ix, 1], col = "red", lwd = 1.5)
 lines(x[ix], paraCI[ix, 2], col = "red", lwd = 1.5)
 axis(2)
-mtext("parametric", side = 3, cex = 1, line = 1)
+mtext("Parametric\n conformal", side = 3, cex = 1, line = 0)
 mtext("shape = 0.75", side = 2, cex = 1, line = 2)
 
 ## LSLW conformal
@@ -6860,12 +6863,12 @@ plot.window(xlim = c(0,1), ylim = c(min(y)-1, max(y)+1))
 points(x, y, pch = 19, col = rgb(0,0,0,alpha=0.2))
 lines(x[ix], LSLWCI[ix, 1], col = "red", lwd = 1.5)
 lines(x[ix], LSLWCI[ix, 2], col = "red", lwd = 1.5)
-mtext("LSLW", side = 3, cex = 1, line = 1)
+mtext("LSLW\n conformal", side = 3, cex = 1, line = 0)
 
 ## nonparametric conformal
 plot.nonparametric(region = nonparaCI, x = x, 
   y = y, bins = bins)
-mtext("nonparametric", side = 3, cex = 1, line = 1)
+mtext("Nonparametric\n conformal", side = 3, cex = 1, line = 0)
 
 ## LS conformal
 plot.new()
@@ -6873,7 +6876,7 @@ plot.window(xlim = c(0,1), ylim = c(min(y)-1, max(y)+1))
 points(x, y, pch = 19, col = rgb(0,0,0,alpha=0.2))
 lines(x[ix], LSCI[ix, 1], col = "red", lwd = 1.5)
 lines(x[ix], LSCI[ix, 2], col = "red", lwd = 1.5)
-mtext("LS", side = 3, cex = 1, line = 1)
+mtext("LS\n conformal", side = 3, cex = 1, line = 0)
 
 
 ############ shape = 2 ################
@@ -7237,7 +7240,7 @@ points(x, y, pch = 19, col = rgb(0,0,0,alpha=0.2))
 lines(x[ix], paraCI[ix, 1], col = "red", lwd = 1.5)
 lines(x[ix], paraCI[ix, 2], col = "red", lwd = 1.5)
 axis(2)
-mtext("parametric", side = 3, cex = 1, line = 1)
+mtext("Parametric\n conformal", side = 3, cex = 1, line = 0)
 mtext("shape = 0.75", side = 2, cex = 1, line = 2)
 
 ## LSLW conformal
@@ -7246,12 +7249,12 @@ plot.window(xlim = c(0,1), ylim = c(min(y)-1, max(y)+1))
 points(x, y, pch = 19, col = rgb(0,0,0,alpha=0.2))
 lines(x[ix], LSLWCI[ix, 1], col = "red", lwd = 1.5)
 lines(x[ix], LSLWCI[ix, 2], col = "red", lwd = 1.5)
-mtext("LSLW", side = 3, cex = 1, line = 1)
+mtext("LSLW\n conformal", side = 3, cex = 1, line = 0)
 
 ## nonparametric conformal
 plot.nonparametric(region = nonparaCI, x = x, 
   y = y, bins = bins)
-mtext("nonparametric", side = 3, cex = 1, line = 1)
+mtext("Nonparametric\n conformal", side = 3, cex = 1, line = 0)
 
 ## LS conformal
 plot.new()
@@ -7259,7 +7262,7 @@ plot.window(xlim = c(0,1), ylim = c(min(y)-1, max(y)+1))
 points(x, y, pch = 19, col = rgb(0,0,0,alpha=0.2))
 lines(x[ix], LSCI[ix, 1], col = "red", lwd = 1.5)
 lines(x[ix], LSCI[ix, 2], col = "red", lwd = 1.5)
-mtext("LS", side = 3, cex = 1, line = 1)
+mtext("LS\n conformal", side = 3, cex = 1, line = 0)
 
 
 ############ shape = 2 ################
@@ -7622,7 +7625,7 @@ points(x, y, pch = 19, col = rgb(0,0,0,alpha=0.2))
 lines(x[ix], paraCI[ix, 1], col = "red", lwd = 1.5)
 lines(x[ix], paraCI[ix, 2], col = "red", lwd = 1.5)
 axis(2)
-mtext("parametric", side = 3, cex = 1, line = 1)
+mtext("Parametric\n conformal", side = 3, cex = 1, line = 0)
 mtext("shape = 0.75", side = 2, cex = 1, line = 2)
 
 ## LSLW conformal
@@ -7631,12 +7634,12 @@ plot.window(xlim = c(0,1), ylim = c(min(y)-1, max(y)+1))
 points(x, y, pch = 19, col = rgb(0,0,0,alpha=0.2))
 lines(x[ix], LSLWCI[ix, 1], col = "red", lwd = 1.5)
 lines(x[ix], LSLWCI[ix, 2], col = "red", lwd = 1.5)
-mtext("LSLW", side = 3, cex = 1, line = 1)
+mtext("LSLW\n conformal", side = 3, cex = 1, line = 0)
 
 ## nonparametric conformal
 plot.nonparametric(region = nonparaCI, x = x, 
   y = y, bins = bins)
-mtext("nonparametric", side = 3, cex = 1, line = 1)
+mtext("Nonparametric\n conformal", side = 3, cex = 1, line = 0)
 
 ## LS conformal
 plot.new()
@@ -7644,7 +7647,7 @@ plot.window(xlim = c(0,1), ylim = c(min(y)-1, max(y)+1))
 points(x, y, pch = 19, col = rgb(0,0,0,alpha=0.2))
 lines(x[ix], LSCI[ix, 1], col = "red", lwd = 1.5)
 lines(x[ix], LSCI[ix, 2], col = "red", lwd = 1.5)
-mtext("LS", side = 3, cex = 1, line = 1)
+mtext("LS\n conformal", side = 3, cex = 1, line = 0)
 
 
 ############ shape = 2 ################
@@ -8009,7 +8012,7 @@ lines(x[ix], paraCI[ix, 1], col = "red", lwd = 1.5)
 lines(x[ix], paraCI[ix, 2], col = "red", lwd = 1.5)
 axis(2)
 mtext("n = 150", side = 2, cex = 1, line = 2)
-mtext("parametric", side = 3, cex = 1, line = 1)
+mtext("Parametric\n conformal", side = 3, cex = 1, line = 0)
 
 ## LSLW conformal
 plot.new()
@@ -8017,12 +8020,12 @@ plot.window(xlim = c(0, 1), ylim = c(min(y)-1, max(y)+1))
 points(x, y, pch = 19, col = rgb(0,0,0,alpha=0.2))
 lines(x[ix], LSLWCI[ix, 1], col = "red", lwd = 1.5)
 lines(x[ix], LSLWCI[ix, 2], col = "red", lwd = 1.5)
-mtext("LSLW", side = 3, cex = 1, line = 1)
+mtext("LSLW\n conformal", side = 3, cex = 1, line = 0)
 
 ## nonparametric conformal
 plot.nonparametric(region = nonparaCI, x = x, 
   y = y, bins = bins)
-mtext("nonparametric", side = 3, cex = 1, line = 1)
+mtext("Nonparametric\n conformal", side = 3, cex = 1, line = 0)
 
 ## LS conformal
 plot.new()
@@ -8030,7 +8033,7 @@ plot.window(xlim = c(0, 1), ylim = c(min(y)-1, max(y)+1))
 points(x, y, pch = 19, col = rgb(0,0,0,alpha=0.2))
 lines(x[ix], LSCI[ix, 1], col = "red", lwd = 1.5)
 lines(x[ix], LSCI[ix, 2], col = "red", lwd = 1.5)
-mtext("LS", side = 3, cex = 1, line = 1)
+mtext("LS\n conformal", side = 3, cex = 1, line = 0)
 
 
 ######### n = 250 ####################
