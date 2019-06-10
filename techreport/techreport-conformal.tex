@@ -165,6 +165,10 @@ within this document.
 \hlkwd{library}\hlstd{(HDInterval)}
 \hlkwd{library}\hlstd{(conformal.glm)} \hlcom{## https://github.com/DEck13/conformal.glm}
 \hlkwd{library}\hlstd{(conformalInference)} \hlcom{## https://github.com/ryantibs/conformal}
+\hlkwd{library}\hlstd{(faraway)}
+\hlkwd{library}\hlstd{(geometry)}
+\hlkwd{library}\hlstd{(xtable)}
+\hlkwd{library}\hlstd{(rgl)}
 \end{alltt}
 \end{kframe}
 \end{knitrout}
@@ -593,39 +597,48 @@ of length 0.04.
 
 \subsection{Diagnostic measures}
 
-In this section we describe the diagnostic measures that we will use to 
-compare conformal prediction regions.
-The specific diagnostics are 
-prediction error at the observed data, 
-area of the prediction region, 
-finite-sample marginal coverage,
-finite-sample local coverage with respec to binning, 
-and 
-finite-sample local conditional coverage.  
-
-We will use a modification of average sum of squares error as our measure of 
-prediction error.  Our prediction error will average the squared distances of 
-observations outside of the prediction region to the closest boundary of the 
-prediction region.  The average will be taken over all observations so that an 
-observation that falls within the prediction region has an error of 0.  
-More formally this prediction error is 
-$$
-  \text{prediciton error} 
+Several diagnostic measures are used to compare conformal prediction regions.
+%%%The specific diagnostics are 
+%%%prediction error at the observed data, 
+%%%area of the prediction region, 
+%%%finite sample marginal coverage,
+%%%finite sample local coverage with respect to binning, 
+%%%and 
+%%%finite sample local conditional coverage.  
+%We will use a modification of average sum of squares error as our measure of 
+%prediction error.  
+These diagnostic measures compare prediction regions by their 
+prediction error, volume, and coverage properties.
+Our prediction error diagnostic metric will be an average of the squared 
+distances of observations outside of the prediction region to the closest 
+boundary of the prediction region, averaged over all 
+observations. An observation that falls within the prediction region 
+has an error of 0.  More formally this prediction error metric is 
+\[ 
+  \text{prediction error} 
     = n^{-1}\sum_{i=1}^n\indicator{Y_i \not\in \Copt(X_i)}
-      \left(\min\{|Y_i - a_{i,1}|, |Y_i - b_{i,1}|, \ldots, 
-      |Y_i - a_{i,m_i}|, |Y_i - b_{i,m_i}|\}\right)^2,
-$$
+      \left(\min_{j=1,\ldots,m_i}\left\{\min\{|Y_i - a_{i,j}|, 
+        |Y_i - b_{i,j}|\}\right\}\right)^2,
+ \]
 where $a_{i,j}$ and $b_{i,j}$ are, respectively, the lower and upper 
 boundaries of possible $j = 1, \ldots, m_i$ disjoint intervals forming 
 the prediction region.  
 
-The area of each prediction region will be estimated by the average of the 
+The volume of each prediction region will be estimated by the average of the 
 upper boundary minus the lower boundary across observed $\X$, written as
 $$ 
   \text{area} = n^{-1}\sum_{i=1}^n\sum_{j=1}^{m_i}(b_{i,j} - a_{i,j}).
 $$
-This estimate of area is appropriate in our simulations in which realiztions 
-of the predictors are generated as $X \sim U(0,1)$.   
+%This estimate of area is appropriate in our simulations in which realizations 
+%of the predictors are generated as $X \sim U(0,1)$.   
+
+%The area of each prediction region will be estimated by the average of the 
+%upper boundary minus the lower boundary across observed $\X$, written as
+%$$ 
+%  \text{area} = n^{-1}\sum_{i=1}^n\sum_{j=1}^{m_i}(b_{i,j} - a_{i,j}).
+%$$
+%This estimate of area is appropriate in our simulations in which realiztions 
+%of the predictors are generated as $X \sim U(0,1)$.   
 
 To assess finite-sample marginal validity we calculate the proportion of 
 responses that fall within the prediction region.  To assess finite-sample 
@@ -1025,6 +1038,450 @@ evidenced by Figure~\ref{Fig:coverageinx500.3}.
 \caption{Plot of the estimated coverage probabilities of prediction regions 
   across $x$.}
 \label{Fig:coverageinx500.3}
+\end{figure}
+
+
+
+
+\newpage
+\section{Predicting the risk of diabetes}
+\label{sec:diabetes}
+
+In this Section we reproduce the data analysis that appears in Section 5 of 
+\citet{eck2019conformal}.  
+We examine the influence of several variables on blood sugar, or glycosylated 
+hemoglobin percentage (also known as HbA1c), an important risk factor for 
+diabetes.  A glycosylated hemoglobin value of 6.5\% can be used as a cutoff 
+for positive diagnosis of diabetes \citep{world2011use}. 
+
+We predict an individual's glycosylated hemoglobin from their height, 
+weight, age, and gender, all of which are easy to measure, inexpensive, and do 
+not require any laboratory testing.  
+The data in this analysis come from a population-based sample of 403 rural 
+African-Americans in Virginia \citep{willems1997prevalence}, taken from the 
+\texttt{faraway} R package \citep{faraway2016R}.  
+We considered a gamma regression model that only includes linear terms for 
+each covariate, a linear regression model with homoskedastic normal errors 
+and the same linear terms for each covariate, and a linear regression model 
+with homoskedastic normal errors that also included quadratic terms for 
+each covariate.
+Of these considered the models, the gamma regression model fit the data 
+best on the basis that it had the lowest AIC value and it gave the best 
+predictive predictive performance on the basis that it had the lowest 
+sum of squares prediction error.  
+That being said, we do not know the data generating process.
+
+Based on these covariates, conformal prediction regions provide finite sample 
+valid prediction regions for glycosylated hemoglobin that may be useful for 
+diagnosing diabetes in this study population.
+The data set is loaded from the R package \citet{faraway2016R}.
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlkwd{data}\hlstd{(diabetes)}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+
+We throw away data points that contain missing values of any variable of 
+interest.
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlstd{dat} \hlkwb{<-} \hlstd{diabetes[,} \hlkwd{c}\hlstd{(}\hlstr{"glyhb"}\hlstd{,} \hlstr{"height"}\hlstd{,} \hlstr{"weight"}\hlstd{,} \hlstr{"age"}\hlstd{,} \hlstr{"gender"}\hlstd{)]}
+\hlstd{dat} \hlkwb{<-} \hlstd{dat[}\hlkwd{complete.cases}\hlstd{(dat), ]}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+
+
+The Gamma regression model with with log link function is selected among 
+several candidate models as the model used for inference in this analysis.
+This model has the lowest AIC value among candidates.
+
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlstd{m.gamma.log} \hlkwb{<-} \hlkwd{glm}\hlstd{(glyhb} \hlopt{~} \hlstd{height} \hlopt{+} \hlstd{weight} \hlopt{+} \hlstd{age} \hlopt{+} \hlstd{gender,}
+  \hlkwc{data} \hlstd{= dat,} \hlkwc{family} \hlstd{=} \hlkwd{Gamma}\hlstd{(}\hlkwc{link} \hlstd{= log))}
+\hlstd{m.gamma} \hlkwb{<-} \hlkwd{glm}\hlstd{(glyhb} \hlopt{~} \hlstd{height} \hlopt{+} \hlstd{weight} \hlopt{+} \hlstd{age} \hlopt{+} \hlstd{gender,}
+  \hlkwc{data} \hlstd{= dat,} \hlkwc{family} \hlstd{=} \hlstr{"Gamma"}\hlstd{)}
+\hlstd{m.gamma.identity} \hlkwb{<-} \hlkwd{glm}\hlstd{(glyhb} \hlopt{~} \hlstd{height} \hlopt{+} \hlstd{weight} \hlopt{+} \hlstd{age} \hlopt{+} \hlstd{gender,}
+  \hlkwc{data} \hlstd{= dat,} \hlkwc{family} \hlstd{=} \hlkwd{Gamma}\hlstd{(}\hlkwc{link} \hlstd{= identity))}
+\hlstd{m.gaussian} \hlkwb{<-} \hlkwd{glm}\hlstd{(glyhb} \hlopt{~} \hlstd{height} \hlopt{+} \hlstd{weight} \hlopt{+} \hlstd{age} \hlopt{+} \hlstd{gender,}
+  \hlkwc{data} \hlstd{= dat,} \hlkwc{family} \hlstd{=} \hlstr{"gaussian"}\hlstd{,} \hlkwc{x} \hlstd{=} \hlnum{TRUE}\hlstd{)}
+\hlstd{X} \hlkwb{<-} \hlstd{m.gaussian}\hlopt{$}\hlstd{x}
+\hlstd{m.gaussian.2} \hlkwb{<-} \hlkwd{glm}\hlstd{(glyhb} \hlopt{~} \hlstd{height} \hlopt{+} \hlstd{weight} \hlopt{+} \hlstd{age} \hlopt{+} \hlkwd{I}\hlstd{(height}\hlopt{^}\hlnum{2}\hlstd{)}
+  \hlopt{+} \hlkwd{I}\hlstd{(weight}\hlopt{^}\hlnum{2}\hlstd{)} \hlopt{+} \hlkwd{I}\hlstd{(age}\hlopt{^}\hlnum{2}\hlstd{)} \hlopt{+} \hlstd{gender,}
+  \hlkwc{data} \hlstd{= dat,} \hlkwc{family} \hlstd{=} \hlstr{"gaussian"}\hlstd{,} \hlkwc{x} \hlstd{=} \hlnum{TRUE}\hlstd{)}
+
+\hlkwd{AIC}\hlstd{(m.gamma.log, m.gamma, m.gamma.identity, m.gaussian, m.gaussian.2)}
+\end{alltt}
+\begin{verbatim}
+##                  df      AIC
+## m.gamma.log       6 1452.012
+## m.gamma           6 1452.328
+## m.gamma.identity  6 1453.972
+## m.gaussian        6 1644.621
+## m.gaussian.2      9 1648.256
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+
+This model also provides satisfactory prediction as seen in 
+Figure~\ref{diabetes:diagnostics}.
+
+
+\begin{figure}
+\begin{center}
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
+\includegraphics[width=\maxwidth]{figure/unnamed-chunk-10-1} 
+
+\end{knitrout}
+\end{center}
+\caption{Predictive performance of candidate models.}
+\label{diabetes:diagnostics}
+\end{figure}
+
+
+Four conformal prediction regions are considered for predicting glycosylated 
+hemoglobin percentage.  These conformal prediction regions are the parametric 
+conformal prediction region with a Gamma model fit, the parametric conformal 
+prediction region with a Gaussian model fit, the least squares conformal 
+prediction region, and the least square conformal prediction region with 
+local weighting.  
+All conformal prediction regions correspond to models that only include 
+linear terms for each of the covariates.  
+The Gamma and Gaussian parametric conformal prediction regions were 
+computed with binning across the binary gender factor variable, the predictor 
+space is partitioned across genders. 
+However, no additional binning structure within the levels of gender was 
+employed.  
+
+These conformal prediction regions are now constructed.
+
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Gamma conformal}
+\hlkwd{system.time}\hlstd{(conformal.gamma} \hlkwb{<-}
+  \hlkwd{conformal.glm}\hlstd{(m.gamma.log,} \hlkwc{cores} \hlstd{=} \hlnum{6}\hlstd{,} \hlkwc{bins} \hlstd{=} \hlnum{1}\hlstd{))}
+\end{alltt}
+\begin{verbatim}
+##    user  system elapsed 
+##  85.879   0.303  19.841
+\end{verbatim}
+\begin{alltt}
+\hlstd{conformal.gamma} \hlkwb{<-} \hlstd{conformal.gamma}\hlopt{$}\hlstd{paraconformal}
+\hlkwd{head}\hlstd{(conformal.gamma)}
+\end{alltt}
+\begin{verbatim}
+##        lwr      upr
+## [1,] 2.485 7.352500
+## [2,] 2.545 7.495000
+## [3,] 3.590 9.620031
+## [4,] 2.925 8.752500
+## [5,] 3.270 9.400000
+## [6,] 2.500 7.777500
+\end{verbatim}
+\begin{alltt}
+\hlcom{## Gaussian conformal}
+\hlkwd{system.time}\hlstd{(conformal.gaussian} \hlkwb{<-}
+  \hlkwd{conformal.glm}\hlstd{(m.gaussian,} \hlkwc{cores} \hlstd{=} \hlnum{6}\hlstd{,} \hlkwc{bins} \hlstd{=} \hlnum{1}\hlstd{))}
+\end{alltt}
+\begin{verbatim}
+##    user  system elapsed 
+##  58.904   0.392   9.269
+\end{verbatim}
+\begin{alltt}
+\hlstd{conformal.gaussian} \hlkwb{<-} \hlstd{conformal.gaussian}\hlopt{$}\hlstd{paraconformal}
+\hlkwd{head}\hlstd{(conformal.gaussian)}
+\end{alltt}
+\begin{verbatim}
+##        lwr      upr
+## [1,] 2.015 7.862500
+## [2,] 2.130 8.012500
+## [3,] 3.670 9.625027
+## [4,] 2.925 8.880000
+## [5,] 3.445 9.390000
+## [6,] 2.190 8.092500
+\end{verbatim}
+\begin{alltt}
+\hlcom{## LS conformal}
+\hlstd{funs} \hlkwb{<-} \hlkwd{lm.funs}\hlstd{(}\hlkwc{intercept} \hlstd{=} \hlnum{TRUE}\hlstd{)}
+\hlstd{train.fun} \hlkwb{<-} \hlstd{funs}\hlopt{$}\hlstd{train.fun}
+\hlstd{predict.fun} \hlkwb{<-} \hlstd{funs}\hlopt{$}\hlstd{predict.fun}
+\hlstd{alpha} \hlkwb{<-} \hlnum{0.10}
+\hlstd{y} \hlkwb{<-} \hlstd{dat}\hlopt{$}\hlstd{glyhb}
+\hlkwd{system.time}\hlstd{(p1.tibs} \hlkwb{<-} \hlkwd{conformal.pred}\hlstd{(}\hlkwc{x} \hlstd{= X[,} \hlopt{-}\hlnum{1}\hlstd{],}
+  \hlkwc{y} \hlstd{= y,} \hlkwc{x0} \hlstd{= X[,} \hlopt{-}\hlnum{1}\hlstd{],}
+  \hlkwc{train.fun} \hlstd{= train.fun,} \hlkwc{predict.fun} \hlstd{= predict.fun,}
+  \hlkwc{alpha} \hlstd{= alpha))}
+\end{alltt}
+\begin{verbatim}
+##    user  system elapsed 
+##   2.481   0.011   2.493
+\end{verbatim}
+\begin{alltt}
+\hlstd{LS} \hlkwb{=} \hlkwd{cbind}\hlstd{(p1.tibs}\hlopt{$}\hlstd{lo, p1.tibs}\hlopt{$}\hlstd{up)}
+\hlkwd{colnames}\hlstd{(LS)} \hlkwb{<-} \hlkwd{c}\hlstd{(}\hlstr{"lwr"}\hlstd{,} \hlstr{"upr"}\hlstd{)}
+\hlkwd{head}\hlstd{(LS)}
+\end{alltt}
+\begin{verbatim}
+##           lwr      upr
+## [1,] 2.034091 7.792133
+## [2,] 2.253147 7.917308
+## [3,] 3.751768 9.545698
+## [4,] 3.022078 8.730944
+## [5,] 3.513430 9.319835
+## [6,] 2.298523 8.045960
+\end{verbatim}
+\begin{alltt}
+\hlcom{## LSLW conformal}
+\hlstd{mad.train.fun} \hlkwb{<-} \hlkwa{function}\hlstd{(}\hlkwc{x}\hlstd{,} \hlkwc{y}\hlstd{,} \hlkwc{out} \hlstd{=} \hlkwa{NULL}\hlstd{)\{}
+  \hlkwd{lm}\hlstd{(y} \hlopt{~} \hlstd{x[,} \hlopt{-}\hlnum{1}\hlstd{],} \hlkwc{x} \hlstd{=} \hlnum{TRUE}\hlstd{,} \hlkwc{y} \hlstd{=} \hlnum{TRUE}\hlstd{)}
+\hlstd{\}}
+\hlstd{mad.predict.fun} \hlkwb{<-} \hlkwa{function}\hlstd{(}\hlkwc{out}\hlstd{,} \hlkwc{newx}\hlstd{)\{}
+  \hlkwd{predict}\hlstd{(out,} \hlkwd{as.data.frame}\hlstd{(newx))}
+\hlstd{\}}
+\hlkwd{system.time}\hlstd{(p2.tibs} \hlkwb{<-} \hlkwd{conformal.pred}\hlstd{(}\hlkwc{x} \hlstd{= X[,} \hlopt{-}\hlnum{1}\hlstd{],}
+  \hlkwc{y} \hlstd{= y,} \hlkwc{x0} \hlstd{= X[,} \hlopt{-}\hlnum{1}\hlstd{],}
+  \hlkwc{train.fun} \hlstd{= train.fun,} \hlkwc{predict.fun} \hlstd{= predict.fun,}
+  \hlkwc{mad.train.fun} \hlstd{= mad.train.fun,}
+  \hlkwc{mad.predict.fun} \hlstd{= mad.predict.fun,}
+  \hlkwc{alpha} \hlstd{= alpha))}
+\end{alltt}
+\begin{verbatim}
+##    user  system elapsed 
+##  47.584   0.008  47.591
+\end{verbatim}
+\begin{alltt}
+\hlstd{LSLW} \hlkwb{=} \hlkwd{cbind}\hlstd{(p2.tibs}\hlopt{$}\hlstd{lo, p2.tibs}\hlopt{$}\hlstd{up)}
+\hlkwd{colnames}\hlstd{(LSLW)} \hlkwb{<-} \hlkwd{c}\hlstd{(}\hlstr{"lwr"}\hlstd{,} \hlstr{"upr"}\hlstd{)}
+\hlkwd{head}\hlstd{(LSLW)}
+\end{alltt}
+\begin{verbatim}
+##           lwr       upr
+## [1,] 2.802525  7.058296
+## [2,] 2.974858  7.246449
+## [3,] 2.169697 11.255303
+## [4,] 2.359546  9.509375
+## [5,] 2.196818 10.577273
+## [6,] 2.905844  7.413132
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+
+
+\subsection{Results in \citet{eck2019conformal}}
+
+We now compute the diagnostics of these four conformal prediction 
+regions and reproduce Table 2 in \citet{eck2019conformal}.  
+We start with the computation of marginal and approximate average 
+conditional coverage using functionality in the \texttt{conformal.glm} 
+software.
+
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## marginal coverages}
+\hlstd{marginal.gamma} \hlkwb{<-} \hlkwd{local.coverage}\hlstd{(}\hlkwc{region} \hlstd{= conformal.gamma,} \hlkwc{data} \hlstd{= dat,}
+  \hlkwc{bins} \hlstd{=} \hlnum{1}\hlstd{,} \hlkwc{d} \hlstd{=} \hlnum{2}\hlstd{)}
+\hlstd{marginal.gaussian} \hlkwb{<-} \hlkwd{local.coverage}\hlstd{(}\hlkwc{region} \hlstd{= conformal.gaussian,}
+  \hlkwc{data} \hlstd{= dat,} \hlkwc{bins} \hlstd{=} \hlnum{1}\hlstd{,} \hlkwc{d} \hlstd{=} \hlnum{2}\hlstd{)}
+\hlstd{marginal.LS} \hlkwb{<-} \hlkwd{local.coverage}\hlstd{(}\hlkwc{region} \hlstd{= LS,} \hlkwc{data} \hlstd{= dat,} \hlkwc{bins} \hlstd{=} \hlnum{1}\hlstd{,} \hlkwc{d} \hlstd{=} \hlnum{2}\hlstd{)}
+\hlstd{marginal.LSLW} \hlkwb{<-} \hlkwd{local.coverage}\hlstd{(}\hlkwc{region} \hlstd{= LSLW,} \hlkwc{data} \hlstd{= dat,} \hlkwc{bins} \hlstd{=} \hlnum{1}\hlstd{,} \hlkwc{d} \hlstd{=} \hlnum{2}\hlstd{)}
+\hlstd{table.marginal} \hlkwb{<-} \hlkwd{matrix}\hlstd{(}\hlkwd{c}\hlstd{(marginal.gamma, marginal.gaussian,}
+  \hlstd{marginal.LSLW, marginal.LS),} \hlkwc{ncol} \hlstd{=} \hlnum{4}\hlstd{)}
+\hlstd{table.marginal} \hlkwb{<-} \hlkwd{round}\hlstd{(table.marginal,} \hlnum{3}\hlstd{)}
+\hlkwd{colnames}\hlstd{(table.marginal)} \hlkwb{<-} \hlkwd{c}\hlstd{(}\hlstr{"gamma"}\hlstd{,} \hlstr{"gaussian"}\hlstd{,} \hlstr{"LSLW"}\hlstd{,} \hlstr{"LS"}\hlstd{)}
+\hlkwd{rownames}\hlstd{(table.marginal)} \hlkwb{<-} \hlstr{"marginal coverage"}
+
+\hlcom{## conditional coverages}
+\hlstd{d} \hlkwb{<-} \hlkwd{ncol}\hlstd{(dat)} \hlopt{-} \hlnum{2}
+\hlstd{conditional.gamma} \hlkwb{<-} \hlkwd{local.coverage}\hlstd{(}\hlkwc{region} \hlstd{= conformal.gamma,} \hlkwc{data} \hlstd{= dat,}
+  \hlkwc{bins} \hlstd{=} \hlnum{3}\hlstd{,} \hlkwc{d} \hlstd{= d)}
+\hlstd{conditional.gaussian} \hlkwb{<-} \hlkwd{local.coverage}\hlstd{(}\hlkwc{region} \hlstd{= conformal.gaussian,}
+  \hlkwc{data} \hlstd{= dat,} \hlkwc{bins} \hlstd{=} \hlnum{3}\hlstd{,} \hlkwc{d} \hlstd{= d)}
+\hlstd{conditional.LS} \hlkwb{<-} \hlkwd{local.coverage}\hlstd{(}\hlkwc{region} \hlstd{= LS,} \hlkwc{data} \hlstd{= dat,} \hlkwc{bins} \hlstd{=} \hlnum{3}\hlstd{,} \hlkwc{d} \hlstd{= d)}
+\hlstd{conditional.LSLW} \hlkwb{<-} \hlkwd{local.coverage}\hlstd{(}\hlkwc{region} \hlstd{= LSLW,} \hlkwc{data} \hlstd{= dat,} \hlkwc{bins} \hlstd{=} \hlnum{3}\hlstd{,} \hlkwc{d} \hlstd{= d)}
+\hlstd{table.conditional} \hlkwb{<-} \hlkwd{matrix}\hlstd{(}\hlkwd{cbind}\hlstd{(conditional.gamma, conditional.gaussian,}
+  \hlstd{conditional.LSLW, conditional.LS),} \hlkwc{ncol} \hlstd{=} \hlnum{4}\hlstd{)}
+\hlstd{table.conditional} \hlkwb{<-} \hlkwd{round}\hlstd{(table.conditional,} \hlnum{3}\hlstd{)}
+\hlkwd{colnames}\hlstd{(table.conditional)} \hlkwb{<-} \hlkwd{c}\hlstd{(}\hlstr{"gamma"}\hlstd{,} \hlstr{"gaussian"}\hlstd{,} \hlstr{"LSLW"}\hlstd{,} \hlstr{"LS"}\hlstd{)}
+\hlstd{avg.cond.coverage} \hlkwb{<-} \hlkwd{colMeans}\hlstd{(table.conditional,}\hlkwc{na.rm} \hlstd{=} \hlnum{TRUE}\hlstd{)}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+
+
+We now compute the prediction error of each conformal prediction region.
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlstd{pred.error.gamma} \hlkwb{<-} \hlkwd{absolute.error}\hlstd{(}\hlkwc{y} \hlstd{= dat}\hlopt{$}\hlstd{glyhb,} \hlkwc{region} \hlstd{= conformal.gamma)}
+\hlstd{pred.error.gaussian} \hlkwb{<-} \hlkwd{absolute.error}\hlstd{(}\hlkwc{y} \hlstd{= y,} \hlkwc{region} \hlstd{= conformal.gaussian)}
+\hlstd{pred.error.LSLW} \hlkwb{<-} \hlkwd{absolute.error}\hlstd{(}\hlkwc{y} \hlstd{= y,} \hlkwc{region} \hlstd{= LSLW)}
+\hlstd{pred.error.LS} \hlkwb{<-} \hlkwd{absolute.error}\hlstd{(}\hlkwc{y} \hlstd{= y,} \hlkwc{region} \hlstd{= LS)}
+\hlstd{table.pred.error} \hlkwb{<-} \hlkwd{matrix}\hlstd{(}\hlkwd{c}\hlstd{(pred.error.gamma, pred.error.gaussian,}
+  \hlstd{pred.error.LSLW, pred.error.LS),} \hlkwc{ncol} \hlstd{=} \hlnum{4}\hlstd{)}
+\hlkwd{colnames}\hlstd{(table.pred.error)} \hlkwb{<-} \hlkwd{c}\hlstd{(}\hlstr{"gamma"}\hlstd{,} \hlstr{"gaussian"}\hlstd{,} \hlstr{"LSLW"}\hlstd{,} \hlstr{"LS"}\hlstd{)}
+\hlkwd{rownames}\hlstd{(table.pred.error)} \hlkwb{<-} \hlstr{"pred error"}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+
+
+We now compute the volume of each conformal prediction region.
+
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## when no factor variables are present}
+\hlstd{volume.regions} \hlkwb{<-} \hlkwa{function}\hlstd{(}\hlkwc{region}\hlstd{,} \hlkwc{preds}\hlstd{)\{}
+  \hlkwa{if}\hlstd{(}\hlkwd{class}\hlstd{(region)} \hlopt{==} \hlstr{"list"}\hlstd{)\{}
+    \hlkwd{stop}\hlstd{(}\hlstr{"Not appropriate for nonparametric conformal prediction regions"}\hlstd{)}
+  \hlstd{\}}
+  \hlstd{n} \hlkwb{<-} \hlkwd{nrow}\hlstd{(region)}
+  \hlstd{mat} \hlkwb{<-} \hlkwd{as.matrix}\hlstd{(}\hlkwd{cbind}\hlstd{(preds, region[,} \hlnum{1}\hlstd{]))}
+  \hlstd{mat2} \hlkwb{<-} \hlkwd{as.matrix}\hlstd{(}\hlkwd{cbind}\hlstd{(preds, region[,} \hlnum{2}\hlstd{]))}
+  \hlstd{mat3} \hlkwb{<-} \hlkwd{rbind}\hlstd{(mat, mat2)}
+  \hlstd{vol} \hlkwb{<-} \hlkwd{as.numeric}\hlstd{(}\hlkwd{convhulln}\hlstd{(mat3,} \hlkwc{option} \hlstd{=} \hlstr{"FA"}\hlstd{)}\hlopt{$}\hlstd{vol)}
+  \hlstd{vol}
+\hlstd{\}}
+
+\hlstd{preds} \hlkwb{<-} \hlstd{dat[,} \hlnum{2}\hlopt{:}\hlnum{4}\hlstd{]}
+\hlstd{volume.gamma} \hlkwb{<-} \hlkwd{volume.regions}\hlstd{(}\hlkwc{region} \hlstd{= conformal.gamma,} \hlkwc{preds} \hlstd{= preds)}
+\hlstd{volume.gaussian} \hlkwb{<-} \hlkwd{volume.regions}\hlstd{(}\hlkwc{region} \hlstd{= conformal.gaussian,} \hlkwc{preds} \hlstd{= preds)}
+\hlstd{volume.LSLW} \hlkwb{<-} \hlkwd{volume.regions}\hlstd{(}\hlkwc{region} \hlstd{= LSLW,} \hlkwc{preds} \hlstd{= preds)}
+\hlstd{volume.LS} \hlkwb{<-} \hlkwd{volume.regions}\hlstd{(}\hlkwc{region} \hlstd{= LS,} \hlkwc{preds} \hlstd{= preds)}
+\hlstd{table.volume} \hlkwb{<-} \hlkwd{matrix}\hlstd{(}\hlkwd{c}\hlstd{(volume.gamma, volume.gaussian,}
+  \hlstd{volume.LSLW, volume.LS),} \hlkwc{ncol} \hlstd{=} \hlnum{4}\hlstd{)}
+\hlkwd{colnames}\hlstd{(table.volume)} \hlkwb{<-} \hlkwd{c}\hlstd{(}\hlstr{"gamma"}\hlstd{,} \hlstr{"gaussian"}\hlstd{,} \hlstr{"LSLW"}\hlstd{,} \hlstr{"LS"}\hlstd{)}
+\hlkwd{rownames}\hlstd{(table.volume)} \hlkwb{<-} \hlstr{"volume"}
+
+\hlstd{volume.factors} \hlkwb{<-} \hlkwa{function}\hlstd{(}\hlkwc{region}\hlstd{,} \hlkwc{bins} \hlstd{=} \hlnum{1}\hlstd{,} \hlkwc{data}\hlstd{,} \hlkwc{object}\hlstd{)\{}
+  \hlkwa{if}\hlstd{(}\hlkwd{class}\hlstd{(region)} \hlopt{==} \hlstr{"list"}\hlstd{)\{}
+    \hlkwd{stop}\hlstd{(}\hlstr{"Not appropriate for nonparametric conformal prediction regions"}\hlstd{)}
+  \hlstd{\}}
+  \hlstd{n} \hlkwb{<-} \hlkwd{nrow}\hlstd{(region)}
+
+  \hlstd{call} \hlkwb{<-} \hlstd{object}\hlopt{$}\hlstd{call}
+  \hlstd{formula} \hlkwb{<-} \hlstd{call}\hlopt{$}\hlstd{formula}
+  \hlstd{respname} \hlkwb{<-} \hlkwd{all.vars}\hlstd{(formula)[}\hlnum{1}\hlstd{]}
+  \hlstd{index.factor.variables} \hlkwb{<-} \hlkwd{which}\hlstd{(}\hlkwd{attr}\hlstd{(}\hlkwd{terms}\hlstd{(object),} \hlstr{"dataClasses"}\hlstd{)} \hlopt{==} \hlstr{"factor"}\hlstd{)}
+  \hlstd{index.numeric.variables} \hlkwb{<-} \hlkwd{which}\hlstd{(}\hlkwd{attr}\hlstd{(}\hlkwd{terms}\hlstd{(object),} \hlstr{"dataClasses"}\hlstd{)} \hlopt{==} \hlstr{"numeric"}\hlstd{)}
+  \hlstd{data} \hlkwb{<-} \hlstd{data[, respname} \hlopt{!=} \hlkwd{colnames}\hlstd{(data)]}
+  \hlstd{index.data.factor.variables} \hlkwb{<-} \hlkwd{which}\hlstd{(}\hlkwd{colnames}\hlstd{(data)} \hlopt{%in%} \hlkwd{names}\hlstd{(index.factor.variables))}
+  \hlstd{index.data.numeric.variables} \hlkwb{<-} \hlkwd{which}\hlstd{(}\hlkwd{colnames}\hlstd{(data)} \hlopt{%in%} \hlkwd{names}\hlstd{(index.numeric.variables))}
+  \hlstd{factors} \hlkwb{<-} \hlkwd{lapply}\hlstd{(index.data.factor.variables,} \hlkwa{function}\hlstd{(}\hlkwc{j}\hlstd{)} \hlkwd{as.numeric}\hlstd{(}\hlkwd{as.factor}\hlstd{(data[, j])))}
+  \hlstd{data.by.factors} \hlkwb{<-} \hlkwd{split}\hlstd{(data, factors,} \hlkwc{drop} \hlstd{=} \hlnum{FALSE}\hlstd{)}
+  \hlstd{region.by.factors} \hlkwb{<-} \hlkwd{split}\hlstd{(region, factors,} \hlkwc{drop} \hlstd{=} \hlnum{FALSE}\hlstd{)}
+  \hlstd{matrix.region.by.factors} \hlkwb{<-} \hlkwd{lapply}\hlstd{(region.by.factors,} \hlkwa{function}\hlstd{(}\hlkwc{x}\hlstd{)\{}
+    \hlkwd{matrix}\hlstd{(x,} \hlkwc{ncol} \hlstd{=} \hlnum{2}\hlstd{)}
+  \hlstd{\})}
+  \hlstd{numeric.by.factors} \hlkwb{<-} \hlkwd{lapply}\hlstd{(data.by.factors,} \hlkwa{function}\hlstd{(}\hlkwc{x}\hlstd{)\{}
+    \hlstd{mat} \hlkwb{<-} \hlstd{x[, index.data.numeric.variables]}
+    \hlkwd{colnames}\hlstd{(mat)} \hlkwb{<-} \hlkwd{colnames}\hlstd{(data)[index.data.numeric.variables]}
+    \hlstd{mat}
+  \hlstd{\})}
+  \hlstd{bin.index.by.factors} \hlkwb{<-} \hlkwd{lapply}\hlstd{(data.by.factors,} \hlkwa{function}\hlstd{(}\hlkwc{x}\hlstd{)\{}
+    \hlkwa{if}\hlstd{(}\hlkwd{nrow}\hlstd{(x)} \hlopt{==} \hlnum{0}\hlstd{)} \hlkwd{return}\hlstd{(}\hlnum{0}\hlstd{)}
+    \hlstd{mat} \hlkwb{<-} \hlkwd{as.matrix}\hlstd{(x[, index.data.numeric.variables[}\hlopt{-}\hlnum{1}\hlstd{]],}
+      \hlkwc{ncol} \hlstd{=} \hlkwd{length}\hlstd{(index.data.numeric.variables[}\hlopt{-}\hlnum{1}\hlstd{]))}
+    \hlkwd{find.index}\hlstd{(}\hlkwc{mat} \hlstd{= mat,} \hlkwc{wn} \hlstd{=} \hlnum{1}\hlopt{/}\hlstd{bins,} \hlkwc{d} \hlstd{=} \hlkwd{ncol}\hlstd{(mat))}
+  \hlstd{\})}
+
+  \hlstd{volume.factor} \hlkwb{<-} \hlkwd{sapply}\hlstd{(}\hlnum{1}\hlopt{:}\hlkwd{length}\hlstd{(region.by.factors),} \hlkwa{function}\hlstd{(}\hlkwc{i}\hlstd{)\{}
+    \hlstd{out} \hlkwb{<-} \hlkwd{sum}\hlstd{(}\hlkwd{sapply}\hlstd{(}\hlnum{1}\hlopt{:}\hlkwd{length}\hlstd{(}\hlkwd{unique}\hlstd{(bin.index.by.factors[[i]])),} \hlkwa{function}\hlstd{(}\hlkwc{j}\hlstd{)\{}
+      \hlstd{X} \hlkwb{<-} \hlkwd{rbind}\hlstd{(}
+        \hlkwd{cbind}\hlstd{(numeric.by.factors[[i]][}\hlkwd{which}\hlstd{(bin.index.by.factors[[i]]} \hlopt{==} \hlstd{j), ],}
+          \hlstd{matrix.region.by.factors[[i]][}\hlkwd{which}\hlstd{(bin.index.by.factors[[i]]} \hlopt{==} \hlstd{j),} \hlnum{1}\hlstd{]),}
+        \hlkwd{cbind}\hlstd{(numeric.by.factors[[i]][}\hlkwd{which}\hlstd{(bin.index.by.factors[[i]]} \hlopt{==} \hlstd{j), ],}
+          \hlstd{matrix.region.by.factors[[i]][}\hlkwd{which}\hlstd{(bin.index.by.factors[[i]]} \hlopt{==} \hlstd{j),} \hlnum{2}\hlstd{])}
+      \hlstd{)}
+      \hlstd{X} \hlkwb{<-} \hlstd{X[,} \hlopt{-}\hlnum{1}\hlstd{]}
+      \hlstd{vol} \hlkwb{<-} \hlkwd{as.numeric}\hlstd{(}\hlkwd{convhulln}\hlstd{(X,} \hlkwc{option} \hlstd{=} \hlstr{"FA"}\hlstd{)}\hlopt{$}\hlstd{vol)} \hlopt{*} \hlkwd{nrow}\hlstd{(X)} \hlopt{/} \hlstd{(}\hlnum{2}\hlopt{*}\hlstd{n)}
+      \hlstd{vol}
+    \hlstd{\}))}
+    \hlkwd{return}\hlstd{(out)}
+  \hlstd{\})}
+
+  \hlkwd{sum}\hlstd{(volume.factor)}
+\hlstd{\}}
+
+\hlstd{volume.gamma} \hlkwb{<-} \hlkwd{volume.factors}\hlstd{(}\hlkwc{region} \hlstd{= conformal.gamma,}
+  \hlkwc{data} \hlstd{= dat,} \hlkwc{object} \hlstd{= m.gamma.log)}
+\hlstd{volume.gaussian} \hlkwb{<-} \hlkwd{volume.factors}\hlstd{(conformal.gaussian,}
+  \hlkwc{data} \hlstd{= dat,} \hlkwc{object} \hlstd{= m.gaussian)}
+\hlstd{volume.LSLW} \hlkwb{<-} \hlkwd{volume.factors}\hlstd{(LSLW,}
+  \hlkwc{data} \hlstd{= dat,} \hlkwc{object} \hlstd{= m.gaussian)}
+\hlstd{volume.LS} \hlkwb{<-} \hlkwd{volume.factors}\hlstd{(LS,}
+  \hlkwc{data} \hlstd{= dat,} \hlkwc{object} \hlstd{= m.gaussian)}
+\hlstd{table.volume} \hlkwb{<-} \hlkwd{matrix}\hlstd{(}\hlkwd{c}\hlstd{(volume.gamma, volume.gaussian,}
+  \hlstd{volume.LSLW, volume.LS),} \hlkwc{ncol} \hlstd{=} \hlnum{4}\hlstd{)}
+\hlkwd{colnames}\hlstd{(table.volume)} \hlkwb{<-} \hlkwd{c}\hlstd{(}\hlstr{"gamma"}\hlstd{,} \hlstr{"gaussian"}\hlstd{,} \hlstr{"LSLW"}\hlstd{,} \hlstr{"LS"}\hlstd{)}
+\hlkwd{rownames}\hlstd{(table.volume)} \hlkwb{<-} \hlstr{"volume"}
+\hlstd{table.volume} \hlkwb{<-} \hlstd{table.volume} \hlopt{/} \hlnum{1e4}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+
+
+Table 2 and Figure 4 in \citet{eck2019conformal} are shown below. 
+
+
+\begin{kframe}
+\begin{alltt}
+\hlstd{diagnostics} \hlkwb{<-} \hlkwd{rbind}\hlstd{(table.marginal, table.volume,}
+  \hlstd{table.pred.error, avg.cond.coverage)}
+\hlcom{#diagnostics <- t(diagnostics)}
+\hlkwd{xtable}\hlstd{(diagnostics,} \hlkwc{digits} \hlstd{=} \hlkwd{c}\hlstd{(}\hlnum{0}\hlstd{,} \hlnum{3}\hlstd{,} \hlnum{3}\hlstd{,} \hlnum{3}\hlstd{,} \hlnum{3}\hlstd{))}
+\end{alltt}
+\end{kframe}% latex table generated in R 3.4.4 by xtable 1.8-3 package
+% Mon Jun 10 14:02:24 2019
+\begin{table}[ht]
+\centering
+\begin{tabular}{rrrrr}
+  \hline
+ & gamma & gaussian & LSLW & LS \\ 
+  \hline
+marginal coverage & 0.909 & 0.906 & 0.906 & 0.909 \\ 
+  volume & 7.349 & 7.730 & 8.983 & 7.601 \\ 
+  pred error & 0.931 & 0.849 & 0.744 & 0.883 \\ 
+  avg.cond.coverage & 0.874 & 0.849 & 0.889 & 0.860 \\ 
+   \hline
+\end{tabular}
+\end{table}
+
+
+
+
+\begin{figure}
+\begin{center}
+
+\includegraphics[width=0.9\textwidth]{conformal3ddiabetes.png}
+\end{center}
+\caption{ 
+  Figure 4 in \citet{eck2019conformal}.
+  Conformal prediction regions for glycosylated hemoglobin projected onto the 
+  age and weight predictor axes.
+  %People with similar ages are grouped. \comment{what do you mean that people with similar ages are grouped?  Why? } 
+  Upper and lower bounds of the conformal prediction region are loess smoothed for visual appearance.
+  %\comment{Why?  What do they look like if you do not smooth? }
+  The code that constructed this figure is displayed in the accompanying .Rnw file.
+}
+\label{Fig:3d-conformal-regions}
 \end{figure}
 
 

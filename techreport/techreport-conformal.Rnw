@@ -114,6 +114,10 @@ library(statmod)
 library(HDInterval)
 library(conformal.glm) ## https://github.com/DEck13/conformal.glm
 library(conformalInference) ## https://github.com/ryantibs/conformal
+library(faraway)
+library(geometry)
+library(xtable)
+library(rgl)
 @
 
 We set the error tolerance to be $\alpha = 0.10$ for all prediction regions 
@@ -483,39 +487,48 @@ of length 0.04.
 
 \subsection{Diagnostic measures}
 
-In this section we describe the diagnostic measures that we will use to 
-compare conformal prediction regions.
-The specific diagnostics are 
-prediction error at the observed data, 
-area of the prediction region, 
-finite-sample marginal coverage,
-finite-sample local coverage with respec to binning, 
-and 
-finite-sample local conditional coverage.  
-
-We will use a modification of average sum of squares error as our measure of 
-prediction error.  Our prediction error will average the squared distances of 
-observations outside of the prediction region to the closest boundary of the 
-prediction region.  The average will be taken over all observations so that an 
-observation that falls within the prediction region has an error of 0.  
-More formally this prediction error is 
-$$
-  \text{prediciton error} 
+Several diagnostic measures are used to compare conformal prediction regions.
+%%%The specific diagnostics are 
+%%%prediction error at the observed data, 
+%%%area of the prediction region, 
+%%%finite sample marginal coverage,
+%%%finite sample local coverage with respect to binning, 
+%%%and 
+%%%finite sample local conditional coverage.  
+%We will use a modification of average sum of squares error as our measure of 
+%prediction error.  
+These diagnostic measures compare prediction regions by their 
+prediction error, volume, and coverage properties.
+Our prediction error diagnostic metric will be an average of the squared 
+distances of observations outside of the prediction region to the closest 
+boundary of the prediction region, averaged over all 
+observations. An observation that falls within the prediction region 
+has an error of 0.  More formally this prediction error metric is 
+\[ 
+  \text{prediction error} 
     = n^{-1}\sum_{i=1}^n\indicator{Y_i \not\in \Copt(X_i)}
-      \left(\min\{|Y_i - a_{i,1}|, |Y_i - b_{i,1}|, \ldots, 
-      |Y_i - a_{i,m_i}|, |Y_i - b_{i,m_i}|\}\right)^2,
-$$
+      \left(\min_{j=1,\ldots,m_i}\left\{\min\{|Y_i - a_{i,j}|, 
+        |Y_i - b_{i,j}|\}\right\}\right)^2,
+ \]
 where $a_{i,j}$ and $b_{i,j}$ are, respectively, the lower and upper 
 boundaries of possible $j = 1, \ldots, m_i$ disjoint intervals forming 
 the prediction region.  
 
-The area of each prediction region will be estimated by the average of the 
+The volume of each prediction region will be estimated by the average of the 
 upper boundary minus the lower boundary across observed $\X$, written as
 $$ 
   \text{area} = n^{-1}\sum_{i=1}^n\sum_{j=1}^{m_i}(b_{i,j} - a_{i,j}).
 $$
-This estimate of area is appropriate in our simulations in which realiztions 
-of the predictors are generated as $X \sim U(0,1)$.   
+%This estimate of area is appropriate in our simulations in which realizations 
+%of the predictors are generated as $X \sim U(0,1)$.   
+
+%The area of each prediction region will be estimated by the average of the 
+%upper boundary minus the lower boundary across observed $\X$, written as
+%$$ 
+%  \text{area} = n^{-1}\sum_{i=1}^n\sum_{j=1}^{m_i}(b_{i,j} - a_{i,j}).
+%$$
+%This estimate of area is appropriate in our simulations in which realiztions 
+%of the predictors are generated as $X \sim U(0,1)$.   
 
 To assess finite-sample marginal validity we calculate the proportion of 
 responses that fall within the prediction region.  To assess finite-sample 
@@ -914,6 +927,534 @@ legend(0.20, 0.75, legend=c("parametric",
 \caption{Plot of the estimated coverage probabilities of prediction regions 
   across $x$.}
 \label{Fig:coverageinx500.3}
+\end{figure}
+
+
+
+
+\newpage
+\section{Predicting the risk of diabetes}
+\label{sec:diabetes}
+
+In this Section we reproduce the data analysis that appears in Section 5 of 
+\citet{eck2019conformal}.  
+We examine the influence of several variables on blood sugar, or glycosylated 
+hemoglobin percentage (also known as HbA1c), an important risk factor for 
+diabetes.  A glycosylated hemoglobin value of 6.5\% can be used as a cutoff 
+for positive diagnosis of diabetes \citep{world2011use}. 
+
+We predict an individual's glycosylated hemoglobin from their height, 
+weight, age, and gender, all of which are easy to measure, inexpensive, and do 
+not require any laboratory testing.  
+The data in this analysis come from a population-based sample of 403 rural 
+African-Americans in Virginia \citep{willems1997prevalence}, taken from the 
+\texttt{faraway} R package \citep{faraway2016R}.  
+We considered a gamma regression model that only includes linear terms for 
+each covariate, a linear regression model with homoskedastic normal errors 
+and the same linear terms for each covariate, and a linear regression model 
+with homoskedastic normal errors that also included quadratic terms for 
+each covariate.
+Of these considered the models, the gamma regression model fit the data 
+best on the basis that it had the lowest AIC value and it gave the best 
+predictive predictive performance on the basis that it had the lowest 
+sum of squares prediction error.  
+That being said, we do not know the data generating process.
+
+Based on these covariates, conformal prediction regions provide finite sample 
+valid prediction regions for glycosylated hemoglobin that may be useful for 
+diagnosing diabetes in this study population.
+The data set is loaded from the R package \citet{faraway2016R}.
+
+<<>>=
+data(diabetes)
+@
+
+We throw away data points that contain missing values of any variable of 
+interest.
+
+<<>>=
+dat <- diabetes[, c("glyhb", "height", "weight", "age", "gender")]
+dat <- dat[complete.cases(dat), ]
+@
+
+
+The Gamma regression model with with log link function is selected among 
+several candidate models as the model used for inference in this analysis.
+This model has the lowest AIC value among candidates.
+
+
+<<>>=
+m.gamma.log <- glm(glyhb ~ height + weight + age + gender, 
+  data = dat, family = Gamma(link = log))
+m.gamma <- glm(glyhb ~ height + weight + age + gender, 
+  data = dat, family = "Gamma")
+m.gamma.identity <- glm(glyhb ~ height + weight + age + gender, 
+  data = dat, family = Gamma(link = identity))
+m.gaussian <- glm(glyhb ~ height + weight + age + gender, 
+  data = dat, family = "gaussian", x = TRUE)
+X <- m.gaussian$x
+m.gaussian.2 <- glm(glyhb ~ height + weight + age + I(height^2) 
+  + I(weight^2) + I(age^2) + gender, 
+  data = dat, family = "gaussian", x = TRUE)
+
+AIC(m.gamma.log, m.gamma, m.gamma.identity, m.gaussian, m.gaussian.2)
+@
+
+
+This model also provides satisfactory prediction as seen in 
+Figure~\ref{diabetes:diagnostics}.
+
+
+\begin{figure}
+\begin{center}
+<<echo = FALSE, fig.height = 3>>=
+par(mfrow = c(1,3))
+preds <- predict(m.gamma.log, type = "response")
+plot(residuals(m.gamma.log, "pearson") ~ preds, 
+  xlab = "predicted response", ylab = "Pearson residuals", 
+  main = "Gamma (log link)", pch = 19, 
+  col = rgb(0,0,0,alpha=0.2))
+abline(h = 0, col = "red", lty = 3, lwd = 2)
+
+preds <- predict(m.gaussian, type = "response")
+plot(residuals(m.gaussian, "pearson") ~ preds, 
+  xlab = "predicted response", ylab = "", 
+  main = "linear regression", pch = 19, 
+  col = rgb(0,0,0,alpha=0.2))
+abline(h = 0, col = "red", lty = 3, lwd = 2)
+
+preds <- predict(m.gaussian.2, type = "response")
+plot(residuals(m.gaussian.2, "pearson") ~ preds, 
+  xlab = "predicted response", main = "quadratic regression",  
+  ylab = "", pch = 19, col = rgb(0,0,0,alpha=0.2))
+abline(h = 0, col = "red", lty = 3, lwd = 2)
+@
+\end{center}
+\caption{Predictive performance of candidate models.}
+\label{diabetes:diagnostics}
+\end{figure}
+
+
+Four conformal prediction regions are considered for predicting glycosylated 
+hemoglobin percentage.  These conformal prediction regions are the parametric 
+conformal prediction region with a Gamma model fit, the parametric conformal 
+prediction region with a Gaussian model fit, the least squares conformal 
+prediction region, and the least square conformal prediction region with 
+local weighting.  
+All conformal prediction regions correspond to models that only include 
+linear terms for each of the covariates.  
+The Gamma and Gaussian parametric conformal prediction regions were 
+computed with binning across the binary gender factor variable, the predictor 
+space is partitioned across genders. 
+However, no additional binning structure within the levels of gender was 
+employed.  
+
+These conformal prediction regions are now constructed.
+
+
+<<diabetes.conformal, cache = TRUE>>=
+## Gamma conformal
+system.time(conformal.gamma <- 
+  conformal.glm(m.gamma.log, cores = 6, bins = 1))
+conformal.gamma <- conformal.gamma$paraconformal
+head(conformal.gamma)
+
+## Gaussian conformal
+system.time(conformal.gaussian <- 
+  conformal.glm(m.gaussian, cores = 6, bins = 1))
+conformal.gaussian <- conformal.gaussian$paraconformal
+head(conformal.gaussian)
+
+## LS conformal
+funs <- lm.funs(intercept = TRUE)
+train.fun <- funs$train.fun
+predict.fun <- funs$predict.fun
+alpha <- 0.10
+y <- dat$glyhb
+system.time(p1.tibs <- conformal.pred(x = X[, -1], 
+  y = y, x0 = X[, -1], 
+  train.fun = train.fun, predict.fun = predict.fun, 
+  alpha = alpha))
+LS = cbind(p1.tibs$lo, p1.tibs$up)
+colnames(LS) <- c("lwr", "upr")
+head(LS)
+
+## LSLW conformal
+mad.train.fun <- function(x, y, out = NULL){
+  lm(y ~ x[, -1], x = TRUE, y = TRUE)
+}
+mad.predict.fun <- function(out, newx){
+  predict(out, as.data.frame(newx))
+}
+system.time(p2.tibs <- conformal.pred(x = X[, -1], 
+  y = y, x0 = X[, -1], 
+  train.fun = train.fun, predict.fun = predict.fun, 
+  mad.train.fun = mad.train.fun,
+  mad.predict.fun = mad.predict.fun,
+  alpha = alpha))
+LSLW = cbind(p2.tibs$lo, p2.tibs$up)
+colnames(LSLW) <- c("lwr", "upr")
+head(LSLW)
+@
+
+
+
+\subsection{Results in \citet{eck2019conformal}}
+
+We now compute the diagnostics of these four conformal prediction 
+regions and reproduce Table 2 in \citet{eck2019conformal}.  
+We start with the computation of marginal and approximate average 
+conditional coverage using functionality in the \texttt{conformal.glm} 
+software.
+
+
+<<>>=
+## marginal coverages
+marginal.gamma <- local.coverage(region = conformal.gamma, data = dat, 
+  bins = 1, d = 2)
+marginal.gaussian <- local.coverage(region = conformal.gaussian, 
+  data = dat, bins = 1, d = 2)
+marginal.LS <- local.coverage(region = LS, data = dat, bins = 1, d = 2)
+marginal.LSLW <- local.coverage(region = LSLW, data = dat, bins = 1, d = 2)
+table.marginal <- matrix(c(marginal.gamma, marginal.gaussian, 
+  marginal.LSLW, marginal.LS), ncol = 4)
+table.marginal <- round(table.marginal, 3)
+colnames(table.marginal) <- c("gamma", "gaussian", "LSLW", "LS")
+rownames(table.marginal) <- "marginal coverage"
+
+## conditional coverages
+d <- ncol(dat) - 2
+conditional.gamma <- local.coverage(region = conformal.gamma, data = dat, 
+  bins = 3, d = d)
+conditional.gaussian <- local.coverage(region = conformal.gaussian, 
+  data = dat, bins = 3, d = d)
+conditional.LS <- local.coverage(region = LS, data = dat, bins = 3, d = d)
+conditional.LSLW <- local.coverage(region = LSLW, data = dat, bins = 3, d = d)
+table.conditional <- matrix(cbind(conditional.gamma, conditional.gaussian, 
+  conditional.LSLW, conditional.LS), ncol = 4)
+table.conditional <- round(table.conditional, 3)
+colnames(table.conditional) <- c("gamma", "gaussian", "LSLW", "LS")
+avg.cond.coverage <- colMeans(table.conditional,na.rm = TRUE)
+@
+
+
+We now compute the prediction error of each conformal prediction region.
+
+<<>>=
+pred.error.gamma <- absolute.error(y = dat$glyhb, region = conformal.gamma)
+pred.error.gaussian <- absolute.error(y = y, region = conformal.gaussian)
+pred.error.LSLW <- absolute.error(y = y, region = LSLW)
+pred.error.LS <- absolute.error(y = y, region = LS)
+table.pred.error <- matrix(c(pred.error.gamma, pred.error.gaussian, 
+  pred.error.LSLW, pred.error.LS), ncol = 4)
+colnames(table.pred.error) <- c("gamma", "gaussian", "LSLW", "LS")
+rownames(table.pred.error) <- "pred error"
+@
+
+
+We now compute the volume of each conformal prediction region.
+
+
+<<>>=
+## when no factor variables are present
+volume.regions <- function(region, preds){
+  if(class(region) == "list"){ 
+    stop("Not appropriate for nonparametric conformal prediction regions")
+  }
+  n <- nrow(region)
+  mat <- as.matrix(cbind(preds, region[, 1]))
+  mat2 <- as.matrix(cbind(preds, region[, 2]))
+  mat3 <- rbind(mat, mat2) 
+  vol <- as.numeric(convhulln(mat3, option = "FA")$vol)
+  vol
+}
+
+preds <- dat[, 2:4]
+volume.gamma <- volume.regions(region = conformal.gamma, preds = preds)
+volume.gaussian <- volume.regions(region = conformal.gaussian, preds = preds)
+volume.LSLW <- volume.regions(region = LSLW, preds = preds)
+volume.LS <- volume.regions(region = LS, preds = preds)
+table.volume <- matrix(c(volume.gamma, volume.gaussian, 
+  volume.LSLW, volume.LS), ncol = 4)
+colnames(table.volume) <- c("gamma", "gaussian", "LSLW", "LS")
+rownames(table.volume) <- "volume"
+
+volume.factors <- function(region, bins = 1, data, object){
+  if(class(region) == "list"){ 
+    stop("Not appropriate for nonparametric conformal prediction regions")
+  }
+  n <- nrow(region)
+
+  call <- object$call
+  formula <- call$formula
+  respname <- all.vars(formula)[1]
+  index.factor.variables <- which(attr(terms(object), "dataClasses") == "factor")
+  index.numeric.variables <- which(attr(terms(object), "dataClasses") == "numeric")
+  data <- data[, respname != colnames(data)]
+  index.data.factor.variables <- which(colnames(data) %in% names(index.factor.variables))
+  index.data.numeric.variables <- which(colnames(data) %in% names(index.numeric.variables))    
+  factors <- lapply(index.data.factor.variables, function(j) as.numeric(as.factor(data[, j])))
+  data.by.factors <- split(data, factors, drop = FALSE)
+  region.by.factors <- split(region, factors, drop = FALSE)
+  matrix.region.by.factors <- lapply(region.by.factors, function(x){
+    matrix(x, ncol = 2)
+  })
+  numeric.by.factors <- lapply(data.by.factors, function(x){ 
+    mat <- x[, index.data.numeric.variables]
+    colnames(mat) <- colnames(data)[index.data.numeric.variables]
+    mat
+  })
+  bin.index.by.factors <- lapply(data.by.factors, function(x){ 
+    if(nrow(x) == 0) return(0)
+    mat <- as.matrix(x[, index.data.numeric.variables[-1]], 
+      ncol = length(index.data.numeric.variables[-1]))
+    find.index(mat = mat, wn = 1/bins, d = ncol(mat))
+  })
+
+  volume.factor <- sapply(1:length(region.by.factors), function(i){
+    out <- sum(sapply(1:length(unique(bin.index.by.factors[[i]])), function(j){
+      X <- rbind( 
+        cbind(numeric.by.factors[[i]][which(bin.index.by.factors[[i]] == j), ], 
+          matrix.region.by.factors[[i]][which(bin.index.by.factors[[i]] == j), 1]), 
+        cbind(numeric.by.factors[[i]][which(bin.index.by.factors[[i]] == j), ], 
+          matrix.region.by.factors[[i]][which(bin.index.by.factors[[i]] == j), 2])          
+      )
+      X <- X[, -1]
+      vol <- as.numeric(convhulln(X, option = "FA")$vol) * nrow(X) / (2*n)
+      vol
+    }))
+    return(out)
+  })
+     
+  sum(volume.factor)  
+}
+
+volume.gamma <- volume.factors(region = conformal.gamma, 
+  data = dat, object = m.gamma.log)
+volume.gaussian <- volume.factors(conformal.gaussian, 
+  data = dat, object = m.gaussian)
+volume.LSLW <- volume.factors(LSLW, 
+  data = dat, object = m.gaussian)
+volume.LS <- volume.factors(LS, 
+  data = dat, object = m.gaussian)
+table.volume <- matrix(c(volume.gamma, volume.gaussian, 
+  volume.LSLW, volume.LS), ncol = 4)
+colnames(table.volume) <- c("gamma", "gaussian", "LSLW", "LS")
+rownames(table.volume) <- "volume"
+table.volume <- table.volume / 1e4
+@
+
+
+Table 2 and Figure 4 in \citet{eck2019conformal} are shown below. 
+
+
+<<results = 'asis'>>=
+diagnostics <- rbind(table.marginal, table.volume, 
+  table.pred.error, avg.cond.coverage)
+#diagnostics <- t(diagnostics)
+xtable(diagnostics, digits = c(0, 3, 3, 3, 3))
+@
+
+
+
+\begin{figure}
+\begin{center}
+<<echo = FALSE, eval = FALSE>>=
+mfrow3d(2, 2)
+
+# need to make weights unique so polygon is well defined. 
+dat$weight = jitter(dat$weight)
+
+## Gamma region
+dat.gamma <- cbind(dat, conformal.gamma)
+upr <- dat.gamma$upr
+lwr <- dat.gamma$lwr
+x <- dat$age
+y <- dat$glyhb
+z <- dat$weight
+age.factor <- cut(x, breaks = c(10,37,47,63,100))
+AGEFACTOR <- c(25, 40, 55, 70)
+dat_age <- split(dat.gamma, f = as.factor(age.factor))
+dat_by_age <- lapply(1:length(levels(age.factor)), 
+                     function(j){
+  qux <- as.data.frame(cbind(dat_age[[j]], AGEFACTOR = AGEFACTOR[j]))
+  index <- sort(qux$weight, index.return = TRUE)$ix
+  qux[index, ]
+})
+
+#######################################
+plot3d(x, y, z, col=rgb(0.5,0.5,0.5,alpha=0.5), type ="p", 
+  xlab = "", zlab = "", ylab = "", xlim = c(19, 92), 
+  zlim = c(75, 450), ylim = c(0, 18),
+  box = FALSE, axes = FALSE)
+rgl.viewpoint(theta = 220, phi = 0, zoom = 1.2, fov = 45)
+axis3d(edge = "x--", nticks = 3)
+axis3d(edge = "y+-", nticks = 4)
+axis3d(edge = "z--", nticks = 3)
+cex = 1.3
+mtext3d("Age (years)",  edge = "x--", line = 2, cex=cex, at=50)
+mtext3d("Weight (lbs)", edge = "z--", line = 2.5, cex=cex, at=250)
+mtext3d("HbA1c (%)",    edge = "y+-", line = 2.5, cex=cex, at=7.5)
+title3d(main="Gamma conformal", cex=2, line = 2)
+material3d("red", alpha=0.3, shininess=5)
+
+spn = 0.5
+for(j in 1:length(dat_by_age)) {
+
+  # smoothed upper and lower predictions
+  pred_upr <- predict(loess(dat_by_age[[j]]$upr ~ dat_by_age[[j]]$weight, span=spn))
+  pred_lwr <- predict(loess(dat_by_age[[j]]$lwr ~ dat_by_age[[j]]$weight, span=spn))
+
+  # polygon vertices
+  xvals = c(dat_by_age[[j]]$AGEFACTOR, dat_by_age[[j]]$AGEFACTOR)
+  yvals = c(pred_upr, rev(pred_lwr))
+  zvals = c(dat_by_age[[j]]$weight, rev(dat_by_age[[j]]$weight))
+
+  # polygon is in (y,z)
+  polygon3d(x=xvals, y=yvals, z=zvals, coords=c(2,3), fill=TRUE, col="red", random=FALSE)
+}
+
+
+## Gausian region
+dat.gaussian <- cbind(dat, conformal.gaussian)
+upr <- dat.gaussian$upr
+lwr <- dat.gaussian$lwr
+dat_age <- split(dat.gaussian, f = as.factor(age.factor))
+dat_by_age <- lapply(1:length(levels(age.factor)), 
+                     function(j){
+  qux <- as.data.frame(cbind(dat_age[[j]], AGEFACTOR = AGEFACTOR[j]))
+  index <- sort(qux$weight, index.return = TRUE)$ix
+  qux[index, ]
+})
+
+#######################################
+plot3d(x, y, z, col=rgb(0.5,0.5,0.5,alpha=0.5), type ="p", 
+  xlab = "", zlab = "", ylab = "", xlim = c(19, 92), 
+  zlim = c(75, 450), ylim = c(0, 18),
+  box = FALSE, axes = FALSE)
+rgl.viewpoint(theta = 220, phi = 0, zoom = 1.2, fov = 45)
+axis3d(edge = "x--", nticks = 3)
+axis3d(edge = "y+-", nticks = 4)
+axis3d(edge = "z--", nticks = 3)
+mtext3d("Age (years)",  edge = "x--", line = 2, cex=cex, at=50)
+mtext3d("Weight (lbs)", edge = "z--", line = 2.5, cex=cex, at=250)
+mtext3d("HbA1c (%)",    edge = "y+-", line = 2.5, cex=cex, at=7.5)
+title3d(main="Gaussian conformal", cex=2, line = 2)
+material3d("red", alpha=0.3, shininess=5)
+
+for(j in 1:length(dat_by_age)) {
+
+  # smoothed upper and lower predictions
+  pred_upr <- predict(loess(dat_by_age[[j]]$upr ~ dat_by_age[[j]]$weight, span=spn))
+  pred_lwr <- predict(loess(dat_by_age[[j]]$lwr ~ dat_by_age[[j]]$weight, span=spn))
+
+  # polygon vertices
+  xvals = c(dat_by_age[[j]]$AGEFACTOR, dat_by_age[[j]]$AGEFACTOR)
+  yvals = c(pred_upr, rev(pred_lwr))
+  zvals = c(dat_by_age[[j]]$weight, rev(dat_by_age[[j]]$weight))
+
+  # polygon is in (y,z)
+  polygon3d(x=xvals, y=yvals, z=zvals, coords=c(2,3), fill=TRUE, col="red")
+}
+
+
+## LS region
+dat.LS <- cbind(dat, LS)
+upr <- dat.LS$upr
+lwr <- dat.LS$lwr
+dat_age <- split(dat.LS, f = as.factor(age.factor))
+dat_by_age <- lapply(1:length(levels(age.factor)), 
+                     function(j){
+  qux <- as.data.frame(cbind(dat_age[[j]], AGEFACTOR = AGEFACTOR[j]))
+  index <- sort(qux$weight, index.return = TRUE)$ix
+  qux[index, ]
+})
+
+#######################################
+plot3d(x, y, z, col=rgb(0.5,0.5,0.5,alpha=0.5), type ="p", 
+  xlab = "", zlab = "", ylab = "", xlim = c(19, 92), 
+  zlim = c(75, 450), ylim = c(0, 18),
+  box = FALSE, axes = FALSE)
+rgl.viewpoint(theta = 220, phi = 0, zoom = 1.2, fov = 45)
+axis3d(edge = "x--", nticks = 3)
+axis3d(edge = "y+-", nticks = 4)
+axis3d(edge = "z--", nticks = 3)
+mtext3d("Age (years)",  edge = "x--", line = 2, cex=cex, at=50)
+mtext3d("Weight (lbs)", edge = "z--", line = 2.5, cex=cex, at=250)
+mtext3d("HbA1c (%)",    edge = "y+-", line = 2.5, cex=cex, at=7.5)
+title3d(main="LS conformal", cex=2, line = 2)
+material3d("red", alpha=0.3, shininess=5)
+
+for(j in 1:length(dat_by_age)) {
+
+  # smoothed upper and lower predictions
+  pred_upr <- predict(loess(dat_by_age[[j]]$upr ~ dat_by_age[[j]]$weight, span=spn))
+  pred_lwr <- predict(loess(dat_by_age[[j]]$lwr ~ dat_by_age[[j]]$weight, span=spn))
+
+  # polygon vertices
+  xvals = c(dat_by_age[[j]]$AGEFACTOR, dat_by_age[[j]]$AGEFACTOR)
+  yvals = c(pred_upr, rev(pred_lwr))
+  zvals = c(dat_by_age[[j]]$weight, rev(dat_by_age[[j]]$weight))
+
+  # polygon is in (y,z)
+  polygon3d(x=xvals, y=yvals, z=zvals, coords=c(2,3), fill=TRUE, col="red")
+}
+
+
+## LSLW region
+dat.LSLW <- cbind(dat, LSLW)
+upr <- dat.LSLW$upr
+lwr <- dat.LSLW$lwr
+dat_age <- split(dat.LSLW, f = as.factor(age.factor))
+dat_by_age <- lapply(1:length(levels(age.factor)), 
+                     function(j){
+  qux <- as.data.frame(cbind(dat_age[[j]], AGEFACTOR = AGEFACTOR[j]))
+  index <- sort(qux$weight, index.return = TRUE)$ix
+  qux[index, ]
+})
+
+#######################################
+plot3d(x, y, z, col=rgb(0.5,0.5,0.5,alpha=0.5), type ="p", 
+  xlab = "", zlab = "", ylab = "", xlim = c(19, 92), 
+  zlim = c(75, 450), ylim = c(0, 18),
+  box = FALSE, axes = FALSE)
+rgl.viewpoint(theta = 220, phi = 0, zoom = 1.2, fov = 45)
+axis3d(edge = "x--", nticks = 3)
+axis3d(edge = "y+-", nticks = 4)
+axis3d(edge = "z--", nticks = 3)
+mtext3d("Age (years)",  edge = "x--", line = 2, cex=cex, at=50)
+mtext3d("Weight (lbs)", edge = "z--", line = 2.5, cex=cex, at=250)
+mtext3d("HbA1c (%)",    edge = "y+-", line = 2.5, cex=cex, at=7.5)
+title3d(main="LSLW conformal", cex=2, line = 2)
+material3d("red", alpha=0.3, shininess=5)
+
+for(j in 1:length(dat_by_age)) {
+
+  # smoothed upper and lower predictions
+  pred_upr <- predict(loess(dat_by_age[[j]]$upr ~ dat_by_age[[j]]$weight, span=spn))
+  pred_lwr <- predict(loess(dat_by_age[[j]]$lwr ~ dat_by_age[[j]]$weight, span=spn))
+
+  # polygon vertices
+  xvals = c(dat_by_age[[j]]$AGEFACTOR, dat_by_age[[j]]$AGEFACTOR)
+  yvals = c(pred_upr, rev(pred_lwr))
+  zvals = c(dat_by_age[[j]]$weight, rev(dat_by_age[[j]]$weight))
+
+  # polygon is in (y,z)
+  polygon3d(x=xvals, y=yvals, z=zvals, coords=c(2,3), fill=TRUE, col="red")
+}
+@
+\includegraphics[width=0.9\textwidth]{conformal3ddiabetes.png}
+\end{center}
+\caption{ 
+  Figure 4 in \citet{eck2019conformal}.
+  Conformal prediction regions for glycosylated hemoglobin projected onto the 
+  age and weight predictor axes.
+  %People with similar ages are grouped. \comment{what do you mean that people with similar ages are grouped?  Why? } 
+  Upper and lower bounds of the conformal prediction region are loess smoothed for visual appearance.
+  %\comment{Why?  What do they look like if you do not smooth? }
+  The code that constructed this figure is displayed in the accompanying .Rnw file.
+}
+\label{Fig:3d-conformal-regions}
 \end{figure}
 
 
