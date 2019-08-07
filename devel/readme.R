@@ -1,7 +1,8 @@
 
 
-library(MASS)
 library(conformal.glm)
+library(HDInterval)
+library(MASS)
 library(parallel)
 
 alpha <- 0.10
@@ -23,9 +24,11 @@ summary(fit.readme)
 ## parametric and nonparametric conformal prediction region
 bins <- 3
 system.time(cpred <- conformal.glm(fit.readme, 
-  nonparametric = TRUE, bins = bins, cores = 6))
-paraCI <- cpred$paraconformal
-nonparaCI <- cpred$nonparaconformal
+  nonparametric = TRUE, bins = bins, cores = 6, 
+  method = "both"))
+parabinCI <- cpred$paraconfbin
+nonparabinCI <- cpred$nonparaconfbin
+transformCI <- cpred$transformconf
 
 
 ## least squares conformal prediction region
@@ -71,17 +74,6 @@ HDCI <- do.call(rbind,
 #########################################
 ## area and coverage
 
-## parametric conformal prediction region
-# estimated area
-mean(apply(paraCI, 1, diff))
-# local coverage
-p <- length(beta) - 1
-local.coverage(region = paraCI, data = data.readme, d = p, 
-  bins = bins, at.data = "TRUE")
-# marginal coverage
-local.coverage(region = paraCI, data = data.readme, d = p, 
-  bins = 1, at.data = "TRUE")
-
 ## nonparametric conformal prediction region
 # estimated area
 area.nonparametric <- function(region){
@@ -97,35 +89,50 @@ area.nonparametric <- function(region){
   }
   area
 }
-area.nonparametric(nonparaCI)
-# local coverage
-local.coverage(region = nonparaCI, data = data.readme, d = p, 
-  nonparametric = "TRUE", bins = bins, at.data = "TRUE")
-# marginal coverage
-local.coverage(region = nonparaCI, data = data.readme, d = p, 
-  nonparametric = "TRUE", bins = 1, at.data = "TRUE")
 
-## LSLW conformal prediction region
-# estimated area
-mean(apply(LSLW, 1, diff))
-# local coverage
-local.coverage(region = LSLW, data = data.readme, d = p, 
-  bins = bins, at.data = "TRUE")
-# marginal coverage
-local.coverage(region = LSLW, data = data.readme, d = p, 
-  bins = 1, at.data = "TRUE")
+# estimated area of prediction regions
+area <- c(
+  mean(apply(transformCI, 1, diff)),
+  mean(apply(parabinCI, 1, diff)),
+  area.nonparametric(nonparabinCI),
+  mean(apply(LSLW, 1, diff)),
+  mean(apply(HDCI, 1, diff))
+)
 
-## HD region
-# estimated area
-mean(apply(HDCI, 1, diff))
-# local coverage
-local.coverage(region = HDCI, data = data.readme, d = p, 
-  bins = bins, at.data = "TRUE")
-# marginal coverage
-local.coverage(region = HDCI, data = data.readme, d = p, 
-  bins = 1, at.data = "TRUE")
+# marginal local coverage of prediction regions
+p <- 1
+marginalcov <- c(
+  local.coverage(region = transformCI, data = data.readme, d = p, 
+    bins = 1, at.data = "TRUE"),
+  local.coverage(region = parabinCI, data = data.readme, d = p, 
+    bins = 1, at.data = "TRUE"),
+  local.coverage(region = nonparabinCI, data = data.readme, d = p, 
+    nonparametric = "TRUE", bins = 1, at.data = "TRUE"),
+  local.coverage(region = LSLW, data = data.readme, d = p, 
+    bins = 1, at.data = "TRUE"), 
+  local.coverage(region = HDCI, data = data.readme, d = p, 
+    bins = 1, at.data = "TRUE")
+)
 
+# local coverage of prediction regions
+localcov <- cbind(
+  local.coverage(region = transformCI, data = data.readme, d = p, 
+    bins = bins, at.data = "TRUE"),
+  local.coverage(region = parabinCI, data = data.readme, d = p, 
+    bins = bins, at.data = "TRUE"),
+  local.coverage(region = nonparabinCI, data = data.readme, d = p, 
+    nonparametric = "TRUE", bins = bins, at.data = "TRUE"),
+  local.coverage(region = LSLW, data = data.readme, d = p, 
+    bins = bins, at.data = "TRUE"),
+  local.coverage(region = HDCI, data = data.readme, d = p, 
+    bins = bins, at.data = "TRUE")
+)
 
+# diagnostics
+diagnostics <- rbind(area, marginalcov, localcov)
+colnames(diagnostics) <- c("transformCI", "binparaCI",  
+  "binnonparaCI", "LSLW", "HDCI")
+diagnostics
 
 
 #########################################
@@ -133,14 +140,22 @@ local.coverage(region = HDCI, data = data.readme, d = p,
 png(filename="gammasimexample.png")
 par(mfrow = c(2,2), oma = c(4,4,0,0), mar = c(1,1,1,1))
 
+# transformation conformal prediction region
+ix <- sort(x, index.return = TRUE)$ix
+plot.new()
+plot.window(xlim = c(0,1), ylim = c(min(y), max(y)))
+points(x, y, pch = 19, col = rgb(0,0,0,alpha=0.2))
+lines(x[ix], transformCI[ix, 1], type = "l", col = "red")
+lines(x[ix], transformCI[ix, 2], type = "l", col = "red")
+axis(2)
+
 # parametric conformal prediction region
 ix <- sort(x, index.return = TRUE)$ix
 plot.new()
 plot.window(xlim = c(0,1), ylim = c(min(y), max(y)))
 points(x, y, pch = 19, col = rgb(0,0,0,alpha=0.2))
-lines(x[ix], paraCI[ix, 1], type = "l", col = "red")
-lines(x[ix], paraCI[ix, 2], type = "l", col = "red")
-axis(2)
+lines(x[ix], parabinCI[ix, 1], type = "l", col = "red")
+lines(x[ix], parabinCI[ix, 2], type = "l", col = "red")
 
 # nonparametric conformal prediction region
 plot.nonparametric <- function(region, x, y, bins){
@@ -151,13 +166,13 @@ plot.nonparametric <- function(region, x, y, bins){
   plot.window(xlim = c(0,1), ylim = c(min(y), max(y)))
   points(x, y, pch = 19, col = rgb(0,0,0,alpha=0.2))
   for(i in 1:bins){ 
-    nonpar.i  <- nonparaCI[[i]]
+    nonpar.i  <- nonparabinCI[[i]]
     odd <- which(1:length(nonpar.i) %% 2 == 1) 
     even <- which(1:length(nonpar.i) %% 2 == 0)
     segments(x0 = 1/bins * (i-1), y0 = nonpar.i, x1 =1/bins * i, 
       col = "red")
     if(i != 1){ 
-      nonpar.i.previous <- nonparaCI[[i-1]]
+      nonpar.i.previous <- nonparabinCI[[i-1]]
       nonpar <- sort(c(nonpar.i, nonpar.i.previous))
       odd2 <- which(1:length(nonpar) %% 2 == 1) 
       even2 <- which(1:length(nonpar) %% 2 == 0)
@@ -166,7 +181,8 @@ plot.nonparametric <- function(region, x, y, bins){
     }
   }
 }    
-plot.nonparametric(nonparaCI, x = x, y = y, bins = bins)
+plot.nonparametric(nonparabinCI, x = x, y = y, bins = bins)
+axis(1); axis(2)
 
 # least squares conformal prediction region
 plot.new()
@@ -174,23 +190,12 @@ plot.window(xlim = c(0,1), ylim = c(0,max(y)))
 points(x, y, pch = 19, col = rgb(0,0,0,alpha=0.2))
 lines(x[ix], LSLW[ix, 1], type = "l", col = "red")
 lines(x[ix], LSLW[ix, 2], type = "l", col = "red")
-axis(1); axis(2)
-
-# highest density region
-plot.new()
-plot.window(xlim = c(0,1), ylim = c(0,max(y)))
-points(x, y, pch = 19, col = rgb(0,0,0,alpha=0.2))
-lines(x[ix], HDCI[ix, 1], type = "l", col = "red")
-lines(x[ix], HDCI[ix, 2], type = "l", col = "red")
 axis(1)
 
 # axis labels
 mtext("x", side = 1, line = 2.5, outer = TRUE, cex = 1.25)
 mtext("y", side = 2, line = 2.5, outer = TRUE, cex = 1.25)
-
-
 dev.off()
-
 
 
 
@@ -199,14 +204,22 @@ dev.off()
 pdf(file="gammasimexample.pdf")
 par(mfrow = c(2,2), oma = c(4,4,0,0), mar = c(1,1,1,1))
 
+# transformation conformal prediction region
+ix <- sort(x, index.return = TRUE)$ix
+plot.new()
+plot.window(xlim = c(0,1), ylim = c(min(y), max(y)))
+points(x, y, pch = 19, col = rgb(0,0,0,alpha=0.2))
+lines(x[ix], transformCI[ix, 1], type = "l", col = "red")
+lines(x[ix], transformCI[ix, 2], type = "l", col = "red")
+axis(2)
+
 # parametric conformal prediction region
 ix <- sort(x, index.return = TRUE)$ix
 plot.new()
 plot.window(xlim = c(0,1), ylim = c(min(y), max(y)))
 points(x, y, pch = 19, col = rgb(0,0,0,alpha=0.2))
-lines(x[ix], paraCI[ix, 1], type = "l", col = "red")
-lines(x[ix], paraCI[ix, 2], type = "l", col = "red")
-axis(2)
+lines(x[ix], parabinCI[ix, 1], type = "l", col = "red")
+lines(x[ix], parabinCI[ix, 2], type = "l", col = "red")
 
 # nonparametric conformal prediction region
 plot.nonparametric <- function(region, x, y, bins){
@@ -217,13 +230,13 @@ plot.nonparametric <- function(region, x, y, bins){
   plot.window(xlim = c(0,1), ylim = c(min(y), max(y)))
   points(x, y, pch = 19, col = rgb(0,0,0,alpha=0.2))
   for(i in 1:bins){ 
-    nonpar.i  <- nonparaCI[[i]]
+    nonpar.i  <- nonparabinCI[[i]]
     odd <- which(1:length(nonpar.i) %% 2 == 1) 
     even <- which(1:length(nonpar.i) %% 2 == 0)
     segments(x0 = 1/bins * (i-1), y0 = nonpar.i, x1 =1/bins * i, 
       col = "red")
     if(i != 1){ 
-      nonpar.i.previous <- nonparaCI[[i-1]]
+      nonpar.i.previous <- nonparabinCI[[i-1]]
       nonpar <- sort(c(nonpar.i, nonpar.i.previous))
       odd2 <- which(1:length(nonpar) %% 2 == 1) 
       even2 <- which(1:length(nonpar) %% 2 == 0)
@@ -232,7 +245,8 @@ plot.nonparametric <- function(region, x, y, bins){
     }
   }
 }    
-plot.nonparametric(nonparaCI, x = x, y = y, bins = bins)
+plot.nonparametric(nonparabinCI, x = x, y = y, bins = bins)
+axis(1); axis(2)
 
 # least squares conformal prediction region
 plot.new()
@@ -240,21 +254,55 @@ plot.window(xlim = c(0,1), ylim = c(0,max(y)))
 points(x, y, pch = 19, col = rgb(0,0,0,alpha=0.2))
 lines(x[ix], LSLW[ix, 1], type = "l", col = "red")
 lines(x[ix], LSLW[ix, 2], type = "l", col = "red")
-axis(1); axis(2)
-
-# highest density region
-plot.new()
-plot.window(xlim = c(0,1), ylim = c(0,max(y)))
-points(x, y, pch = 19, col = rgb(0,0,0,alpha=0.2))
-lines(x[ix], HDCI[ix, 1], type = "l", col = "red")
-lines(x[ix], HDCI[ix, 2], type = "l", col = "red")
 axis(1)
 
 # axis labels
 mtext("x", side = 1, line = 2.5, outer = TRUE, cex = 1.25)
 mtext("y", side = 2, line = 2.5, outer = TRUE, cex = 1.25)
+dev.off()
 
 
+
+
+# comparison between transformation conformal prediction region
+# and HD prediction region (.png)
+png(filename="comparison.png")
+par(mfrow = c(1,1), oma = c(4,4,0,0), mar = c(1,1,1,1))
+plot.new()
+plot.window(xlim = c(0,1), ylim = c(min(y), max(y)))
+points(x, y, pch = 19, col = rgb(0,0,0,alpha=0.2))
+lines(x[ix], transformCI[ix, 1], type = "l", lwd = 2, col = "red")
+lines(x[ix], transformCI[ix, 2], type = "l", lwd = 2, col = "red")
+lines(x[ix], parabinCI[ix, 1], type = "l", lwd = 2, lty = 2, col = "blue")
+lines(x[ix], parabinCI[ix, 2], type = "l", lwd = 2, lty = 2, col = "blue")
+lines(x[ix], HDCI[ix, 1], type = "l", lwd = 2, lty = 3, col = "black")
+lines(x[ix], HDCI[ix, 2], type = "l", lwd = 2, lty = 3, col = "black")
+axis(1); axis(2)
+legend(0.55, 12.5, legend=c("transformation conformal", 
+  "binned parametric conformal", "HD region"), 
+  col=c("red", "blue", "black"), cex = 1, lwd = c(2, 2, 2),
+  lty=c(1, 2, 3), bty = "n")
+dev.off()
+
+
+# comparison between transformation conformal prediction region
+# and HD prediction region (.pdf)
+pdf(file="comparison.pdf")
+par(mfrow = c(1,1), oma = c(4,4,0,0), mar = c(1,1,1,1))
+plot.new()
+plot.window(xlim = c(0,1), ylim = c(min(y), max(y)))
+points(x, y, pch = 19, col = rgb(0,0,0,alpha=0.2))
+lines(x[ix], transformCI[ix, 1], type = "l", lwd = 2, col = "red")
+lines(x[ix], transformCI[ix, 2], type = "l", lwd = 2, col = "red")
+lines(x[ix], parabinCI[ix, 1], type = "l", lwd = 2, lty = 2, col = "blue")
+lines(x[ix], parabinCI[ix, 2], type = "l", lwd = 2, lty = 2, col = "blue")
+lines(x[ix], HDCI[ix, 1], type = "l", lwd = 2, lty = 3, col = "black")
+lines(x[ix], HDCI[ix, 2], type = "l", lwd = 2, lty = 3, col = "black")
+axis(1); axis(2)
+legend(0.55, 12.5, legend=c("transformation conformal", 
+  "binned parametric conformal", "HD region"), 
+  col=c("red", "blue", "black"), cex = 1, lwd = c(2, 2, 2),
+  lty=c(1, 2, 3), bty = "n")
 dev.off()
 
 
