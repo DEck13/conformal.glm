@@ -19,8 +19,9 @@
 }
 \usage{
   conformal.glm(object, ..., newdata = NULL, alpha = 0.10, 
-  	cores = 1, bins = 1, parametric = TRUE, intercept = TRUE, 
-  	nonparametric = FALSE, h = NULL, precision = 0.005)
+    cores = 1, bins = 1, parametric = TRUE, nonparametric = FALSE, 
+    method = c("transform", "bin", "both"), intercept = TRUE, h = NULL, 
+    precision = 0.005)
 }
 \arguments{
   \item{object}{an object of class \code{"glm"}.}
@@ -43,13 +44,16 @@
     and \code{d} is the dimension of the main effects).}
   \item{parametric}{a Boolean variable corresponding to whether or not the 
     parametric conformal region is to be computed. The default is set at TRUE.}
+  \item{nonparametric}{a Boolean variable corresponding to whether or not the 
+    nonparametric conformal region is to be computed. The default is set at 
+    TRUE.}
+  \item{method}{the method used for constructing conformal prediction regions, 
+    either binning for local validity, or transform for marginal validity, 
+    or both.}    
   \item{intercept}{a Boolean variable corresponding to whether or not the 
     intercept is included in the regression equation. This is only relevant 
     for the computation of the prediction region by conformalization of 
     residuals (when \code{LS = TRUE}). The default is set at TRUE.}    
-  \item{nonparametric}{a Boolean variable corresponding to whether or not the 
-    nonparametric conformal region is to be computed. The default is set at 
-    TRUE.}
   \item{h}{The bandwidth corresponding to the estimated density to form the 
     nonparametric conformal prediction region.  The default value is 
     \code{1/bins}.}
@@ -65,10 +69,15 @@
   \code{regions} has functionality for the parametric conformal prediction 
   region and the nonparametric conformal prediction region. 
 
-  \item{paraconformal}{The parametric conformal prediction region which is 
-    returned when \code{parametric = TRUE}.}
-  \item{nonparaconformal}{The nonparametric conformal prediction region which 
-    is returned when \code{nonparametric = TRUE}.}
+  \item{transformconf}{The transform parametric conformal prediction region  
+    which is returned when \code{parametric = TRUE} and either 
+    \code{method = "transform"} or \code{method = "both"} is supplied.}
+  \item{paraconfbin}{The parametric conformal prediction region with binning 
+    which is returned when \code{parametric = TRUE} and either 
+    \code{method = "bin"} or \code{method = "both"} is supplied.}
+  \item{nonparaconfbin}{The nonparametric conformal prediction region with 
+    binning which is returned when \code{nonparametric = TRUE} and either 
+    \code{method = "bin"} or \code{method = "both"} is supplied.}
 }
 \seealso{
   \code{\link{regions}}, \code{glm}

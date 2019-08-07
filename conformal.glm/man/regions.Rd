@@ -79,9 +79,9 @@
   prediction region, and prediction regions from conformalization of 
   residuals. 
 
-  \item{paraconformal}{The parametric conformal prediction region which is 
+  \item{paraconfbin}{The parametric conformal prediction region which is 
     returned when \code{parametric = TRUE}.}
-  \item{nonparaconformal}{The nonparametric conformal prediction region which 
+  \item{nonparaconfbin}{The nonparametric conformal prediction region which 
     is returned when \code{nonparametric = TRUE}.}
   \item{interval.plugin}{The usual prediction region that one obtains from 
     maximum likelihood estimation and the delta method.}

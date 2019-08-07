@@ -5,8 +5,8 @@ Title: Conformal Prediction for Generalized Linear Regression Models
 Author: Daniel J. Eck <daniel.eck@yale.edu>
 Maintainer: Daniel J. Eck <daniel.eck@yale.edu>
 Depends: R (>= 3.0.0)
-Imports: stats, MASS, stringr, statmod, parallel
-Suggests: conformalInference, HDInterval
+Imports: stats, HDInterval, MASS, stringr, statmod, parallel
+Suggests: conformalInference
 ByteCompile: FALSE
 Description: Compute and compare prediciton regions for the normal, Gamma, 
   and inverse Gaussian families in the \code{glm} package.  There is 

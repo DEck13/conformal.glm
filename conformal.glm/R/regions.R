@@ -253,6 +253,7 @@ regions <- function(formula, data, newdata, family = "gaussian", link,
 
   newdata <- as.matrix(newdata)
   colnames(newdata) <- colnames(data)[!(colnames(data) %in% respname)]
+
   ## create model calls when appropriate
   ## obtain OLS estimate 
   ## calculate important quantities for the gaussian 
@@ -268,6 +269,7 @@ regions <- function(formula, data, newdata, family = "gaussian", link,
     p <- length(betaOLS) - 1
     sd.res <- summary(m1)$sigma
   }
+
   ## Get MLEs and plugin interval for gamma distribution 
   betaMLE <- shapeMLE <- rateMLE <- 0
   if(family == "Gamma"){
@@ -298,7 +300,6 @@ regions <- function(formula, data, newdata, family = "gaussian", link,
   index.pred <- find.index(matrix(newdata, ncol = d), wn = wn, d = d)
   indices.pred <- sort(unique(index.pred))
 
-
   ## newdata object for main effects only
   newdata.variables <- as.matrix(model.frame(~ ., as.data.frame(newdata)))
 
@@ -308,7 +309,7 @@ regions <- function(formula, data, newdata, family = "gaussian", link,
   newdata.formula <- as.matrix(model.frame(formula, as.data.frame(foo))[, -1])
   
 
-  paraconformal <- nonparaconformal <- NULL
+  paraconfbin <- nonparaconfbin <- NULL
   if(parametric == TRUE){
 
     # upfront quantities to improve speed
@@ -431,7 +432,7 @@ regions <- function(formula, data, newdata, family = "gaussian", link,
       out
     }
 
-    paraconformal <- Copt(newdata.variables)
+    paraconfbin <- Copt(newdata.variables)
 
   }
 
@@ -454,7 +455,7 @@ regions <- function(formula, data, newdata, family = "gaussian", link,
         if(nk.tilde == 0) stop("bin width is too small")
 
         ## nonparametric density
-        phatxy <- function(y){                
+        kernxy <- function(y){                
           int <- which(unlist(lapply(1:nk, FUN = function(j){
             Yknotj <- Yk[-j]
             Ykj <- Yk[j]
@@ -471,7 +472,7 @@ regions <- function(formula, data, newdata, family = "gaussian", link,
         quant.Yk <- quantile(Yk, probs = c(2 * alpha, 1 - 2 * alpha ))
         prec <- max( min(diff(sort(Yk[Yk <= quant.Yk[1]]))), precision)      
         steps <- 1
-        while(!phatxy(y.lwr)){
+        while(!kernxy(y.lwr)){
           y.lwr <- y.lwr + steps * prec
           steps <- steps + 1
         }
@@ -479,7 +480,7 @@ regions <- function(formula, data, newdata, family = "gaussian", link,
         prec <- min( min(diff(sort(Yk[Yk <= quant.Yk[1]]))), precision)
         #if(prec < 0.001) prec <- 0.0005
           #mean(min(diff(sort(Yk[Yk <= quant.Yk[1]]))), 0.001)
-        while(phatxy(y.lwr)){
+        while(kernxy(y.lwr)){
           y.lwr <- y.lwr - steps * prec
           steps <- steps + 1
         }
@@ -488,7 +489,7 @@ regions <- function(formula, data, newdata, family = "gaussian", link,
         y.upr <- y.max <- max(Yk)
         prec <- max( min(diff(sort(Yk[Yk >= quant.Yk[2]]))), precision)
         steps <- 1
-        while(!phatxy(y.upr)){
+        while(!kernxy(y.upr)){
           y.upr <- y.upr - steps * prec
           steps <- steps + 1
         }
@@ -496,13 +497,13 @@ regions <- function(formula, data, newdata, family = "gaussian", link,
         prec <- min( min(diff(sort(Yk[Yk >= quant.Yk[2]]))), precision)
         #if(prec < 0.001) prec <- 0.0005
           #mean(min(diff(sort(Yk[Yk >= quant.Yk[2]]))), 0.001)
-        while(phatxy(y.upr)){
+        while(kernxy(y.upr)){
           y.upr <- y.upr + steps * prec
           steps <- steps + 1
         }
 
         y.seq <- seq(y.lwr, y.upr, by = precision)
-        foo <- unlist(lapply(y.seq, FUN = phatxy))
+        foo <- unlist(lapply(y.seq, FUN = kernxy))
         y.seq <- y.seq[foo]
         breaks <- which(round(diff(y.seq), 
           ceiling(log10(1/precision))) != precision)
@@ -523,11 +524,11 @@ regions <- function(formula, data, newdata, family = "gaussian", link,
       })
       out
     }
-    nonparaconformal <- COPS(index.pred)
+    nonparaconfbin <- COPS(index.pred)
   }
 
-  out = list(paraconformal = paraconformal, 
-    nonparaconformal = nonparaconformal)
+  out = list(paraconfbin = paraconfbin, 
+    nonparaconfbin = nonparaconfbin)
   return(out)
 }
 
