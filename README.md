@@ -290,7 +290,7 @@ For more details on the parametric conformal prediction region, see:
 
   Eck, D.J. and Crawford, F.W. (2019+)
   Conformal prediction for exponential families and generalized linear models.
-  Preprint available on request (email daniel.eck@yale.edu).
+  Preprint available on request (email dje13@illinois.edu).
 
 For more details on the prediciton region formed from conformalization of 
 residuals, see:
