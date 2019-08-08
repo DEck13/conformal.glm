@@ -5,7 +5,7 @@ conformal.glm <- function(object, ..., newdata = NULL, alpha = 0.10,
   method = c("transform", "bin", "both"), intercept = TRUE, h = NULL, 
   precision = 0.005){
 
-  # declare output quantities
+  ## declare output quantities
   out <- NULL
   transformconf <- NULL 
   paraconfbin <- NULL
@@ -21,16 +21,47 @@ conformal.glm <- function(object, ..., newdata = NULL, alpha = 0.10,
   stopifnot(family %in% c("Gamma", "gaussian", "inverse.gaussian"))
   link <- fam$link
   data <- object$data
+  X <- as.matrix(object$x[, -1])
+  colnames(X) <- colnames(object$x)[-1]
 
-  # ---- Parametric transform conformal -------
+  ## Get MLEs
+  sd.res <- NULL
+  betaMLE <- shapeMLE <- rateMLE <- dispersionMLE <- NULL
+  ## Get MLEs for Gaussian Distribution 
+  if(family == "gaussian"){
+    m1 <- lm(formula, data = data, x = TRUE)
+    betaMLE <- coefficients(m1)
+    sd.res <- summary(m1)$sigma
+  }
+  ## Get MLEs for gamma distribution 
+  if(family == "Gamma"){
+    betaMLE <- coefficients(object)
+    shapeMLE <- as.numeric(gamma.shape(object)[1])
+    if(link == "identity"){
+      rateMLE <- 1 / (cbind(1, X) %*% betaMLE) * shapeMLE
+    }
+    if(link == "inverse"){
+      rateMLE <- (cbind(1, X) %*% betaMLE) * shapeMLE
+    }
+    if(link == "log"){
+      rateMLE <- (1 / exp(cbind(1, X) %*% betaMLE)) * shapeMLE
+    }
+  }
+  ## Get MLEs for Inverse Gaussian Distribution 
+  if(family == "inverse.gaussian"){
+    betaMLE <- coefficients(object)
+    dispersionMLE <- summary(object)$dispersion
+  }
+
+  ################################################
+  ## ---- Parametric transform conformal ------- #
+  ################################################
   if(method %in% c("transform", "both")){
 
-    ## check for factors. If no factors then call regions function
+    ## check for factors
     if(!any(attr(object$terms, "dataClasses")[-1] == "factor")){
 
       ## some important quantities
-      X <- as.matrix(object$x[, -1])
-      colnames(X) <- colnames(object$x)[-1]
       if(is.null(newdata)){ 
         newdata <- data
         respname <- all.vars(formula)[1]
@@ -45,35 +76,9 @@ conformal.glm <- function(object, ..., newdata = NULL, alpha = 0.10,
       X.newdata <- model.matrix(~ ., model.frame(Terms, data.frame(newdata)))[, -1]
       X.newdata <- as.matrix(X.newdata)
 
-      sd.res <- NULL
-      betaMLE <- shapeMLE <- rateMLE <- NULL
-      ## Get MLEs for Gaussian Distribution 
-      if(family == "gaussian"){
-        m1 <- lm(formula, data = data, x = TRUE)
-        betaMLE <- coefficients(m1)
-        sd.res <- summary(m1)$sigma
-      }
-      ## Get MLEs for gamma distribution 
-      if(family == "Gamma"){
-        betaMLE <- coefficients(object)
-        shapeMLE <- as.numeric(gamma.shape(object)[1])
-        if(link == "identity"){
-          rateMLE <- 1 / (cbind(1, X) %*% betaMLE) * shapeMLE
-        }
-        if(link == "inverse"){
-          rateMLE <- (cbind(1, X) %*% betaMLE) * shapeMLE
-        }
-        if(link == "log"){
-          rateMLE <- (1 / exp(cbind(1, X) %*% betaMLE)) * shapeMLE
-        }
-      }
-      ## Get MLEs for Inverse Gaussian Distribution 
-      if(family == "inverse.gaussian"){
-        betaMLE <- coefficients(object)
-      }
-
-
-      ## transform conformal with no factors 
+      ########################################
+      ## transform conformal with no factors #
+      ########################################
       XnewX <- matrix(0, nrow = n+1, ncol = ncol(X))
       transformconformal <- function(newX){
   
@@ -102,6 +107,7 @@ conformal.glm <- function(object, ..., newdata = NULL, alpha = 0.10,
         }
         if(family == "inverse.gaussian"){
           betaMLE <- coefficients(object)
+          dispersionMLE <- summary(object)$dispersion
         }
 
         ## augmented data with small upper boundary 
@@ -243,22 +249,20 @@ conformal.glm <- function(object, ..., newdata = NULL, alpha = 0.10,
 
       transformconf <- do.call(rbind, mclapply(1:nrow(X.newdata), mc.cores = cores, 
         FUN = function(j){ transformconformal(X.newdata[j, ]) }))
+      colnames(transformconf) <- c("lwr", "upr")
 
     }
 
+    ## check for factors
     if(any(attr(object$terms, "dataClasses")[-1] == "factor")){
 
       ## some important quantities    
-      X <- object$x[, -1]
       Y <- object$y
       n <- length(Y)
       p <- ncol(X) - 1
       respname <- all.vars(formula)[1]
       terms <- c(respname, attr(terms(object), "term.labels"))
       data <- data[, colnames(data) %in% terms]
-      d <- ncol(data)
-      wn <- min(1/ floor(1 / (log(n)/n)^(1/(d+3))), 1/2)
-      if(class(bins) != "NULL") wn <- 1 / bins
 
       #newdata <- NULL
       if(is.null(newdata)){ 
@@ -277,20 +281,194 @@ conformal.glm <- function(object, ..., newdata = NULL, alpha = 0.10,
       #####################################
       ## transform conformal with factors #
       #####################################
+      XnewX <- matrix(0, nrow = n+1, ncol = ncol(X))
+      newX <- X.newdata[1, ]
+      rownewdata <- newdata[1, ]
+      namesdata <- names(data)
+      transformconformal.factor <- function(j){
+  
+        # important quantities
+        newX <- X.newdata[j, ]
+        newX <- matrix(newX, nrow = 1)
+        lwr <- upr <- NULL
+        rateMLEnewX <- NULL
+        ## Get new MLEs and candidate boundary points of 
+        ## transform conformal prediction region
+        if(family == "gaussian"){
+          muX <- (cbind(1, newX) %*% betaMLE)
+          lwr <- qnorm(1.25 * alpha, mean = muX, sd = sd.res)
+          upr <- qnorm(1 - 1.25 * alpha, mean = muX, sd = sd.res)
+        } 
+        if(family == "Gamma"){
+          if(link == "identity"){
+            rateMLEnewX <- 1 / (cbind(1, newX) %*% betaMLE) * shapeMLE
+          }
+          if(link == "inverse"){
+            rateMLEnewX <- (cbind(1, newX) %*% betaMLE) * shapeMLE
+          }
+          if(link == "log"){
+            rateMLEnewX <- (1 / exp(cbind(1, newX) %*% betaMLE)) * shapeMLE
+          }
+          lwr <- qgamma(1.25 * alpha, rate = rateMLEnewX, shape = shapeMLE)
+          upr <- qgamma(1 - 1.25 * alpha, rate = rateMLEnewX, shape = shapeMLE)
+        }
+        if(family == "inverse.gaussian"){
+          betaMLE <- coefficients(object)
+          dispersionMLE <- summary(object)$dispersion          
+        }
 
+        ## augmented data with small upper boundary 
+        ## used to get upper boundary of transform conformal prediction region
+        rownewdata <- newdata[j, ]
+        newrow <- cbind(upr, rownewdata)
+        names(newrow) <- namesdata
+        aug.data <- rbind(data, newrow)
+        objectnewX = glm(formula, family = fam, 
+          data = aug.data, x = TRUE)
+        XnewX <- objectnewX$x
+        betaMLEnewX <- coefficients(objectnewX)
+
+        ## transform conformal for linear regression model
+        sd.resnewX <- sd.res
+        if(family == "gaussian"){
+          muX <- XnewX %*% betaMLEnewX
+          m1 <- lm(formula, data = aug.data, x = TRUE)
+          sd.resnewX <- summary(m1)$sigma
+          critval <- c(alpha/2, 1 - alpha/2)
+
+          ## get upper boundary of transform conformal prediction region
+          U.upr <- pnorm(upr, mean = muX[n+1, ], sd = sd.resnewX)
+          condition <- FALSE
+          while(!condition){
+            newrow <- cbind(upr, rownewdata)
+            names(newrow) <- namesdata            
+            aug.data <- rbind(data, newrow) 
+            objectnewX = lm(formula, data = aug.data, x = TRUE)
+            betaMLEnewX <- coefficients(objectnewX)
+            XnewX <- objectnewX$x
+            munewX <- XnewX %*% betaMLEnewX
+            sd.resnewX <- summary(objectnewX)$sigma
+            #HDCI <- hdi(qnorm, 1 - alpha, mean = munewX[n+1, 1], sd = sd.resnewX)
+            #critval <- pnorm(HDCI, mean = munewX[n+1, 1], sd = sd.resnewX)
+            Unorm <- pnorm(aug.data[, 1], mean = munewX, sd = sd.resnewX)
+            U.upr <- Unorm[n+1]
+            condition <- U.upr - quantile(Unorm, probs = 1 - alpha/2) > 0
+            upr <- upr + precision
+          }
+
+          ## get lower boundary of transform conformal prediction region
+          U.lwr <- pnorm(lwr, mean = muX[n+1, ], sd = sd.res)
+          condition <- FALSE
+          while(!condition){
+            newrow <- cbind(lwr, rownewdata)
+            names(newrow) <- namesdata            
+            aug.data <- rbind(data, newrow) 
+            objectnewX = lm(formula, data = aug.data, x = TRUE)
+            betaMLEnewX <- coefficients(objectnewX)
+            XnewX <- objectnewX$x
+            munewX <- XnewX %*% betaMLEnewX
+            sd.resnewX <- summary(objectnewX)$sigma
+            #HDCI <- hdi(qnorm, 1 - alpha, mean = munewX[n+1, 1], sd = sd.resnewX)
+            #critval <- pnorm(HDCI, mean = munewX[n+1, 1], sd = sd.resnewX)
+            Unorm <- pnorm(aug.data[, 1], mean = munewX, sd = sd.resnewX)
+            U.lwr <- Unorm[n+1]
+            condition <- quantile(Unorm, probs = alpha/2) - U.lwr > 0
+            lwr <- lwr - precision
+          }
+        }
+
+        ## transform conformal for gamma regression model
+        if(family == "Gamma"){
+          shapeMLEnewX <- as.numeric(gamma.shape(objectnewX)[1])
+          if(link == "identity"){
+            rateMLEnewX <- 1 / (XnewX %*% betaMLEnewX) * shapeMLEnewX
+          }
+          if(link == "inverse"){
+            rateMLEnewX <- (XnewX %*% betaMLEnewX) * shapeMLEnewX
+          }
+          if(link == "log"){
+            rateMLEnewX <- (1 / exp(XnewX %*% betaMLEnewX)) * shapeMLEnewX
+          }        
+
+          ## get percentiles for highest density region
+          HDCI <- do.call(rbind, 
+            lapply(1:nrow(aug.data), function(j){ 
+            hdi(qgamma, 1 - alpha, shape = shapeMLEnewX, rate = rateMLEnewX[j, 1])
+          }))
+          critval <- pgamma(HDCI[n+1, ], shape = shapeMLEnewX, rate = rateMLEnewX[n+1, 1])
+
+          ## get upper boundary of transform conformal prediction region
+          U.upr <- pgamma(upr, rate = rateMLEnewX[n+1, ], shape = shapeMLEnewX)
+          condition <- FALSE
+          while(!condition){
+            newrow <- cbind(upr, rownewdata)
+            names(newrow) <- namesdata            
+            aug.data <- rbind(data, newrow) 
+            objectnewX = glm(formula, family = fam, data = aug.data, x = TRUE)
+            betaMLEnewX <- coefficients(objectnewX)
+            XnewX <- objectnewX$x
+            shapeMLEnewX <- as.numeric(gamma.shape(objectnewX)[1])
+            if(link == "identity"){
+              rateMLEnewX <- 1 / (XnewX %*% betaMLEnewX) * shapeMLEnewX
+            }
+            if(link == "inverse"){
+              rateMLEnewX <- (XnewX %*% betaMLEnewX) * shapeMLEnewX
+            }
+            if(link == "log"){
+              rateMLEnewX <- (1 / exp(XnewX %*% betaMLEnewX)) * shapeMLEnewX
+            }
+            HDCI <- hdi(qgamma, 1 - alpha, shape = shapeMLEnewX, rate = rateMLEnewX[n+1, 1])
+            critval <- pgamma(HDCI, shape = shapeMLEnewX, rate = rateMLEnewX[n+1, 1])
+            Ugamma <- pgamma(aug.data[, 1], rate = rateMLEnewX, shape = shapeMLEnewX)
+            U.upr <- Ugamma[n+1]
+            condition <- U.upr - quantile(Ugamma, probs = critval[2]) > 0
+            upr <- upr + precision
+          }
+
+          ## get lower boundary of transform conformal prediction region
+          U.lwr <- pgamma(lwr, rate = rateMLEnewX[n+1, ], shape = shapeMLEnewX)
+          condition <- FALSE
+          while(!condition){
+            newrow <- cbind(lwr, rownewdata)
+            names(newrow) <- namesdata            
+            aug.data <- rbind(data, newrow)  
+            objectnewX = glm(formula, family = fam, data = aug.data, x = TRUE)
+            betaMLEnewX <- coefficients(objectnewX)
+            XnewX <- objectnewX$x
+            shapeMLEnewX <- as.numeric(gamma.shape(objectnewX)[1])
+            if(link == "identity"){
+              rateMLEnewX <- 1 / (XnewX %*% betaMLEnewX) * shapeMLEnewX
+            }
+            if(link == "inverse"){
+              rateMLEnewX <- (XnewX %*% betaMLEnewX) * shapeMLEnewX
+            }
+            if(link == "log"){
+              rateMLEnewX <- (1 / exp(XnewX %*% betaMLEnewX)) * shapeMLEnewX
+            }
+            HDCI <- hdi(qgamma, 1 - alpha, shape = shapeMLEnewX, rate = rateMLEnewX[n+1, 1])
+            critval <- pgamma(HDCI, shape = shapeMLEnewX, rate = rateMLEnewX[n+1, 1])
+            Ugamma <- pgamma(aug.data[, 1], rate = rateMLEnewX, shape = shapeMLEnewX)
+            U.lwr <- Ugamma[n+1]
+            condition <- quantile(Ugamma, probs = critval[1]) - U.lwr > 0
+            lwr <- lwr - precision
+            if(lwr < 0){
+              lwr <- 0.001
+              break
+            }
+          }
+        }
+        c(lwr, upr)
+      }
+
+      transformconf <- do.call(rbind, mclapply(1:n.pred, mc.cores = cores, 
+        FUN = function(j){ transformconformal.factor(j) }))
+      colnames(transformconf) <- c("lwr", "upr")
     }
-
-
-
-    out = list(transformconf = transformconf, 
-      paraconfbin = paraconfbin, 
-      nonparaconfbin = nonparaconfbin)
   }
 
-
-  
-
-  # ---- Conformal prediction w/ binning -------
+  ################################################
+  # ---- Conformal prediction w/ binning ------- #
+  ################################################
   if(method %in% c("bin", "both")){
   
     ## check for factors. If no factors then call regions function
@@ -311,11 +489,8 @@ conformal.glm <- function(object, ..., newdata = NULL, alpha = 0.10,
         parametric = parametric, nonparametric = nonparametric, 
         h = h, precision = precision)
 
-      paraconfbin <- int$paraconformal
-      nonparaconfbin <- int$nonparaconformal
-      out = list(transformconf = transformconf, 
-        paraconfbin = paraconfbin, 
-        nonparaconfbin = nonparaconfbin)    
+      paraconfbin <- int$paraconfbin
+      nonparaconfbin <- int$nonparaconfbin
     }
 
     if(any(attr(object$terms, "dataClasses")[-1] == "factor")){
@@ -387,9 +562,9 @@ conformal.glm <- function(object, ..., newdata = NULL, alpha = 0.10,
       index.bin.newdata <- unsplit(newdata.bin.index.by.factors, 
         factors.newdata, drop = FALSE)
 
-      ######################################################
-      ## Split data quantities by factor level combinations
-      ######################################################
+      #######################################################
+      ## Split data quantities by factor level combinations #
+      #######################################################
       index.factor.variables <- which(attr(terms(object), "dataClasses") == "factor")
       index.numeric.variables <- which(attr(terms(object), "dataClasses") == "numeric")
       index.data.factor.variables <- which(colnames(data) %in% names(index.factor.variables))
@@ -447,7 +622,7 @@ conformal.glm <- function(object, ..., newdata = NULL, alpha = 0.10,
           sd.res <- summary(m1)$sigma
         }
         ## Get MLEs and plugin interval for gamma distribution 
-        betaMLE <- shapeMLE <- rateMLE <- 0
+        betaMLE <- shapeMLE <- rateMLE <- dispersionMLE <- 0
         if(family == "Gamma"){
           betaMLE <- coefficients(object)
           shapeMLE <- as.numeric(gamma.shape(object)[1])
@@ -465,12 +640,14 @@ conformal.glm <- function(object, ..., newdata = NULL, alpha = 0.10,
         ## Get MLEs and plugin interval for Inverse Gaussian Distribution 
         if(family == "inverse.gaussian"){
           betaMLE <- coefficients(object)
+          dispersionMLE <- summary(object)$dispersion
         }
 
         # upfront quantities to improve speed
         shapeMLE.y <- shapeMLE 
         rateMLE.y <- rbind(rateMLE, 1) 
         betaMLE.y <- betaMLE
+        dispersionMLE.y <- dispersionMLE
         sd.y <- sd.res
         object.y <- object
         #data.y <- matrix(0, nrow = nrow(data) + 1, ncol = ncol(data))
@@ -604,7 +781,9 @@ conformal.glm <- function(object, ..., newdata = NULL, alpha = 0.10,
         colnames(paraconfbin) <- c("lwr", "upr")
       }
 
-      # ---- The nonparametric conformal implementation -------
+      ###########################################################
+      # ---- The nonparametric conformal implementation ------- #
+      ###########################################################
       if(class(h) == "NULL") h <- wn
       if(nonparametric){  
 
@@ -706,10 +885,10 @@ conformal.glm <- function(object, ..., newdata = NULL, alpha = 0.10,
         })
       }
     }    
-    out = list(transformconf = transformconf, 
+  }
+  out = list(transformconf = transformconf, 
       paraconfbin = paraconfbin, 
       nonparaconfbin = nonparaconfbin)
-  }
   return(out)
 }
 

@@ -224,8 +224,9 @@ phatxy <- function(ynew, xnew, Yk, Xk, xnew.modmat,
 
   if(family == "inverse.gaussian"){
     m1.y <- glm(formula, data = data.y, family = family)
+    dispersionMLE <- summary(m1.y)$dispersion
     out <- dinvgauss(c(Yk, ynew), mean = 1 / sqrt(cbind(1, rbind(Xk, xnew.modmat)) %*% 
-      coefficients(m1.y)))
+      coefficients(m1.y)), dispersion = dispersionMLE)
   }
 
   out
@@ -271,7 +272,7 @@ regions <- function(formula, data, newdata, family = "gaussian", link,
   }
 
   ## Get MLEs and plugin interval for gamma distribution 
-  betaMLE <- shapeMLE <- rateMLE <- 0
+  betaMLE <- shapeMLE <- rateMLE <- dispersionMLE <- 0
   if(family == "Gamma"){
     m1 <- glm(formula, data = data, family = family, x = TRUE)
     X <- matrix(m1$x[, -1], nrow = n)
@@ -286,6 +287,7 @@ regions <- function(formula, data, newdata, family = "gaussian", link,
     m1 <- glm(formula, data = data, family = family, x = TRUE)
     X <- matrix(m1$x[, -1], nrow = n)
     betaMLE <- coefficients(m1)
+    dispersionMLE <- summary(m1)$dispersion
     p <- length(betaMLE) - 1
   }
 
@@ -314,6 +316,7 @@ regions <- function(formula, data, newdata, family = "gaussian", link,
 
     # upfront quantities to improve speed
     shapeMLE.y <- shapeMLE; rateMLE.y <- rbind(rateMLE, 1); betaMLE.y <- betaMLE
+    dispersionMLE.y <- dispersionMLE
     sd.y <- sd.res
     m1.y <- m1
 
