@@ -131,7 +131,7 @@ reproduce the analyses which appear in the paper \citet{eck2019conformal}, the
 README file in the R package \citet{eck2018conformalR}, and this document.  
 Several additional analyses to those presented in 
 \citet{eck2019conformal} are provided in this document.  
-Of particular intherest, we investigate the performance of the parametric 
+Of particular intherest, we investigate the performance of parametric 
 conformal prediction regions under model misspecification.  
 Specifically, we focus on settings where the underlying data is generated 
 via a Gamma distribution and parametric prediction regions are obtained using a 
@@ -140,7 +140,8 @@ chosen because it is intuitive and it fits the Gamma data better than a simple
 linear regression model or a quadratic model.  
 
 Our goal in this manuscript is to demonstrate the advantages and disadvantages 
-of our parametric conformal prediction region \citep{eck2019conformal} 
+of our binned and transformation based parametric conformal prediction regions 
+\citep{eck2019conformal} 
 compared with the nonparametric conformal prediction region 
 \citep{lei2014distribution}, the least squares (LS) conformal prediction 
 region \citep{lei2018distribution} obtained from conformalized residual scores, 
@@ -154,7 +155,7 @@ nonparametric conformal prediction regions follows the bin width asymptotics
 of \citet{lei2014distribution}.
 
 %In our simulations 
-We find that the parametric conformal prediction 
+We find that the binned parametric conformal prediction 
 region performs well even when the model is misspecified.  By construction, 
 this region, along with the nonparametric conformal prediction region, 
 maintains finite-sample local validity with respect to binning.  
@@ -162,16 +163,25 @@ These conformal prediction regions therefore achieves finite-sample marginal
 validity.  The guarantee of finite-sample marginal and local validity are 
 noted benefits of these conformal prediction regions 
 \citep{lei2014distribution, eck2019conformal}.  
-However, the parametric and nonparametric conformal prediction regions are 
-visually very different, as seen in Section~\ref{sec:plotsofregions}, and 
-give different prediction errors at small to moderate sample sizes.  
-We see that the parametric conformal prediction region adapts naturally 
-to the data when the model is correctly specified or modest deviations 
-from the specified model are present.  On the other hand, the 
-nonparametric conformal prediction region does not adapt well to 
-data obtained from a Gamma regression model or data obtained from a 
-linear regression model with a steep mean function where steepness is 
+However, the binned parametric and nonparametric conformal prediction 
+regions are visually very different, as seen in 
+Section~\ref{sec:plotsofregions}, and give different prediction errors at 
+small to moderate sample sizes.  We see that the binned parametric conformal 
+prediction region adapts naturally to the data when the model is correctly 
+specified or modest deviations from the specified model are present.  
+On the other hand, the nonparametric conformal prediction region does not 
+adapt well to data obtained from a Gamma regression model or data obtained 
+from a linear regression model with a steep mean function where steepness is 
 relative to the variability about the mean function.
+
+We find that the transformation based parametric conformal prediction region 
+performs similarily to the HD prediction region under the assumed model when 
+the assumed model is either the data generating model or only modest 
+departures exist between the assumed model and the data generating model.  
+This parametric conformal prediction region can be prohibitively large and 
+inapproriate when the assumed model is in strong disagreement with the data 
+generating model.  However, this parametric conformal prediction region 
+maintains finite sample marginal coverage in such settings.
 
 The LS conformal prediction region obtains marginal validity 
 \citep{lei2018distribution} but performs poorly when deviations about the 
@@ -220,25 +230,27 @@ summary(fit.readme)
 @
 
 
-We now compute the parametric conformal prediction region 
-\citep{eck2019conformal} and the nonparametric conformal prediction region 
-\citep{lei2014distribution} using the \texttt{conformal.glm} function in the 
-\texttt{conformal.glm} package.  For illustration, we set the number of bins 
-to be equal to 3.  Since $X_i \sim U(0,1)$, we expect for there to be about 
-167 cases per bin with this choice of 3 bins.  This choice for the number of 
-bins is consistent with the bin width asymptotics in 
-\citet{lei2014distribution}.  The number of cores is set to 6,  if your 
-computer has fewer than 6 cores at its disposal then you have to reduce the 
-number of cores.  This will not effect the final output but it will take 
-longer to run. 
+We now compute the binned and transformation based parametric conformal
+prediction regions \citep{eck2019conformal} 
+and the nonparametric conformal prediction region \citep{lei2014distribution} 
+using the \texttt{conformal.glm} function in the \texttt{conformal.glm} package.  
+For illustration, we set the number of bins to be equal to 3.  
+Since $X_i \sim U(0,1)$, we expect for there to be about 167 cases per bin with 
+this choice of 3 bins.  This choice for the number of bins is consistent with 
+the bin width asymptotics in \citet{lei2014distribution}.  The number of cores 
+is set to 7,  if your computer has fewer than 7 cores at its disposal then you 
+have to reduce the number of cores.  This will not effect the final output but 
+it will take longer to run. 
 
 
 <<initialconfit, cache = TRUE>>=
 bins <- 3
 system.time(cpred <- conformal.glm(fit.readme, 
-  nonparametric = TRUE, bins = bins, cores = 6))
-paraCI <- cpred$paraconformal
-nonparaCI <- cpred$nonparaconformal
+  nonparametric = TRUE, bins = bins, cores = 7, 
+  method = "both"))
+parabinCI <- cpred$paraconfbin
+nonparabinCI <- cpred$nonparaconfbin
+transformCI <- cpred$transformconf
 @
 
 
@@ -264,9 +276,7 @@ than a simple linear or quadratic model.  We estimate $\hat{\rho}_y$ using a
 smoothing spline whose parameters are chosen by cross-validation.  
 
 
-
 <<initialLSLWconfit, cache = TRUE>>=
-library(conformalInference)
 funs <- lm.funs(intercept = TRUE)
 train.fun <- funs$train.fun
 predict.fun <- funs$predict.fun
@@ -299,7 +309,6 @@ the \texttt{HDInterval} package \citep{meredith2018HDIntervalR}.
 
 
 <<initialHDfit, cache = TRUE>>=
-library(HDInterval)
 betaMLE <- coefficients(fit.readme)
 shapeMLE <- as.numeric(gamma.shape(fit.readme)[1])
 rateMLE <- cbind(1, x) %*% betaMLE * shapeMLE
@@ -329,14 +338,22 @@ values of large magnitude.
 <<gammasimexample, echo = FALSE>>=
 par(mfrow = c(2,2), oma = c(4,4,0,0), mar = c(1,1,1,1))
 
+# transformation conformal prediction region
+ix <- sort(x, index.return = TRUE)$ix
+plot.new()
+plot.window(xlim = c(0,1), ylim = c(min(y), max(y)))
+points(x, y, pch = 19, col = rgb(0,0,0,alpha=0.2))
+lines(x[ix], transformCI[ix, 1], type = "l", col = "red")
+lines(x[ix], transformCI[ix, 2], type = "l", col = "red")
+axis(2)
+
 # parametric conformal prediction region
 ix <- sort(x, index.return = TRUE)$ix
 plot.new()
 plot.window(xlim = c(0,1), ylim = c(min(y), max(y)))
 points(x, y, pch = 19, col = rgb(0,0,0,alpha=0.2))
-lines(x[ix], paraCI[ix, 1], type = "l", col = "red", lwd = 1.5)
-lines(x[ix], paraCI[ix, 2], type = "l", col = "red", lwd = 1.5)
-axis(2)
+lines(x[ix], parabinCI[ix, 1], type = "l", col = "red")
+lines(x[ix], parabinCI[ix, 2], type = "l", col = "red")
 
 # nonparametric conformal prediction region
 plot.nonparametric <- function(region, x, y, bins){
@@ -344,41 +361,33 @@ plot.nonparametric <- function(region, x, y, bins){
     stop("Only appropriate for nonparametric conformal prediction region")
   }
   plot.new()
-  plot.window(xlim = c(0, 1), ylim = c(min(y)-1, max(y)+1))
+  plot.window(xlim = c(0,1), ylim = c(min(y), max(y)))
   points(x, y, pch = 19, col = rgb(0,0,0,alpha=0.2))
   for(i in 1:bins){ 
-    nonpar.i  <- region[[i]]
+    nonpar.i  <- nonparabinCI[[i]]
     odd <- which(1:length(nonpar.i) %% 2 == 1) 
     even <- which(1:length(nonpar.i) %% 2 == 0)
     segments(x0 = 1/bins * (i-1), y0 = nonpar.i, x1 =1/bins * i, 
-      col = "red", lwd = 1.5)
+      col = "red")
     if(i != 1){ 
-      nonpar.i.previous <- region[[i-1]]
+      nonpar.i.previous <- nonparabinCI[[i-1]]
       nonpar <- sort(c(nonpar.i, nonpar.i.previous))
       odd2 <- which(1:length(nonpar) %% 2 == 1) 
       even2 <- which(1:length(nonpar) %% 2 == 0)
       segments(x0 = 1/bins * (i-1), y0 = nonpar[odd2], 
-        y1 = nonpar[even2], col = "red", lwd = 1.5)
+        y1 = nonpar[even2], col = "red")
     }
   }
 }    
-plot.nonparametric(region = nonparaCI, x = x, 
-  y = y, bins = bins)
+plot.nonparametric(nonparabinCI, x = x, y = y, bins = bins)
+axis(1); axis(2)
 
 # least squares conformal prediction region
 plot.new()
 plot.window(xlim = c(0,1), ylim = c(0,max(y)))
 points(x, y, pch = 19, col = rgb(0,0,0,alpha=0.2))
-lines(x[ix], LSLW[ix, 1], type = "l", col = "red", lwd = 1.5)
-lines(x[ix], LSLW[ix, 2], type = "l", col = "red", lwd = 1.5)
-axis(1); axis(2)
-
-# highest density region
-plot.new()
-plot.window(xlim = c(0,1), ylim = c(0,max(y)))
-points(x, y, pch = 19, col = rgb(0,0,0,alpha=0.2))
-lines(x[ix], HDCI[ix, 1], type = "l", col = "red", lwd = 1.5)
-lines(x[ix], HDCI[ix, 2], type = "l", col = "red", lwd = 1.5)
+lines(x[ix], LSLW[ix, 1], type = "l", col = "red")
+lines(x[ix], LSLW[ix, 2], type = "l", col = "red")
 axis(1)
 
 # axis labels
@@ -388,40 +397,66 @@ mtext("y", side = 2, line = 2.5, outer = TRUE, cex = 1.25)
 \end{center}
 \caption{Sim setting: $n = 500$, shape = $2$, bins = $3$. 
   The regions are depicted as follows: 
-    parametric conformal prediction region (top-left panel),
-    nonparametric conformal prediction region (top-right panel),
-    LSLW conformal prediction region (bottom-left panel),
-    HD prediction region (bottom-right panel).}
+    transformation based parametric conformal prediction (top-left panel),
+    binned parametric conformal prediction region (top-right panel),
+    nonparametric conformal prediction region (bottom-left panel), and 
+    LSLW conformal prediction region (bottom-right panel).}
 \label{Fig:plots}
 \end{figure}
 
+In Figure~\ref{Fig:plots2} we see that the transformation parametric conformal 
+prediction region closely resembles the HD prediction region, and that the 
+binned parametric conformal prediction region is a close descretization of 
+the HD prediction region.
+
+
+\begin{figure}[h!]
+\begin{center}
+<<gammasimexample2, echo = FALSE>>=
+par(mfrow = c(1,1), oma = c(4,4,0,0), mar = c(1,1,1,1))
+plot.new()
+plot.window(xlim = c(0,1), ylim = c(min(y), max(y)))
+points(x, y, pch = 19, col = rgb(0,0,0,alpha=0.2))
+lines(x[ix], transformCI[ix, 1], type = "l", lwd = 2, col = "red")
+lines(x[ix], transformCI[ix, 2], type = "l", lwd = 2, col = "red")
+lines(x[ix], parabinCI[ix, 1], type = "l", lwd = 2, lty = 2, col = "blue")
+lines(x[ix], parabinCI[ix, 2], type = "l", lwd = 2, lty = 2, col = "blue")
+lines(x[ix], HDCI[ix, 1], type = "l", lwd = 2, lty = 3, col = "black")
+lines(x[ix], HDCI[ix, 2], type = "l", lwd = 2, lty = 3, col = "black")
+axis(1); axis(2)
+legend(0.45, 12.5, legend=c("transformation conformal", 
+  "binned parametric conformal", "HD region"), 
+  col=c("red", "blue", "black"), cex = 1, lwd = c(2, 2, 2),
+  lty=c(1, 2, 3), bty = "n")
+@
+\end{center}
+\label{Fig:plots2}
+\end{figure}
+
+
 All of the presented prediction regions exhibit close to finite-sample 
-marginal validity and local validity with respect to bining.  However, 
-the LSLW conformal prediction region and the HD prediction region do not 
-exhibit finite-sample local validity in the second bin and the HD prediction 
-region does not quite possess finite-sample marginal validity.  The parametric 
-conformal prediction region is smallest in size with an estimated area of 
-2.20.  The HD prediction region is a close second with an estimated area of 
-2.21.  LSLW conformal prediction region has an estimated area of 2.57 and 
-The nonparametric conformal prediction region has an estimated area of 2.69.  
+marginal validity and local validity with respect to binning.  However, 
+the transformation conformal prediction region, LSLW conformal prediction 
+region, and the HD prediction region do not exhibit finite-sample local 
+validity in the second bin and the HD prediction region does not quite 
+possess finite-sample marginal validity.  
+The binned parametric conformal prediction region is smallest in size 
+with an estimated area of 2.19.  The HD prediction region is a close second 
+with an estimated area of 2.21.  The tranformation conformal prediction 
+region is a respectable third with an estimated area of 2.26.
+LSLW conformal prediction region has an estimated area of 2.56 and 
+The nonparametric conformal prediction region has an estimated area of 2.68. 
 Under correct model specification, the parametric conformal prediction 
-region is similar in performance to that of the highest density prediction 
+regions are similar in performance to that of the highest density prediction 
 region.
 
 
-<<>>=
-## parametric conformal prediction region
-# estimated area
-mean(apply(paraCI, 1, diff))
-# local coverage
-p <- length(beta) - 1
-local.coverage(region = paraCI, data = data.readme, d = p, 
-  bins = bins, at.data = "TRUE")
-# marginal coverage
-local.coverage(region = paraCI, data = data.readme, d = p, 
-  bins = 1, at.data = "TRUE")
 
-## nonparametric conformal prediction region
+<<>>=
+#########################################
+## area and coverage
+
+# nonparametric conformal prediction region
 # estimated area
 area.nonparametric <- function(region){
   if(class(region) != "list"){ 
@@ -436,40 +471,62 @@ area.nonparametric <- function(region){
   }
   area
 }
-area.nonparametric(nonparaCI)
-# local coverage
-local.coverage(region = nonparaCI, data = data.readme, d = p, 
-  nonparametric = "TRUE", bins = bins, at.data = "TRUE")
-# marginal coverage
-local.coverage(region = nonparaCI, data = data.readme, d = p, 
-  nonparametric = "TRUE", bins = 1, at.data = "TRUE")
+# estimated area of prediction regions
+area <- c(
+  mean(apply(transformCI, 1, diff)),
+  mean(apply(parabinCI, 1, diff)),
+  area.nonparametric(nonparabinCI),
+  mean(apply(LSLW, 1, diff)),
+  mean(apply(HDCI, 1, diff))
+)
 
-## LSLW conformal prediction region
-# estimated area
-mean(apply(LSLW, 1, diff))
-# local coverage
-local.coverage(region = LSLW, data = data.readme, d = p, 
-  bins = bins, at.data = "TRUE")
-# marginal coverage
-local.coverage(region = LSLW, data = data.readme, d = p, 
-  bins = 1, at.data = "TRUE")
+# marginal local coverage of prediction regions
+p <- 1
+marginalcov <- c(
+  local.coverage(region = transformCI, data = data.readme, d = p, 
+    bins = 1, at.data = "TRUE"),
+  local.coverage(region = parabinCI, data = data.readme, d = p, 
+    bins = 1, at.data = "TRUE"),
+  local.coverage(region = nonparabinCI, data = data.readme, d = p, 
+    nonparametric = "TRUE", bins = 1, at.data = "TRUE"),
+  local.coverage(region = LSLW, data = data.readme, d = p, 
+    bins = 1, at.data = "TRUE"), 
+  local.coverage(region = HDCI, data = data.readme, d = p, 
+    bins = 1, at.data = "TRUE")
+)
 
-## HD region
-# estimated area
-mean(apply(HDCI, 1, diff))
-# local coverage
-local.coverage(region = HDCI, data = data.readme, d = p, 
-  bins = bins, at.data = "TRUE")
-# marginal coverage
-local.coverage(region = HDCI, data = data.readme, d = p, 
-  bins = 1, at.data = "TRUE")
+# local coverage of prediction regions
+localcov <- cbind(
+  local.coverage(region = transformCI, data = data.readme, d = p, 
+    bins = bins, at.data = "TRUE"),
+  local.coverage(region = parabinCI, data = data.readme, d = p, 
+    bins = bins, at.data = "TRUE"),
+  local.coverage(region = nonparabinCI, data = data.readme, d = p, 
+    nonparametric = "TRUE", bins = bins, at.data = "TRUE"),
+  local.coverage(region = LSLW, data = data.readme, d = p, 
+    bins = bins, at.data = "TRUE"),
+  local.coverage(region = HDCI, data = data.readme, d = p, 
+    bins = bins, at.data = "TRUE")
+)
+
+# diagnostics
+diagnostics <- rbind(area, marginalcov, localcov)
+colnames(diagnostics) <- c("transformCI", "binparaCI",  
+  "binnonparaCI", "LSLW", "HDCI")
+rownames(diagnostics) <- c("area", "marginal coverage", "bin 1 coverage", 
+  "bin 2 coverage", "bin 3 coverage")
+@
+
+
+<<tabdiagnostics, results = 'asis'>>=
+xtable(diagnostics, digits = c(0, 2, 2, 2, 2, 2))
 @
 
 
 \section{Extension of the illustrative example from the README file}
 
-In this extension we investigate the local coverage properties of five 
-prediction regions, the four from the previous section and a least squares 
+In this extension we investigate the local coverage properties of six  
+prediction regions, the five from the previous section and a least squares 
 (LS) conformal prediction region without local weighting.  Local coverage is 
 assessed via a Monte Carlo simulation of size $B = 50$.  At each iteration 
 of this simulation a new dataset is generated under the same specifications 
@@ -485,18 +542,10 @@ parametric and nonparametric conformal prediction regions.  We form 25 bins
 of length 0.04. 
 
 
+
 \subsection{Diagnostic measures}
 
 Several diagnostic measures are used to compare conformal prediction regions.
-%%%The specific diagnostics are 
-%%%prediction error at the observed data, 
-%%%area of the prediction region, 
-%%%finite sample marginal coverage,
-%%%finite sample local coverage with respect to binning, 
-%%%and 
-%%%finite sample local conditional coverage.  
-%We will use a modification of average sum of squares error as our measure of 
-%prediction error.  
 These diagnostic measures compare prediction regions by their 
 prediction error, volume, and coverage properties.
 Our prediction error diagnostic metric will be an average of the squared 
@@ -504,12 +553,12 @@ distances of observations outside of the prediction region to the closest
 boundary of the prediction region, averaged over all 
 observations. An observation that falls within the prediction region 
 has an error of 0.  More formally this prediction error metric is 
-\[ 
+$$
   \text{prediction error} 
     = n^{-1}\sum_{i=1}^n\indicator{Y_i \not\in \Copt(X_i)}
       \left(\min_{j=1,\ldots,m_i}\left\{\min\{|Y_i - a_{i,j}|, 
         |Y_i - b_{i,j}|\}\right\}\right)^2,
- \]
+$$
 where $a_{i,j}$ and $b_{i,j}$ are, respectively, the lower and upper 
 boundaries of possible $j = 1, \ldots, m_i$ disjoint intervals forming 
 the prediction region.  
@@ -593,17 +642,31 @@ Our Monte Carlo simulator follows. This function computes all of the
 dignostics and local coverage probabilities for each prediction region 
 for every generated dataset.
 
+
+\begin{center}
+{\Huge Revised up to here}
+\end{center}
+
+
 <<>>=
-gamma.simulator <- function(n = 500, alpha = 0.10, beta, bins = 3, 
+funs <- lm.funs(intercept = TRUE)
+train.fun <- funs$train.fun
+predict.fun <- funs$predict.fun
+mad.predict.fun <- function(out, newx){
+  newx <- as.numeric(newx)
+  as.numeric(predict(out, newx[, 1])$y)
+}
+
+gamma_simulator <- function(beta, n = 500, alpha = 0.10, bins = 3, 
   family = "Gamma", link = "inverse", shape = 2, 
-  parametric = TRUE, nonparametric = TRUE, 
-  LS = TRUE, LSLW = TRUE, HD = TRUE, cores = 6){
+  parametric = TRUE, nonparametric = TRUE, method = "both", 
+  LS = TRUE, LSLW = TRUE, HD = TRUE, cores = 7){
 
   ## in this univariate problem, p and d are the same
   p <- d <- length(beta) - 1
-  x <- matrix(runif(n), ncol = p)
+  x <- matrix(runif(n*p), ncol = p)
   y <- rep(0,n)
-  data <- NULL
+  dat <- NULL
 
   ## set up partition
   if(class(bins) == "NULL"){
@@ -618,68 +681,122 @@ gamma.simulator <- function(n = 500, alpha = 0.10, beta, bins = 3,
       rate <- (1 / (cbind(1, x) %*% beta)) * shape
       y <- rgamma(n = n, shape = shape, rate = rate)
       y <- y / sd(y)
-      data <- data.frame(y = y, x = x)
-      colnames(data)[2:(p+1)] <- paste("x", 1:p, sep = "")
+      dat <- data.frame(y = y, x = x)
+      colnames(dat)[2:(p+1)] <- paste("x", 1:p, sep = "")
     }
     if(link == "inverse"){
       rate <- (cbind(1, x) %*% beta) * shape
       y <- rgamma(n = n, shape = shape, rate = rate)
       y <- y / sd(y)
-      data <- data.frame(y = y, x = x)
-      colnames(data)[2:(p+1)] <- paste("x", 1:p, sep = "")
+      dat <- data.frame(y = y, x = x)
+      colnames(dat)[2:(p+1)] <- paste("x", 1:p, sep = "")
     }
     if(link == "log"){
       rate <- (1 / exp(cbind(1, x) %*% beta)) * shape
       y <- rgamma(n = n, shape = shape, rate = rate)
       y <- y / sd(y)
-      data <- data.frame(y = y, x = x)
-      colnames(data)[2:(p+1)] <- paste("x", 1:p, sep = "")
+      dat <- data.frame(y = y, x = x)
+      colnames(dat)[2:(p+1)] <- paste("x", 1:p, sep = "")
     }
   }
-
   if(family == "gaussian"){
     mu <- cbind(1, x) %*% beta
     y <- rnorm(n = n, mean = mu, sd = sd)
-    data <- data.frame(y = y, x = x)
-    colnames(data)[2:(p+1)] <- paste("x", 1:p, sep = "")
+    dat <- data.frame(y = y, x = x)
+    colnames(dat)[2:(p+1)] <- paste("x", 1:p, sep = "")
   }
-
   if(family == "inverse.gaussian"){
     mu = 1 / sqrt(cbind(1, x) %*% beta)
     y <- rinvgauss(n = n, mean = mu)
     y <- y / sd(y)
-    data <- data.frame(y = y, x = x)
-    colnames(data)[2:(p+1)] <- paste("x", 1:p, sep = "")
+    dat <- data.frame(y = y, x = x)
+    colnames(dat)[2:(p+1)] <- paste("x", 1:p, sep = "")
   }
 
   ## fit the Gamma regression model
-  fit <- glm(y ~ x1, family = "Gamma", data = data)
-  paraCI <- nonparaCI <- LSCI <- LSLWCI <- HDCI <- NULL
+  fit <- glm(y ~ x1, family = "Gamma", data = dat)
+  assign("dat", dat, .GlobalEnv)
+  parabinCI <- transformCI <- nonparabinCI <- LSCI <- 
+    LSLWCI <- HDCI <- NULL
   formula <- fit$formula
-  newdata <- data
+  newdata <- dat
   respname <- all.vars(formula)[1]
-  newdata <- newdata[, !(colnames(data) %in% respname)]
+  newdata <- newdata[, !(colnames(dat) %in% respname)]
   newdata <- as.matrix(newdata)
 
   ## obtain the prediction regions
+  output.parabin <- output.transform <- output.nonparabin <- 
+    output.LS <- output.LSLW <- output.HD <- rep(NA, bins + 1)  
   if(parametric){ 
     cpred <- conformal.glm(fit, parametric = TRUE, 
-      nonparametric = FALSE, alpha = alpha,
-      bins = bins, cores = cores)
-    paraCI <- cpred$paraconformal
+      nonparametric = FALSE, alpha = alpha, method = "both", 
+      bins = bins, cores = cores, newdata = newdata, 
+      precision = 0.02)   
+
+    # bin parametric conformal
+    parabinCI <- cpred$paraconfbin
+    marginal.parabin <- local.coverage(region = parabinCI, 
+      data = dat, d = p, bins = 1, at.data = "TRUE")  
+    local.parabin <- local.coverage(region = parabinCI, 
+      data = dat, d = p, bins = bins, at.data = "TRUE")
+    local.inx.parabin <- local.coverage(region = parabinCI, 
+      data = dat, d = p, bins = 25, at.data = "TRUE")
+    output.parabin <- c(marginal.parabin, local.parabin, 
+      local.inx.parabin, 
+      mean(apply(parabinCI, 1, diff)), 
+      absolute.error(y = y, region = parabinCI))
+
+    # transform parametric conformal
+    transformCI <- cpred$transformconf      
+    marginal.transform <- local.coverage(region = transformCI, 
+      data = dat, d = p, bins = 1, at.data = "TRUE")  
+    local.transform <- local.coverage(region = transformCI, 
+      data = dat, d = p, bins = bins, at.data = "TRUE")
+    local.inx.transform <- local.coverage(region = transformCI, 
+      data = dat, d = p, bins = 25, at.data = "TRUE")
+    output.transform <- c(marginal.transform, local.transform, 
+      local.inx.transform, 
+      mean(apply(transformCI, 1, diff)), 
+      absolute.error(y = y, region = transformCI))      
   }
   if(nonparametric){ 
     cpred <- conformal.glm(fit, parametric = FALSE, 
-      nonparametric = TRUE, alpha = alpha,
-      bins = bins, cores = cores)
-    nonparaCI <- cpred$nonparaconformal
-  }
+      nonparametric = TRUE, alpha = alpha, method = "both", 
+      bins = bins, cores = cores, precision = 0.02)
+    nonparabinCI <- cpred$nonparaconfbin
+
+    marginal.nonparabin <- local.coverage(region = nonparabinCI, 
+      nonparametric = "TRUE", data = dat, d = p, bins = 1, 
+      at.data = "TRUE")
+    local.nonparabin <- local.coverage(region = nonparabinCI, 
+      nonparametric = "TRUE", data = dat, d = p, bins = bins, 
+      at.data = "TRUE")
+    local.inx.nonparabin <- local.coverage(region = nonparabinCI, 
+      nonparametric = "TRUE", data = dat, d = p, bins = 25, 
+      at.data = "TRUE")
+    output.nonparabin <- 
+      c(marginal.nonparabin, local.nonparabin, 
+        local.inx.nonparabin, 
+        area.nonparametric(nonparabinCI),
+        absolute.error.nonparametric(data = dat, 
+          region = nonparabinCI))    
+  }      
   if(LS){
     p1.tibs <- conformal.pred(x = cbind(x,x^2,x^3), y = y, 
       x0 = cbind(x,x^2,x^3), 
       train.fun = train.fun, predict.fun = predict.fun, 
       alpha = alpha)
     LSCI <- cbind(p1.tibs$lo, p1.tibs$up)
+
+    marginal.LS <- local.coverage(region = LSCI, 
+      data = dat, d = p, bins = 1, at.data = "TRUE")
+    local.LS <- local.coverage(region = LSCI, 
+      data = dat, d = p, bins = bins, at.data = "TRUE")
+    local.inx.LS <- local.coverage(region = LSCI, 
+      data = dat, d = p, bins = 25, at.data = "TRUE")
+    output.LS <- c(marginal.LS, local.LS, local.inx.LS, 
+      mean(apply(LSCI, 1, diff)), 
+      absolute.error(y = y, region = LSCI))
   }
   if(LSLW){
     cubic.model <- lm(y ~ x + I(x^2) + I(x^3))
@@ -699,6 +816,16 @@ gamma.simulator <- function(n = 500, alpha = 0.10, beta, bins = 3,
       mad.predict.fun = mad.predict.fun,
       alpha = alpha)
     LSLWCI <- cbind(p2.tibs$lo, p2.tibs$up)
+
+    marginal.LSLW <- local.coverage(region = LSLWCI, 
+      data = dat, d = p, bins = 1, at.data = "TRUE")
+    local.LSLW <- local.coverage(region = LSLWCI, 
+      data = dat, d = p, bins = bins, at.data = "TRUE")
+    local.inx.LSLW <- local.coverage(region = LSLWCI, 
+      data = dat, d = p, bins = 25, at.data = "TRUE")
+    output.LSLW <- c(marginal.LSLW, local.LSLW, local.inx.LSLW, 
+      mean(apply(LSLWCI, 1, diff)), 
+      absolute.error(y = y, region = LSLWCI))          
   }
   if(HD){
     betaMLE <- coefficients(fit)
@@ -707,91 +834,36 @@ gamma.simulator <- function(n = 500, alpha = 0.10, beta, bins = 3,
     HDCI <- do.call(rbind, lapply(1:nrow(newdata), function(j){ 
       hdi(qgamma, 1 - alpha, shape = shapeMLE, rate = rateMLE[j, 1])
     }))
-  }
-    
-  ## local coverage prediction regions
-  output.parametric <- output.nonparametric <- 
-    output.LS <- output.LSLW <- output.HD <- rep(NA, bins + 1)
-  if(parametric){
-    marginal.parametric <- local.coverage(region = paraCI, 
-      data = data, d = p, bins = 1, at.data = "TRUE")  
-    local.parametric <- local.coverage(region = paraCI, 
-      data = data, d = p, bins = bins, at.data = "TRUE")
-    local.inx.parametric <- local.coverage(region = paraCI, 
-      data = data, d = p, bins = 25, at.data = "TRUE")
-    output.parametric <- c(marginal.parametric, local.parametric, 
-      local.inx.parametric, 
-      mean(apply(paraCI, 1, diff)), 
-      absolute.error(y = y, region = paraCI))
-  }
-  if(nonparametric){
-    marginal.nonparametric <- local.coverage(region = nonparaCI, 
-      nonparametric = "TRUE", data = data, d = p, bins = 1, 
-      at.data = "TRUE")
-    local.nonparametric <- local.coverage(region = nonparaCI, 
-      nonparametric = "TRUE", data = data, d = p, bins = bins, 
-      at.data = "TRUE")
-    local.inx.nonparametric <- local.coverage(region = nonparaCI, 
-      nonparametric = "TRUE", data = data, d = p, bins = 25, 
-      at.data = "TRUE")
-    output.nonparametric <- 
-      c(marginal.nonparametric, local.nonparametric, 
-        local.inx.nonparametric, 
-        area.nonparametric(nonparaCI),
-        absolute.error.nonparametric(data = data, 
-          region = nonparaCI))
-  }
-  if(LS){
-    marginal.LS <- local.coverage(region = LSCI, 
-      data = data, d = p, bins = 1, at.data = "TRUE")
-    local.LS <- local.coverage(region = LSCI, 
-      data = data, d = p, bins = bins, at.data = "TRUE")
-    local.inx.LS <- local.coverage(region = LSCI, 
-      data = data, d = p, bins = 25, at.data = "TRUE")
-    output.LS <- c(marginal.LS, local.LS, local.inx.LS, 
-      mean(apply(LSCI, 1, diff)), 
-      absolute.error(y = y, region = LSCI))
-  }
-  if(LSLW){
-    marginal.LSLW <- local.coverage(region = LSLWCI, 
-      data = data, d = p, bins = 1, at.data = "TRUE")
-    local.LSLW <- local.coverage(region = LSLWCI, 
-      data = data, d = p, bins = bins, at.data = "TRUE")
-    local.inx.LSLW <- local.coverage(region = LSLWCI, 
-      data = data, d = p, bins = 25, at.data = "TRUE")
-    output.LSLW <- c(marginal.LSLW, local.LSLW, local.inx.LSLW, 
-      mean(apply(LSLWCI, 1, diff)), 
-      absolute.error(y = y, region = LSLWCI))      
-  }
-  if(HD){
+
     marginal.HD <- local.coverage(region = HDCI, 
-      data = data, d = p, bins = 1, at.data = "TRUE")
+      data = dat, d = p, bins = 1, at.data = "TRUE")
     local.HD <- local.coverage(region = HDCI, 
-      data = data, d = p, bins = bins, at.data = "TRUE")
+      data = dat, d = p, bins = bins, at.data = "TRUE")
     local.inx.HD <- local.coverage(region = HDCI, 
-      data = data, d = p, bins = 25, at.data = "TRUE")
+      data = dat, d = p, bins = 25, at.data = "TRUE")
     output.HD <- c(marginal.HD, local.HD, local.inx.HD, 
       mean(apply(HDCI, 1, diff)), 
       absolute.error(y = y, region = HDCI))
   }
-
-  output <- list(output.parametric = output.parametric, 
-    output.nonparametric = output.nonparametric,
+    
+  output <- list(output.parabin = output.parabin, 
+    output.transform = output.transform, 
+    output.nonparabin = output.nonparabin,
     output.LS = output.LS, 
     output.LSLW = output.LSLW, 
     output.HD = output.HD)
   output
-
 }
 @
 
 The following performs our Monte Carlo simulation with $B = 50$ iterations. 
 
 <<localcoverage, cache = TRUE>>=
+set.seed(13)
 B <- 50
 system.time(local.500.3.2 <- do.call(cbind, lapply(1:B, 
   FUN = function(j){
-    unlist(gamma.simulator(beta = beta))
+    unlist(gamma_simulator(beta = beta))
 })))
 @
 
@@ -812,7 +884,7 @@ local.gamma.500.3.2[, 2] <- round(local.gamma.500.3.2[, 2], 4)
 
 
 %Describe the table
-Diagnostics for each of the five prediction regions are given in Table 1 and 
+Diagnostics for each of the siz prediction regions are given in Table 1 and 
 Figure~\ref{Fig:coverageinx500.3}.  We see that the parametric 
 conformal prediction region performs as advertised.  When the model is 
 correctly specified, the parametric conformal prediction region is similar to 
@@ -1500,7 +1572,7 @@ n <- 150
 B <- 250
 system.time(out.gamma.150.2.0.5 <- do.call(cbind, 
   lapply(1:B, FUN = function(j){
-    unlist(gamma.simulator(beta = beta, n = n, 
+    unlist(gamma_simulator(beta = beta, n = n, 
       bins = bins, shape = 0.5))
 })))
 @
@@ -1522,7 +1594,7 @@ when $n = 150$ and shape = $0.75$.
 <<gamma.150.2.0.75, cache = TRUE>>=
 system.time(out.gamma.150.2.0.75 <- do.call(cbind, 
   lapply(1:B, FUN = function(j){
-    unlist(gamma.simulator(beta = beta, n = n, 
+    unlist(gamma_simulator(beta = beta, n = n, 
       bins = bins, shape = 0.75))
 })))
 @
@@ -1544,7 +1616,7 @@ when $n = 150$ and shape = $1$.
 <<gamma.150.2.1, cache = TRUE>>=
 system.time(out.gamma.150.2.1 <- do.call(cbind, 
   lapply(1:B, FUN = function(j){
-    unlist(gamma.simulator(beta = beta, n = n, 
+    unlist(gamma_simulator(beta = beta, n = n, 
       bins = bins, shape = 1))
 })))
 @
@@ -1566,7 +1638,7 @@ when $n = 150$ and shape = $1.5$.
 <<gamma.150.2.1.5, cache = TRUE>>=
 system.time(out.gamma.150.2.1.5 <- do.call(cbind, 
   lapply(1:B, FUN = function(j){
-    unlist(gamma.simulator(beta = beta, n = n, 
+    unlist(gamma_simulator(beta = beta, n = n, 
       bins = bins, shape = 1.5))
 })))
 @
@@ -1588,7 +1660,7 @@ when $n = 150$ and shape = $2$.
 <<gamma.150.2.2, cache = TRUE>>=
 system.time(out.gamma.150.2.2 <- do.call(cbind, 
   lapply(1:B, FUN = function(j){
-    unlist(gamma.simulator(beta = beta, n = n, 
+    unlist(gamma_simulator(beta = beta, n = n, 
       bins = bins, shape = 2))
 })))
 @
@@ -1610,7 +1682,7 @@ when $n = 150$ and shape = $5$.
 <<gamma.150.2.5, cache = TRUE>>=
 system.time(out.gamma.150.2.5 <- do.call(cbind, 
   lapply(1:B, FUN = function(j){
-    unlist(gamma.simulator(beta = beta, n = n, 
+    unlist(gamma_simulator(beta = beta, n = n, 
       bins = bins, shape = 5))
 })))
 @
@@ -1632,7 +1704,7 @@ when $n = 150$ and shape = $7$.
 <<gamma.150.2.7, cache = TRUE>>=
 system.time(out.gamma.150.2.7 <- do.call(cbind, 
   lapply(1:B, FUN = function(j){
-    unlist(gamma.simulator(beta = beta, n = n, 
+    unlist(gamma_simulator(beta = beta, n = n, 
       bins = bins, shape = 7))
 })))
 @
@@ -1654,7 +1726,7 @@ when $n = 150$ and shape = $10$.
 <<gamma.150.2.10, cache = TRUE>>=
 system.time(out.gamma.150.2.10 <- do.call(cbind, 
   lapply(1:B, FUN = function(j){
-    unlist(gamma.simulator(beta = beta, n = n, 
+    unlist(gamma_simulator(beta = beta, n = n, 
       bins = bins, shape = 10))
 })))
 @
@@ -1676,7 +1748,7 @@ when $n = 150$ and shape = $12$.
 <<gamma.150.2.12, cache = TRUE>>=
 system.time(out.gamma.150.2.12 <- do.call(cbind, 
   lapply(1:B, FUN = function(j){
-    unlist(gamma.simulator(beta = beta, n = n, 
+    unlist(gamma_simulator(beta = beta, n = n, 
       bins = bins, shape = 12))
 })))
 @
@@ -1698,7 +1770,7 @@ when $n = 150$ and shape = $15$.
 <<gamma.150.2.15, cache = TRUE>>=
 system.time(out.gamma.150.2.15 <- do.call(cbind, 
   lapply(1:B, FUN = function(j){
-    unlist(gamma.simulator(beta = beta, n = n, 
+    unlist(gamma_simulator(beta = beta, n = n, 
       bins = bins, shape = 15))
 })))
 @
@@ -1720,7 +1792,7 @@ when $n = 150$ and shape = $20$.
 <<gamma.150.2.20, cache = TRUE>>=
 system.time(out.gamma.150.2.20 <- do.call(cbind, 
   lapply(1:B, FUN = function(j){
-    unlist(gamma.simulator(beta = beta, n = n, 
+    unlist(gamma_simulator(beta = beta, n = n, 
       bins = bins, shape = 20))
 })))
 @
@@ -1742,7 +1814,7 @@ when $n = 150$ and shape = $25$.
 <<gamma.150.2.25, cache = TRUE>>=
 system.time(out.gamma.150.2.25 <- do.call(cbind, 
   lapply(1:B, FUN = function(j){
-    unlist(gamma.simulator(beta = beta, n = n, 
+    unlist(gamma_simulator(beta = beta, n = n, 
       bins = bins, shape = 25))
 })))
 @
@@ -1764,7 +1836,7 @@ when $n = 150$ and shape = $30$.
 <<gamma.150.2.30, cache = TRUE>>=
 system.time(out.gamma.150.2.30 <- do.call(cbind, 
   lapply(1:B, FUN = function(j){
-    unlist(gamma.simulator(beta = beta, n = n, 
+    unlist(gamma_simulator(beta = beta, n = n, 
       bins = bins, shape = 30))
 })))
 @
@@ -1786,7 +1858,7 @@ when $n = 150$ and shape = $40$.
 <<gamma.150.2.40, cache = TRUE>>=
 system.time(out.gamma.150.2.40 <- do.call(cbind, 
   lapply(1:B, FUN = function(j){
-    unlist(gamma.simulator(beta = beta, n = n, 
+    unlist(gamma_simulator(beta = beta, n = n, 
       bins = bins, shape = 40))
 })))
 @
@@ -1808,7 +1880,7 @@ when $n = 150$ and shape = $50$.
 <<gamma.150.2.50, cache = TRUE>>=
 system.time(out.gamma.150.2.50 <- do.call(cbind, 
   lapply(1:B, FUN = function(j){
-    unlist(gamma.simulator(beta = beta, n = n, 
+    unlist(gamma_simulator(beta = beta, n = n, 
       bins = bins, shape = 50))
 })))
 @
@@ -1830,7 +1902,7 @@ when $n = 150$ and shape = $60$.
 <<gamma.150.2.60, cache = TRUE>>=
 system.time(out.gamma.150.2.60 <- do.call(cbind, 
   lapply(1:B, FUN = function(j){
-    unlist(gamma.simulator(beta = beta, n = n, 
+    unlist(gamma_simulator(beta = beta, n = n, 
       bins = bins, shape = 60))
 })))
 @
@@ -1852,7 +1924,7 @@ when $n = 150$ and shape = $70$.
 <<gamma.150.2.70, cache = TRUE>>=
 system.time(out.gamma.150.2.70 <- do.call(cbind, 
   lapply(1:B, FUN = function(j){
-    unlist(gamma.simulator(beta = beta, n = n, 
+    unlist(gamma_simulator(beta = beta, n = n, 
       bins = bins, shape = 70))
 })))
 @
@@ -1874,7 +1946,7 @@ when $n = 150$ and shape = $80$.
 <<gamma.150.2.80, cache = TRUE>>=
 system.time(out.gamma.150.2.80 <- do.call(cbind, 
   lapply(1:B, FUN = function(j){
-    unlist(gamma.simulator(beta = beta, n = n, 
+    unlist(gamma_simulator(beta = beta, n = n, 
       bins = bins, shape = 80))
 })))
 @
@@ -1896,7 +1968,7 @@ when $n = 150$ and shape = $90$.
 <<gamma.150.2.90, cache = TRUE>>=
 system.time(out.gamma.150.2.90 <- do.call(cbind, 
   lapply(1:B, FUN = function(j){
-    unlist(gamma.simulator(beta = beta, n = n, 
+    unlist(gamma_simulator(beta = beta, n = n, 
       bins = bins, shape = 90))
 })))
 @
@@ -1918,7 +1990,7 @@ when $n = 150$ and shape = $100$.
 <<gamma.150.2.100, cache = TRUE>>=
 system.time(out.gamma.150.2.100 <- do.call(cbind, 
   lapply(1:B, FUN = function(j){
-    unlist(gamma.simulator(beta = beta, n = n, 
+    unlist(gamma_simulator(beta = beta, n = n, 
       bins = bins, shape = 100))
 })))
 @

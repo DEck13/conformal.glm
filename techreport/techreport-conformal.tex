@@ -184,7 +184,7 @@ reproduce the analyses which appear in the paper \citet{eck2019conformal}, the
 README file in the R package \citet{eck2018conformalR}, and this document.  
 Several additional analyses to those presented in 
 \citet{eck2019conformal} are provided in this document.  
-Of particular intherest, we investigate the performance of the parametric 
+Of particular intherest, we investigate the performance of parametric 
 conformal prediction regions under model misspecification.  
 Specifically, we focus on settings where the underlying data is generated 
 via a Gamma distribution and parametric prediction regions are obtained using a 
@@ -193,7 +193,8 @@ chosen because it is intuitive and it fits the Gamma data better than a simple
 linear regression model or a quadratic model.  
 
 Our goal in this manuscript is to demonstrate the advantages and disadvantages 
-of our parametric conformal prediction region \citep{eck2019conformal} 
+of our binned and transformation based parametric conformal prediction regions 
+\citep{eck2019conformal} 
 compared with the nonparametric conformal prediction region 
 \citep{lei2014distribution}, the least squares (LS) conformal prediction 
 region \citep{lei2018distribution} obtained from conformalized residual scores, 
@@ -207,7 +208,7 @@ nonparametric conformal prediction regions follows the bin width asymptotics
 of \citet{lei2014distribution}.
 
 %In our simulations 
-We find that the parametric conformal prediction 
+We find that the binned parametric conformal prediction 
 region performs well even when the model is misspecified.  By construction, 
 this region, along with the nonparametric conformal prediction region, 
 maintains finite-sample local validity with respect to binning.  
@@ -215,16 +216,25 @@ These conformal prediction regions therefore achieves finite-sample marginal
 validity.  The guarantee of finite-sample marginal and local validity are 
 noted benefits of these conformal prediction regions 
 \citep{lei2014distribution, eck2019conformal}.  
-However, the parametric and nonparametric conformal prediction regions are 
-visually very different, as seen in Section~\ref{sec:plotsofregions}, and 
-give different prediction errors at small to moderate sample sizes.  
-We see that the parametric conformal prediction region adapts naturally 
-to the data when the model is correctly specified or modest deviations 
-from the specified model are present.  On the other hand, the 
-nonparametric conformal prediction region does not adapt well to 
-data obtained from a Gamma regression model or data obtained from a 
-linear regression model with a steep mean function where steepness is 
+However, the binned parametric and nonparametric conformal prediction 
+regions are visually very different, as seen in 
+Section~\ref{sec:plotsofregions}, and give different prediction errors at 
+small to moderate sample sizes.  We see that the binned parametric conformal 
+prediction region adapts naturally to the data when the model is correctly 
+specified or modest deviations from the specified model are present.  
+On the other hand, the nonparametric conformal prediction region does not 
+adapt well to data obtained from a Gamma regression model or data obtained 
+from a linear regression model with a steep mean function where steepness is 
 relative to the variability about the mean function.
+
+We find that the transformation based parametric conformal prediction region 
+performs similarily to the HD prediction region under the assumed model when 
+the assumed model is either the data generating model or only modest 
+departures exist between the assumed model and the data generating model.  
+This parametric conformal prediction region can be prohibitively large and 
+inapproriate when the assumed model is in strong disagreement with the data 
+generating model.  However, this parametric conformal prediction region 
+maintains finite sample marginal coverage in such settings.
 
 The LS conformal prediction region obtains marginal validity 
 \citep{lei2018distribution} but performs poorly when deviations about the 
@@ -301,17 +311,17 @@ R package \texttt{conformal.glm} \citep{eck2018conformalR}.
 \end{knitrout}
 
 
-We now compute the parametric conformal prediction region 
-\citep{eck2019conformal} and the nonparametric conformal prediction region 
-\citep{lei2014distribution} using the \texttt{conformal.glm} function in the 
-\texttt{conformal.glm} package.  For illustration, we set the number of bins 
-to be equal to 3.  Since $X_i \sim U(0,1)$, we expect for there to be about 
-167 cases per bin with this choice of 3 bins.  This choice for the number of 
-bins is consistent with the bin width asymptotics in 
-\citet{lei2014distribution}.  The number of cores is set to 6,  if your 
-computer has fewer than 6 cores at its disposal then you have to reduce the 
-number of cores.  This will not effect the final output but it will take 
-longer to run. 
+We now compute the binned and transformation based parametric conformal
+prediction regions \citep{eck2019conformal} 
+and the nonparametric conformal prediction region \citep{lei2014distribution} 
+using the \texttt{conformal.glm} function in the \texttt{conformal.glm} package.  
+For illustration, we set the number of bins to be equal to 3.  
+Since $X_i \sim U(0,1)$, we expect for there to be about 167 cases per bin with 
+this choice of 3 bins.  This choice for the number of bins is consistent with 
+the bin width asymptotics in \citet{lei2014distribution}.  The number of cores 
+is set to 7,  if your computer has fewer than 7 cores at its disposal then you 
+have to reduce the number of cores.  This will not effect the final output but 
+it will take longer to run. 
 
 
 \begin{knitrout}
@@ -319,15 +329,17 @@ longer to run.
 \begin{alltt}
 \hlstd{bins} \hlkwb{<-} \hlnum{3}
 \hlkwd{system.time}\hlstd{(cpred} \hlkwb{<-} \hlkwd{conformal.glm}\hlstd{(fit.readme,}
-  \hlkwc{nonparametric} \hlstd{=} \hlnum{TRUE}\hlstd{,} \hlkwc{bins} \hlstd{= bins,} \hlkwc{cores} \hlstd{=} \hlnum{6}\hlstd{))}
+  \hlkwc{nonparametric} \hlstd{=} \hlnum{TRUE}\hlstd{,} \hlkwc{bins} \hlstd{= bins,} \hlkwc{cores} \hlstd{=} \hlnum{7}\hlstd{,}
+  \hlkwc{method} \hlstd{=} \hlstr{"both"}\hlstd{))}
 \end{alltt}
 \begin{verbatim}
 ##    user  system elapsed 
-## 140.926   0.215  41.171
+## 654.599   1.305 107.699
 \end{verbatim}
 \begin{alltt}
-\hlstd{paraCI} \hlkwb{<-} \hlstd{cpred}\hlopt{$}\hlstd{paraconformal}
-\hlstd{nonparaCI} \hlkwb{<-} \hlstd{cpred}\hlopt{$}\hlstd{nonparaconformal}
+\hlstd{parabinCI} \hlkwb{<-} \hlstd{cpred}\hlopt{$}\hlstd{paraconfbin}
+\hlstd{nonparabinCI} \hlkwb{<-} \hlstd{cpred}\hlopt{$}\hlstd{nonparaconfbin}
+\hlstd{transformCI} \hlkwb{<-} \hlstd{cpred}\hlopt{$}\hlstd{transformconf}
 \end{alltt}
 \end{kframe}
 \end{knitrout}
@@ -355,11 +367,9 @@ than a simple linear or quadratic model.  We estimate $\hat{\rho}_y$ using a
 smoothing spline whose parameters are chosen by cross-validation.  
 
 
-
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 \begin{alltt}
-\hlkwd{library}\hlstd{(conformalInference)}
 \hlstd{funs} \hlkwb{<-} \hlkwd{lm.funs}\hlstd{(}\hlkwc{intercept} \hlstd{=} \hlnum{TRUE}\hlstd{)}
 \hlstd{train.fun} \hlkwb{<-} \hlstd{funs}\hlopt{$}\hlstd{train.fun}
 \hlstd{predict.fun} \hlkwb{<-} \hlstd{funs}\hlopt{$}\hlstd{predict.fun}
@@ -386,7 +396,7 @@ smoothing spline whose parameters are chosen by cross-validation.
 \end{alltt}
 \begin{verbatim}
 ##    user  system elapsed 
-##  89.826   0.087  89.934
+## 309.964   0.177 310.344
 \end{verbatim}
 \begin{alltt}
 \hlstd{LSLW} \hlkwb{=} \hlkwd{cbind}\hlstd{(p1.tibs}\hlopt{$}\hlstd{lo, p1.tibs}\hlopt{$}\hlstd{up)}
@@ -402,7 +412,6 @@ the \texttt{HDInterval} package \citep{meredith2018HDIntervalR}.
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 \begin{alltt}
-\hlkwd{library}\hlstd{(HDInterval)}
 \hlstd{betaMLE} \hlkwb{<-} \hlkwd{coefficients}\hlstd{(fit.readme)}
 \hlstd{shapeMLE} \hlkwb{<-} \hlkwd{as.numeric}\hlstd{(}\hlkwd{gamma.shape}\hlstd{(fit.readme)[}\hlnum{1}\hlstd{])}
 \hlstd{rateMLE} \hlkwb{<-} \hlkwd{cbind}\hlstd{(}\hlnum{1}\hlstd{, x)} \hlopt{%*%} \hlstd{betaMLE} \hlopt{*} \hlstd{shapeMLE}
@@ -439,56 +448,56 @@ values of large magnitude.
 \end{center}
 \caption{Sim setting: $n = 500$, shape = $2$, bins = $3$. 
   The regions are depicted as follows: 
-    parametric conformal prediction region (top-left panel),
-    nonparametric conformal prediction region (top-right panel),
-    LSLW conformal prediction region (bottom-left panel),
-    HD prediction region (bottom-right panel).}
+    transformation based parametric conformal prediction (top-left panel),
+    binned parametric conformal prediction region (top-right panel),
+    nonparametric conformal prediction region (bottom-left panel), and 
+    LSLW conformal prediction region (bottom-right panel).}
 \label{Fig:plots}
 \end{figure}
 
+In Figure~\ref{Fig:plots2} we see that the transformation parametric conformal 
+prediction region closely resembles the HD prediction region, and that the 
+binned parametric conformal prediction region is a close descretization of 
+the HD prediction region.
+
+
+\begin{figure}[h!]
+\begin{center}
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
+\includegraphics[width=\maxwidth]{figure/gammasimexample2-1} 
+
+\end{knitrout}
+\end{center}
+\label{Fig:plots2}
+\end{figure}
+
+
 All of the presented prediction regions exhibit close to finite-sample 
-marginal validity and local validity with respect to bining.  However, 
-the LSLW conformal prediction region and the HD prediction region do not 
-exhibit finite-sample local validity in the second bin and the HD prediction 
-region does not quite possess finite-sample marginal validity.  The parametric 
-conformal prediction region is smallest in size with an estimated area of 
-2.20.  The HD prediction region is a close second with an estimated area of 
-2.21.  LSLW conformal prediction region has an estimated area of 2.57 and 
-The nonparametric conformal prediction region has an estimated area of 2.69.  
+marginal validity and local validity with respect to binning.  However, 
+the transformation conformal prediction region, LSLW conformal prediction 
+region, and the HD prediction region do not exhibit finite-sample local 
+validity in the second bin and the HD prediction region does not quite 
+possess finite-sample marginal validity.  
+The binned parametric conformal prediction region is smallest in size 
+with an estimated area of 2.19.  The HD prediction region is a close second 
+with an estimated area of 2.21.  The tranformation conformal prediction 
+region is a respectable third with an estimated area of 2.26.
+LSLW conformal prediction region has an estimated area of 2.56 and 
+The nonparametric conformal prediction region has an estimated area of 2.68. 
 Under correct model specification, the parametric conformal prediction 
-region is similar in performance to that of the highest density prediction 
+regions are similar in performance to that of the highest density prediction 
 region.
+
 
 
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 \begin{alltt}
-\hlcom{## parametric conformal prediction region}
-\hlcom{# estimated area}
-\hlkwd{mean}\hlstd{(}\hlkwd{apply}\hlstd{(paraCI,} \hlnum{1}\hlstd{, diff))}
-\end{alltt}
-\begin{verbatim}
-## [1] 2.198495
-\end{verbatim}
-\begin{alltt}
-\hlcom{# local coverage}
-\hlstd{p} \hlkwb{<-} \hlkwd{length}\hlstd{(beta)} \hlopt{-} \hlnum{1}
-\hlkwd{local.coverage}\hlstd{(}\hlkwc{region} \hlstd{= paraCI,} \hlkwc{data} \hlstd{= data.readme,} \hlkwc{d} \hlstd{= p,}
-  \hlkwc{bins} \hlstd{= bins,} \hlkwc{at.data} \hlstd{=} \hlstr{"TRUE"}\hlstd{)}
-\end{alltt}
-\begin{verbatim}
-## [1] 0.9135802 0.9028571 0.9079755
-\end{verbatim}
-\begin{alltt}
-\hlcom{# marginal coverage}
-\hlkwd{local.coverage}\hlstd{(}\hlkwc{region} \hlstd{= paraCI,} \hlkwc{data} \hlstd{= data.readme,} \hlkwc{d} \hlstd{= p,}
-  \hlkwc{bins} \hlstd{=} \hlnum{1}\hlstd{,} \hlkwc{at.data} \hlstd{=} \hlstr{"TRUE"}\hlstd{)}
-\end{alltt}
-\begin{verbatim}
-## [1] 0.908
-\end{verbatim}
-\begin{alltt}
-\hlcom{## nonparametric conformal prediction region}
+\hlcom{#########################################}
+\hlcom{## area and coverage}
+
+\hlcom{# nonparametric conformal prediction region}
 \hlcom{# estimated area}
 \hlstd{area.nonparametric} \hlkwb{<-} \hlkwa{function}\hlstd{(}\hlkwc{region}\hlstd{)\{}
   \hlkwa{if}\hlstd{(}\hlkwd{class}\hlstd{(region)} \hlopt{!=} \hlstr{"list"}\hlstd{)\{}
@@ -503,83 +512,82 @@ region.
   \hlstd{\}}
   \hlstd{area}
 \hlstd{\}}
-\hlkwd{area.nonparametric}\hlstd{(nonparaCI)}
+\hlcom{# estimated area of prediction regions}
+\hlstd{area} \hlkwb{<-} \hlkwd{c}\hlstd{(}
+  \hlkwd{mean}\hlstd{(}\hlkwd{apply}\hlstd{(transformCI,} \hlnum{1}\hlstd{, diff)),}
+  \hlkwd{mean}\hlstd{(}\hlkwd{apply}\hlstd{(parabinCI,} \hlnum{1}\hlstd{, diff)),}
+  \hlkwd{area.nonparametric}\hlstd{(nonparabinCI),}
+  \hlkwd{mean}\hlstd{(}\hlkwd{apply}\hlstd{(LSLW,} \hlnum{1}\hlstd{, diff)),}
+  \hlkwd{mean}\hlstd{(}\hlkwd{apply}\hlstd{(HDCI,} \hlnum{1}\hlstd{, diff))}
+\hlstd{)}
+
+\hlcom{# marginal local coverage of prediction regions}
+\hlstd{p} \hlkwb{<-} \hlnum{1}
+\hlstd{marginalcov} \hlkwb{<-} \hlkwd{c}\hlstd{(}
+  \hlkwd{local.coverage}\hlstd{(}\hlkwc{region} \hlstd{= transformCI,} \hlkwc{data} \hlstd{= data.readme,} \hlkwc{d} \hlstd{= p,}
+    \hlkwc{bins} \hlstd{=} \hlnum{1}\hlstd{,} \hlkwc{at.data} \hlstd{=} \hlstr{"TRUE"}\hlstd{),}
+  \hlkwd{local.coverage}\hlstd{(}\hlkwc{region} \hlstd{= parabinCI,} \hlkwc{data} \hlstd{= data.readme,} \hlkwc{d} \hlstd{= p,}
+    \hlkwc{bins} \hlstd{=} \hlnum{1}\hlstd{,} \hlkwc{at.data} \hlstd{=} \hlstr{"TRUE"}\hlstd{),}
+  \hlkwd{local.coverage}\hlstd{(}\hlkwc{region} \hlstd{= nonparabinCI,} \hlkwc{data} \hlstd{= data.readme,} \hlkwc{d} \hlstd{= p,}
+    \hlkwc{nonparametric} \hlstd{=} \hlstr{"TRUE"}\hlstd{,} \hlkwc{bins} \hlstd{=} \hlnum{1}\hlstd{,} \hlkwc{at.data} \hlstd{=} \hlstr{"TRUE"}\hlstd{),}
+  \hlkwd{local.coverage}\hlstd{(}\hlkwc{region} \hlstd{= LSLW,} \hlkwc{data} \hlstd{= data.readme,} \hlkwc{d} \hlstd{= p,}
+    \hlkwc{bins} \hlstd{=} \hlnum{1}\hlstd{,} \hlkwc{at.data} \hlstd{=} \hlstr{"TRUE"}\hlstd{),}
+  \hlkwd{local.coverage}\hlstd{(}\hlkwc{region} \hlstd{= HDCI,} \hlkwc{data} \hlstd{= data.readme,} \hlkwc{d} \hlstd{= p,}
+    \hlkwc{bins} \hlstd{=} \hlnum{1}\hlstd{,} \hlkwc{at.data} \hlstd{=} \hlstr{"TRUE"}\hlstd{)}
+\hlstd{)}
+
+\hlcom{# local coverage of prediction regions}
+\hlstd{localcov} \hlkwb{<-} \hlkwd{cbind}\hlstd{(}
+  \hlkwd{local.coverage}\hlstd{(}\hlkwc{region} \hlstd{= transformCI,} \hlkwc{data} \hlstd{= data.readme,} \hlkwc{d} \hlstd{= p,}
+    \hlkwc{bins} \hlstd{= bins,} \hlkwc{at.data} \hlstd{=} \hlstr{"TRUE"}\hlstd{),}
+  \hlkwd{local.coverage}\hlstd{(}\hlkwc{region} \hlstd{= parabinCI,} \hlkwc{data} \hlstd{= data.readme,} \hlkwc{d} \hlstd{= p,}
+    \hlkwc{bins} \hlstd{= bins,} \hlkwc{at.data} \hlstd{=} \hlstr{"TRUE"}\hlstd{),}
+  \hlkwd{local.coverage}\hlstd{(}\hlkwc{region} \hlstd{= nonparabinCI,} \hlkwc{data} \hlstd{= data.readme,} \hlkwc{d} \hlstd{= p,}
+    \hlkwc{nonparametric} \hlstd{=} \hlstr{"TRUE"}\hlstd{,} \hlkwc{bins} \hlstd{= bins,} \hlkwc{at.data} \hlstd{=} \hlstr{"TRUE"}\hlstd{),}
+  \hlkwd{local.coverage}\hlstd{(}\hlkwc{region} \hlstd{= LSLW,} \hlkwc{data} \hlstd{= data.readme,} \hlkwc{d} \hlstd{= p,}
+    \hlkwc{bins} \hlstd{= bins,} \hlkwc{at.data} \hlstd{=} \hlstr{"TRUE"}\hlstd{),}
+  \hlkwd{local.coverage}\hlstd{(}\hlkwc{region} \hlstd{= HDCI,} \hlkwc{data} \hlstd{= data.readme,} \hlkwc{d} \hlstd{= p,}
+    \hlkwc{bins} \hlstd{= bins,} \hlkwc{at.data} \hlstd{=} \hlstr{"TRUE"}\hlstd{)}
+\hlstd{)}
+
+\hlcom{# diagnostics}
+\hlstd{diagnostics} \hlkwb{<-} \hlkwd{rbind}\hlstd{(area, marginalcov, localcov)}
+\hlkwd{colnames}\hlstd{(diagnostics)} \hlkwb{<-} \hlkwd{c}\hlstd{(}\hlstr{"transformCI"}\hlstd{,} \hlstr{"binparaCI"}\hlstd{,}
+  \hlstr{"binnonparaCI"}\hlstd{,} \hlstr{"LSLW"}\hlstd{,} \hlstr{"HDCI"}\hlstd{)}
+\hlkwd{rownames}\hlstd{(diagnostics)} \hlkwb{<-} \hlkwd{c}\hlstd{(}\hlstr{"area"}\hlstd{,} \hlstr{"marginal coverage"}\hlstd{,} \hlstr{"bin 1 coverage"}\hlstd{,}
+  \hlstr{"bin 2 coverage"}\hlstd{,} \hlstr{"bin 3 coverage"}\hlstd{)}
 \end{alltt}
-\begin{verbatim}
-## [1] 2.687667
-\end{verbatim}
-\begin{alltt}
-\hlcom{# local coverage}
-\hlkwd{local.coverage}\hlstd{(}\hlkwc{region} \hlstd{= nonparaCI,} \hlkwc{data} \hlstd{= data.readme,} \hlkwc{d} \hlstd{= p,}
-  \hlkwc{nonparametric} \hlstd{=} \hlstr{"TRUE"}\hlstd{,} \hlkwc{bins} \hlstd{= bins,} \hlkwc{at.data} \hlstd{=} \hlstr{"TRUE"}\hlstd{)}
-\end{alltt}
-\begin{verbatim}
-## [1] 0.9259259 0.9028571 0.9018405
-\end{verbatim}
-\begin{alltt}
-\hlcom{# marginal coverage}
-\hlkwd{local.coverage}\hlstd{(}\hlkwc{region} \hlstd{= nonparaCI,} \hlkwc{data} \hlstd{= data.readme,} \hlkwc{d} \hlstd{= p,}
-  \hlkwc{nonparametric} \hlstd{=} \hlstr{"TRUE"}\hlstd{,} \hlkwc{bins} \hlstd{=} \hlnum{1}\hlstd{,} \hlkwc{at.data} \hlstd{=} \hlstr{"TRUE"}\hlstd{)}
-\end{alltt}
-\begin{verbatim}
-## [1] 0.91
-\end{verbatim}
-\begin{alltt}
-\hlcom{## LSLW conformal prediction region}
-\hlcom{# estimated area}
-\hlkwd{mean}\hlstd{(}\hlkwd{apply}\hlstd{(LSLW,} \hlnum{1}\hlstd{, diff))}
-\end{alltt}
-\begin{verbatim}
-## [1] 2.563743
-\end{verbatim}
-\begin{alltt}
-\hlcom{# local coverage}
-\hlkwd{local.coverage}\hlstd{(}\hlkwc{region} \hlstd{= LSLW,} \hlkwc{data} \hlstd{= data.readme,} \hlkwc{d} \hlstd{= p,}
-  \hlkwc{bins} \hlstd{= bins,} \hlkwc{at.data} \hlstd{=} \hlstr{"TRUE"}\hlstd{)}
-\end{alltt}
-\begin{verbatim}
-## [1] 0.9197531 0.8914286 0.9509202
-\end{verbatim}
-\begin{alltt}
-\hlcom{# marginal coverage}
-\hlkwd{local.coverage}\hlstd{(}\hlkwc{region} \hlstd{= LSLW,} \hlkwc{data} \hlstd{= data.readme,} \hlkwc{d} \hlstd{= p,}
-  \hlkwc{bins} \hlstd{=} \hlnum{1}\hlstd{,} \hlkwc{at.data} \hlstd{=} \hlstr{"TRUE"}\hlstd{)}
-\end{alltt}
-\begin{verbatim}
-## [1] 0.92
-\end{verbatim}
-\begin{alltt}
-\hlcom{## HD region}
-\hlcom{# estimated area}
-\hlkwd{mean}\hlstd{(}\hlkwd{apply}\hlstd{(HDCI,} \hlnum{1}\hlstd{, diff))}
-\end{alltt}
-\begin{verbatim}
-## [1] 2.207619
-\end{verbatim}
-\begin{alltt}
-\hlcom{# local coverage}
-\hlkwd{local.coverage}\hlstd{(}\hlkwc{region} \hlstd{= HDCI,} \hlkwc{data} \hlstd{= data.readme,} \hlkwc{d} \hlstd{= p,}
-  \hlkwc{bins} \hlstd{= bins,} \hlkwc{at.data} \hlstd{=} \hlstr{"TRUE"}\hlstd{)}
-\end{alltt}
-\begin{verbatim}
-## [1] 0.9012346 0.8800000 0.9079755
-\end{verbatim}
-\begin{alltt}
-\hlcom{# marginal coverage}
-\hlkwd{local.coverage}\hlstd{(}\hlkwc{region} \hlstd{= HDCI,} \hlkwc{data} \hlstd{= data.readme,} \hlkwc{d} \hlstd{= p,}
-  \hlkwc{bins} \hlstd{=} \hlnum{1}\hlstd{,} \hlkwc{at.data} \hlstd{=} \hlstr{"TRUE"}\hlstd{)}
-\end{alltt}
-\begin{verbatim}
-## [1] 0.896
-\end{verbatim}
 \end{kframe}
 \end{knitrout}
 
 
+\begin{kframe}
+\begin{alltt}
+\hlkwd{xtable}\hlstd{(diagnostics,} \hlkwc{digits} \hlstd{=} \hlkwd{c}\hlstd{(}\hlnum{0}\hlstd{,} \hlnum{2}\hlstd{,} \hlnum{2}\hlstd{,} \hlnum{2}\hlstd{,} \hlnum{2}\hlstd{,} \hlnum{2}\hlstd{))}
+\end{alltt}
+\end{kframe}% latex table generated in R 3.4.4 by xtable 1.8-3 package
+% Wed Sep  4 08:35:36 2019
+\begin{table}[ht]
+\centering
+\begin{tabular}{rrrrrr}
+  \hline
+ & transformCI & binparaCI & binnonparaCI & LSLW & HDCI \\ 
+  \hline
+area & 2.26 & 2.19 & 2.68 & 2.56 & 2.21 \\ 
+  marginal coverage & 0.91 & 0.91 & 0.91 & 0.92 & 0.90 \\ 
+  bin 1 coverage & 0.91 & 0.91 & 0.93 & 0.92 & 0.90 \\ 
+  bin 2 coverage & 0.89 & 0.90 & 0.90 & 0.89 & 0.88 \\ 
+  bin 3 coverage & 0.93 & 0.91 & 0.90 & 0.95 & 0.91 \\ 
+   \hline
+\end{tabular}
+\end{table}
+
+
+
 \section{Extension of the illustrative example from the README file}
 
-In this extension we investigate the local coverage properties of five 
-prediction regions, the four from the previous section and a least squares 
+In this extension we investigate the local coverage properties of six  
+prediction regions, the five from the previous section and a least squares 
 (LS) conformal prediction region without local weighting.  Local coverage is 
 assessed via a Monte Carlo simulation of size $B = 50$.  At each iteration 
 of this simulation a new dataset is generated under the same specifications 
@@ -595,18 +603,10 @@ parametric and nonparametric conformal prediction regions.  We form 25 bins
 of length 0.04. 
 
 
+
 \subsection{Diagnostic measures}
 
 Several diagnostic measures are used to compare conformal prediction regions.
-%%%The specific diagnostics are 
-%%%prediction error at the observed data, 
-%%%area of the prediction region, 
-%%%finite sample marginal coverage,
-%%%finite sample local coverage with respect to binning, 
-%%%and 
-%%%finite sample local conditional coverage.  
-%We will use a modification of average sum of squares error as our measure of 
-%prediction error.  
 These diagnostic measures compare prediction regions by their 
 prediction error, volume, and coverage properties.
 Our prediction error diagnostic metric will be an average of the squared 
@@ -614,12 +614,12 @@ distances of observations outside of the prediction region to the closest
 boundary of the prediction region, averaged over all 
 observations. An observation that falls within the prediction region 
 has an error of 0.  More formally this prediction error metric is 
-\[ 
+$$
   \text{prediction error} 
     = n^{-1}\sum_{i=1}^n\indicator{Y_i \not\in \Copt(X_i)}
       \left(\min_{j=1,\ldots,m_i}\left\{\min\{|Y_i - a_{i,j}|, 
         |Y_i - b_{i,j}|\}\right\}\right)^2,
- \]
+$$
 where $a_{i,j}$ and $b_{i,j}$ are, respectively, the lower and upper 
 boundaries of possible $j = 1, \ldots, m_i$ disjoint intervals forming 
 the prediction region.  
@@ -711,19 +711,33 @@ Our Monte Carlo simulator follows. This function computes all of the
 dignostics and local coverage probabilities for each prediction region 
 for every generated dataset.
 
+
+\begin{center}
+{\Huge Revised up to here}
+\end{center}
+
+
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 \begin{alltt}
-\hlstd{gamma.simulator} \hlkwb{<-} \hlkwa{function}\hlstd{(}\hlkwc{n} \hlstd{=} \hlnum{500}\hlstd{,} \hlkwc{alpha} \hlstd{=} \hlnum{0.10}\hlstd{,} \hlkwc{beta}\hlstd{,} \hlkwc{bins} \hlstd{=} \hlnum{3}\hlstd{,}
+\hlstd{funs} \hlkwb{<-} \hlkwd{lm.funs}\hlstd{(}\hlkwc{intercept} \hlstd{=} \hlnum{TRUE}\hlstd{)}
+\hlstd{train.fun} \hlkwb{<-} \hlstd{funs}\hlopt{$}\hlstd{train.fun}
+\hlstd{predict.fun} \hlkwb{<-} \hlstd{funs}\hlopt{$}\hlstd{predict.fun}
+\hlstd{mad.predict.fun} \hlkwb{<-} \hlkwa{function}\hlstd{(}\hlkwc{out}\hlstd{,} \hlkwc{newx}\hlstd{)\{}
+  \hlstd{newx} \hlkwb{<-} \hlkwd{as.numeric}\hlstd{(newx)}
+  \hlkwd{predict}\hlstd{(out, newx[,} \hlnum{1}\hlstd{])}\hlopt{$}\hlstd{y}
+\hlstd{\}}
+
+\hlstd{gamma_simulator} \hlkwb{<-} \hlkwa{function}\hlstd{(}\hlkwc{beta}\hlstd{,} \hlkwc{n} \hlstd{=} \hlnum{500}\hlstd{,} \hlkwc{alpha} \hlstd{=} \hlnum{0.10}\hlstd{,} \hlkwc{bins} \hlstd{=} \hlnum{3}\hlstd{,}
   \hlkwc{family} \hlstd{=} \hlstr{"Gamma"}\hlstd{,} \hlkwc{link} \hlstd{=} \hlstr{"inverse"}\hlstd{,} \hlkwc{shape} \hlstd{=} \hlnum{2}\hlstd{,}
-  \hlkwc{parametric} \hlstd{=} \hlnum{TRUE}\hlstd{,} \hlkwc{nonparametric} \hlstd{=} \hlnum{TRUE}\hlstd{,}
-  \hlkwc{LS} \hlstd{=} \hlnum{TRUE}\hlstd{,} \hlkwc{LSLW} \hlstd{=} \hlnum{TRUE}\hlstd{,} \hlkwc{HD} \hlstd{=} \hlnum{TRUE}\hlstd{,} \hlkwc{cores} \hlstd{=} \hlnum{6}\hlstd{)\{}
+  \hlkwc{parametric} \hlstd{=} \hlnum{TRUE}\hlstd{,} \hlkwc{nonparametric} \hlstd{=} \hlnum{TRUE}\hlstd{,} \hlkwc{method} \hlstd{=} \hlstr{"both"}\hlstd{,}
+  \hlkwc{LS} \hlstd{=} \hlnum{TRUE}\hlstd{,} \hlkwc{LSLW} \hlstd{=} \hlnum{TRUE}\hlstd{,} \hlkwc{HD} \hlstd{=} \hlnum{TRUE}\hlstd{,} \hlkwc{cores} \hlstd{=} \hlnum{7}\hlstd{)\{}
 
   \hlcom{## in this univariate problem, p and d are the same}
   \hlstd{p} \hlkwb{<-} \hlstd{d} \hlkwb{<-} \hlkwd{length}\hlstd{(beta)} \hlopt{-} \hlnum{1}
-  \hlstd{x} \hlkwb{<-} \hlkwd{matrix}\hlstd{(}\hlkwd{runif}\hlstd{(n),} \hlkwc{ncol} \hlstd{= p)}
+  \hlstd{x} \hlkwb{<-} \hlkwd{matrix}\hlstd{(}\hlkwd{runif}\hlstd{(n}\hlopt{*}\hlstd{p),} \hlkwc{ncol} \hlstd{= p)}
   \hlstd{y} \hlkwb{<-} \hlkwd{rep}\hlstd{(}\hlnum{0}\hlstd{,n)}
-  \hlstd{data} \hlkwb{<-} \hlkwa{NULL}
+  \hlstd{dat} \hlkwb{<-} \hlkwa{NULL}
 
   \hlcom{## set up partition}
   \hlkwa{if}\hlstd{(}\hlkwd{class}\hlstd{(bins)} \hlopt{==} \hlstr{"NULL"}\hlstd{)\{}
@@ -738,61 +752,105 @@ for every generated dataset.
       \hlstd{rate} \hlkwb{<-} \hlstd{(}\hlnum{1} \hlopt{/} \hlstd{(}\hlkwd{cbind}\hlstd{(}\hlnum{1}\hlstd{, x)} \hlopt{%*%} \hlstd{beta))} \hlopt{*} \hlstd{shape}
       \hlstd{y} \hlkwb{<-} \hlkwd{rgamma}\hlstd{(}\hlkwc{n} \hlstd{= n,} \hlkwc{shape} \hlstd{= shape,} \hlkwc{rate} \hlstd{= rate)}
       \hlstd{y} \hlkwb{<-} \hlstd{y} \hlopt{/} \hlkwd{sd}\hlstd{(y)}
-      \hlstd{data} \hlkwb{<-} \hlkwd{data.frame}\hlstd{(}\hlkwc{y} \hlstd{= y,} \hlkwc{x} \hlstd{= x)}
-      \hlkwd{colnames}\hlstd{(data)[}\hlnum{2}\hlopt{:}\hlstd{(p}\hlopt{+}\hlnum{1}\hlstd{)]} \hlkwb{<-} \hlkwd{paste}\hlstd{(}\hlstr{"x"}\hlstd{,} \hlnum{1}\hlopt{:}\hlstd{p,} \hlkwc{sep} \hlstd{=} \hlstr{""}\hlstd{)}
+      \hlstd{dat} \hlkwb{<-} \hlkwd{data.frame}\hlstd{(}\hlkwc{y} \hlstd{= y,} \hlkwc{x} \hlstd{= x)}
+      \hlkwd{colnames}\hlstd{(dat)[}\hlnum{2}\hlopt{:}\hlstd{(p}\hlopt{+}\hlnum{1}\hlstd{)]} \hlkwb{<-} \hlkwd{paste}\hlstd{(}\hlstr{"x"}\hlstd{,} \hlnum{1}\hlopt{:}\hlstd{p,} \hlkwc{sep} \hlstd{=} \hlstr{""}\hlstd{)}
     \hlstd{\}}
     \hlkwa{if}\hlstd{(link} \hlopt{==} \hlstr{"inverse"}\hlstd{)\{}
       \hlstd{rate} \hlkwb{<-} \hlstd{(}\hlkwd{cbind}\hlstd{(}\hlnum{1}\hlstd{, x)} \hlopt{%*%} \hlstd{beta)} \hlopt{*} \hlstd{shape}
       \hlstd{y} \hlkwb{<-} \hlkwd{rgamma}\hlstd{(}\hlkwc{n} \hlstd{= n,} \hlkwc{shape} \hlstd{= shape,} \hlkwc{rate} \hlstd{= rate)}
       \hlstd{y} \hlkwb{<-} \hlstd{y} \hlopt{/} \hlkwd{sd}\hlstd{(y)}
-      \hlstd{data} \hlkwb{<-} \hlkwd{data.frame}\hlstd{(}\hlkwc{y} \hlstd{= y,} \hlkwc{x} \hlstd{= x)}
-      \hlkwd{colnames}\hlstd{(data)[}\hlnum{2}\hlopt{:}\hlstd{(p}\hlopt{+}\hlnum{1}\hlstd{)]} \hlkwb{<-} \hlkwd{paste}\hlstd{(}\hlstr{"x"}\hlstd{,} \hlnum{1}\hlopt{:}\hlstd{p,} \hlkwc{sep} \hlstd{=} \hlstr{""}\hlstd{)}
+      \hlstd{dat} \hlkwb{<-} \hlkwd{data.frame}\hlstd{(}\hlkwc{y} \hlstd{= y,} \hlkwc{x} \hlstd{= x)}
+      \hlkwd{colnames}\hlstd{(dat)[}\hlnum{2}\hlopt{:}\hlstd{(p}\hlopt{+}\hlnum{1}\hlstd{)]} \hlkwb{<-} \hlkwd{paste}\hlstd{(}\hlstr{"x"}\hlstd{,} \hlnum{1}\hlopt{:}\hlstd{p,} \hlkwc{sep} \hlstd{=} \hlstr{""}\hlstd{)}
     \hlstd{\}}
     \hlkwa{if}\hlstd{(link} \hlopt{==} \hlstr{"log"}\hlstd{)\{}
       \hlstd{rate} \hlkwb{<-} \hlstd{(}\hlnum{1} \hlopt{/} \hlkwd{exp}\hlstd{(}\hlkwd{cbind}\hlstd{(}\hlnum{1}\hlstd{, x)} \hlopt{%*%} \hlstd{beta))} \hlopt{*} \hlstd{shape}
       \hlstd{y} \hlkwb{<-} \hlkwd{rgamma}\hlstd{(}\hlkwc{n} \hlstd{= n,} \hlkwc{shape} \hlstd{= shape,} \hlkwc{rate} \hlstd{= rate)}
       \hlstd{y} \hlkwb{<-} \hlstd{y} \hlopt{/} \hlkwd{sd}\hlstd{(y)}
-      \hlstd{data} \hlkwb{<-} \hlkwd{data.frame}\hlstd{(}\hlkwc{y} \hlstd{= y,} \hlkwc{x} \hlstd{= x)}
-      \hlkwd{colnames}\hlstd{(data)[}\hlnum{2}\hlopt{:}\hlstd{(p}\hlopt{+}\hlnum{1}\hlstd{)]} \hlkwb{<-} \hlkwd{paste}\hlstd{(}\hlstr{"x"}\hlstd{,} \hlnum{1}\hlopt{:}\hlstd{p,} \hlkwc{sep} \hlstd{=} \hlstr{""}\hlstd{)}
+      \hlstd{dat} \hlkwb{<-} \hlkwd{data.frame}\hlstd{(}\hlkwc{y} \hlstd{= y,} \hlkwc{x} \hlstd{= x)}
+      \hlkwd{colnames}\hlstd{(dat)[}\hlnum{2}\hlopt{:}\hlstd{(p}\hlopt{+}\hlnum{1}\hlstd{)]} \hlkwb{<-} \hlkwd{paste}\hlstd{(}\hlstr{"x"}\hlstd{,} \hlnum{1}\hlopt{:}\hlstd{p,} \hlkwc{sep} \hlstd{=} \hlstr{""}\hlstd{)}
     \hlstd{\}}
   \hlstd{\}}
-
   \hlkwa{if}\hlstd{(family} \hlopt{==} \hlstr{"gaussian"}\hlstd{)\{}
     \hlstd{mu} \hlkwb{<-} \hlkwd{cbind}\hlstd{(}\hlnum{1}\hlstd{, x)} \hlopt{%*%} \hlstd{beta}
     \hlstd{y} \hlkwb{<-} \hlkwd{rnorm}\hlstd{(}\hlkwc{n} \hlstd{= n,} \hlkwc{mean} \hlstd{= mu,} \hlkwc{sd} \hlstd{= sd)}
-    \hlstd{data} \hlkwb{<-} \hlkwd{data.frame}\hlstd{(}\hlkwc{y} \hlstd{= y,} \hlkwc{x} \hlstd{= x)}
-    \hlkwd{colnames}\hlstd{(data)[}\hlnum{2}\hlopt{:}\hlstd{(p}\hlopt{+}\hlnum{1}\hlstd{)]} \hlkwb{<-} \hlkwd{paste}\hlstd{(}\hlstr{"x"}\hlstd{,} \hlnum{1}\hlopt{:}\hlstd{p,} \hlkwc{sep} \hlstd{=} \hlstr{""}\hlstd{)}
+    \hlstd{dat} \hlkwb{<-} \hlkwd{data.frame}\hlstd{(}\hlkwc{y} \hlstd{= y,} \hlkwc{x} \hlstd{= x)}
+    \hlkwd{colnames}\hlstd{(dat)[}\hlnum{2}\hlopt{:}\hlstd{(p}\hlopt{+}\hlnum{1}\hlstd{)]} \hlkwb{<-} \hlkwd{paste}\hlstd{(}\hlstr{"x"}\hlstd{,} \hlnum{1}\hlopt{:}\hlstd{p,} \hlkwc{sep} \hlstd{=} \hlstr{""}\hlstd{)}
   \hlstd{\}}
-
   \hlkwa{if}\hlstd{(family} \hlopt{==} \hlstr{"inverse.gaussian"}\hlstd{)\{}
     \hlstd{mu} \hlkwb{=} \hlnum{1} \hlopt{/} \hlkwd{sqrt}\hlstd{(}\hlkwd{cbind}\hlstd{(}\hlnum{1}\hlstd{, x)} \hlopt{%*%} \hlstd{beta)}
     \hlstd{y} \hlkwb{<-} \hlkwd{rinvgauss}\hlstd{(}\hlkwc{n} \hlstd{= n,} \hlkwc{mean} \hlstd{= mu)}
     \hlstd{y} \hlkwb{<-} \hlstd{y} \hlopt{/} \hlkwd{sd}\hlstd{(y)}
-    \hlstd{data} \hlkwb{<-} \hlkwd{data.frame}\hlstd{(}\hlkwc{y} \hlstd{= y,} \hlkwc{x} \hlstd{= x)}
-    \hlkwd{colnames}\hlstd{(data)[}\hlnum{2}\hlopt{:}\hlstd{(p}\hlopt{+}\hlnum{1}\hlstd{)]} \hlkwb{<-} \hlkwd{paste}\hlstd{(}\hlstr{"x"}\hlstd{,} \hlnum{1}\hlopt{:}\hlstd{p,} \hlkwc{sep} \hlstd{=} \hlstr{""}\hlstd{)}
+    \hlstd{dat} \hlkwb{<-} \hlkwd{data.frame}\hlstd{(}\hlkwc{y} \hlstd{= y,} \hlkwc{x} \hlstd{= x)}
+    \hlkwd{colnames}\hlstd{(dat)[}\hlnum{2}\hlopt{:}\hlstd{(p}\hlopt{+}\hlnum{1}\hlstd{)]} \hlkwb{<-} \hlkwd{paste}\hlstd{(}\hlstr{"x"}\hlstd{,} \hlnum{1}\hlopt{:}\hlstd{p,} \hlkwc{sep} \hlstd{=} \hlstr{""}\hlstd{)}
   \hlstd{\}}
 
   \hlcom{## fit the Gamma regression model}
-  \hlstd{fit} \hlkwb{<-} \hlkwd{glm}\hlstd{(y} \hlopt{~} \hlstd{x1,} \hlkwc{family} \hlstd{=} \hlstr{"Gamma"}\hlstd{,} \hlkwc{data} \hlstd{= data)}
-  \hlstd{paraCI} \hlkwb{<-} \hlstd{nonparaCI} \hlkwb{<-} \hlstd{LSCI} \hlkwb{<-} \hlstd{LSLWCI} \hlkwb{<-} \hlstd{HDCI} \hlkwb{<-} \hlkwa{NULL}
+  \hlstd{fit} \hlkwb{<-} \hlkwd{glm}\hlstd{(y} \hlopt{~} \hlstd{x1,} \hlkwc{family} \hlstd{=} \hlstr{"Gamma"}\hlstd{,} \hlkwc{data} \hlstd{= dat)}
+  \hlkwd{assign}\hlstd{(}\hlstr{"dat"}\hlstd{, dat, .GlobalEnv)}
+  \hlstd{parabinCI} \hlkwb{<-} \hlstd{transformCI} \hlkwb{<-} \hlstd{nonparabinCI} \hlkwb{<-} \hlstd{LSCI} \hlkwb{<-}
+    \hlstd{LSLWCI} \hlkwb{<-} \hlstd{HDCI} \hlkwb{<-} \hlkwa{NULL}
   \hlstd{formula} \hlkwb{<-} \hlstd{fit}\hlopt{$}\hlstd{formula}
-  \hlstd{newdata} \hlkwb{<-} \hlstd{data}
+  \hlstd{newdata} \hlkwb{<-} \hlstd{dat}
   \hlstd{respname} \hlkwb{<-} \hlkwd{all.vars}\hlstd{(formula)[}\hlnum{1}\hlstd{]}
-  \hlstd{newdata} \hlkwb{<-} \hlstd{newdata[,} \hlopt{!}\hlstd{(}\hlkwd{colnames}\hlstd{(data)} \hlopt{%in%} \hlstd{respname)]}
+  \hlstd{newdata} \hlkwb{<-} \hlstd{newdata[,} \hlopt{!}\hlstd{(}\hlkwd{colnames}\hlstd{(dat)} \hlopt{%in%} \hlstd{respname)]}
   \hlstd{newdata} \hlkwb{<-} \hlkwd{as.matrix}\hlstd{(newdata)}
 
   \hlcom{## obtain the prediction regions}
+  \hlstd{output.parabin} \hlkwb{<-} \hlstd{output.transform} \hlkwb{<-} \hlstd{output.nonparabin} \hlkwb{<-}
+    \hlstd{output.LS} \hlkwb{<-} \hlstd{output.LSLW} \hlkwb{<-} \hlstd{output.HD} \hlkwb{<-} \hlkwd{rep}\hlstd{(}\hlnum{NA}\hlstd{, bins} \hlopt{+} \hlnum{1}\hlstd{)}
   \hlkwa{if}\hlstd{(parametric)\{}
     \hlstd{cpred} \hlkwb{<-} \hlkwd{conformal.glm}\hlstd{(fit,} \hlkwc{parametric} \hlstd{=} \hlnum{TRUE}\hlstd{,}
-      \hlkwc{nonparametric} \hlstd{=} \hlnum{FALSE}\hlstd{,} \hlkwc{alpha} \hlstd{= alpha,}
-      \hlkwc{bins} \hlstd{= bins,} \hlkwc{cores} \hlstd{= cores)}
-    \hlstd{paraCI} \hlkwb{<-} \hlstd{cpred}\hlopt{$}\hlstd{paraconformal}
+      \hlkwc{nonparametric} \hlstd{=} \hlnum{FALSE}\hlstd{,} \hlkwc{alpha} \hlstd{= alpha,} \hlkwc{method} \hlstd{=} \hlstr{"both"}\hlstd{,}
+      \hlkwc{bins} \hlstd{= bins,} \hlkwc{cores} \hlstd{= cores,} \hlkwc{newdata} \hlstd{= newdata,}
+      \hlkwc{precision} \hlstd{=} \hlnum{0.02}\hlstd{)}
+
+    \hlcom{# bin parametric conformal}
+    \hlstd{parabinCI} \hlkwb{<-} \hlstd{cpred}\hlopt{$}\hlstd{paraconfbin}
+    \hlstd{marginal.parabin} \hlkwb{<-} \hlkwd{local.coverage}\hlstd{(}\hlkwc{region} \hlstd{= parabinCI,}
+      \hlkwc{data} \hlstd{= dat,} \hlkwc{d} \hlstd{= p,} \hlkwc{bins} \hlstd{=} \hlnum{1}\hlstd{,} \hlkwc{at.data} \hlstd{=} \hlstr{"TRUE"}\hlstd{)}
+    \hlstd{local.parabin} \hlkwb{<-} \hlkwd{local.coverage}\hlstd{(}\hlkwc{region} \hlstd{= parabinCI,}
+      \hlkwc{data} \hlstd{= dat,} \hlkwc{d} \hlstd{= p,} \hlkwc{bins} \hlstd{= bins,} \hlkwc{at.data} \hlstd{=} \hlstr{"TRUE"}\hlstd{)}
+    \hlstd{local.inx.parabin} \hlkwb{<-} \hlkwd{local.coverage}\hlstd{(}\hlkwc{region} \hlstd{= parabinCI,}
+      \hlkwc{data} \hlstd{= dat,} \hlkwc{d} \hlstd{= p,} \hlkwc{bins} \hlstd{=} \hlnum{25}\hlstd{,} \hlkwc{at.data} \hlstd{=} \hlstr{"TRUE"}\hlstd{)}
+    \hlstd{output.parabin} \hlkwb{<-} \hlkwd{c}\hlstd{(marginal.parabin, local.parabin,}
+      \hlstd{local.inx.parabin,}
+      \hlkwd{mean}\hlstd{(}\hlkwd{apply}\hlstd{(parabinCI,} \hlnum{1}\hlstd{, diff)),}
+      \hlkwd{absolute.error}\hlstd{(}\hlkwc{y} \hlstd{= y,} \hlkwc{region} \hlstd{= parabinCI))}
+
+    \hlcom{# transform parametric conformal}
+    \hlstd{transformCI} \hlkwb{<-} \hlstd{cpred}\hlopt{$}\hlstd{transformconf}
+    \hlstd{marginal.transform} \hlkwb{<-} \hlkwd{local.coverage}\hlstd{(}\hlkwc{region} \hlstd{= transformCI,}
+      \hlkwc{data} \hlstd{= dat,} \hlkwc{d} \hlstd{= p,} \hlkwc{bins} \hlstd{=} \hlnum{1}\hlstd{,} \hlkwc{at.data} \hlstd{=} \hlstr{"TRUE"}\hlstd{)}
+    \hlstd{local.transform} \hlkwb{<-} \hlkwd{local.coverage}\hlstd{(}\hlkwc{region} \hlstd{= transformCI,}
+      \hlkwc{data} \hlstd{= dat,} \hlkwc{d} \hlstd{= p,} \hlkwc{bins} \hlstd{= bins,} \hlkwc{at.data} \hlstd{=} \hlstr{"TRUE"}\hlstd{)}
+    \hlstd{local.inx.transform} \hlkwb{<-} \hlkwd{local.coverage}\hlstd{(}\hlkwc{region} \hlstd{= transformCI,}
+      \hlkwc{data} \hlstd{= dat,} \hlkwc{d} \hlstd{= p,} \hlkwc{bins} \hlstd{=} \hlnum{25}\hlstd{,} \hlkwc{at.data} \hlstd{=} \hlstr{"TRUE"}\hlstd{)}
+    \hlstd{output.transform} \hlkwb{<-} \hlkwd{c}\hlstd{(marginal.transform, local.transform,}
+      \hlstd{local.inx.transform,}
+      \hlkwd{mean}\hlstd{(}\hlkwd{apply}\hlstd{(transformCI,} \hlnum{1}\hlstd{, diff)),}
+      \hlkwd{absolute.error}\hlstd{(}\hlkwc{y} \hlstd{= y,} \hlkwc{region} \hlstd{= transformCI))}
   \hlstd{\}}
   \hlkwa{if}\hlstd{(nonparametric)\{}
     \hlstd{cpred} \hlkwb{<-} \hlkwd{conformal.glm}\hlstd{(fit,} \hlkwc{parametric} \hlstd{=} \hlnum{FALSE}\hlstd{,}
-      \hlkwc{nonparametric} \hlstd{=} \hlnum{TRUE}\hlstd{,} \hlkwc{alpha} \hlstd{= alpha,}
-      \hlkwc{bins} \hlstd{= bins,} \hlkwc{cores} \hlstd{= cores)}
-    \hlstd{nonparaCI} \hlkwb{<-} \hlstd{cpred}\hlopt{$}\hlstd{nonparaconformal}
+      \hlkwc{nonparametric} \hlstd{=} \hlnum{TRUE}\hlstd{,} \hlkwc{alpha} \hlstd{= alpha,} \hlkwc{method} \hlstd{=} \hlstr{"both"}\hlstd{,}
+      \hlkwc{bins} \hlstd{= bins,} \hlkwc{cores} \hlstd{= cores,} \hlkwc{precision} \hlstd{=} \hlnum{0.02}\hlstd{)}
+    \hlstd{nonparabinCI} \hlkwb{<-} \hlstd{cpred}\hlopt{$}\hlstd{nonparaconfbin}
+
+    \hlstd{marginal.nonparabin} \hlkwb{<-} \hlkwd{local.coverage}\hlstd{(}\hlkwc{region} \hlstd{= nonparabinCI,}
+      \hlkwc{nonparametric} \hlstd{=} \hlstr{"TRUE"}\hlstd{,} \hlkwc{data} \hlstd{= dat,} \hlkwc{d} \hlstd{= p,} \hlkwc{bins} \hlstd{=} \hlnum{1}\hlstd{,}
+      \hlkwc{at.data} \hlstd{=} \hlstr{"TRUE"}\hlstd{)}
+    \hlstd{local.nonparabin} \hlkwb{<-} \hlkwd{local.coverage}\hlstd{(}\hlkwc{region} \hlstd{= nonparabinCI,}
+      \hlkwc{nonparametric} \hlstd{=} \hlstr{"TRUE"}\hlstd{,} \hlkwc{data} \hlstd{= dat,} \hlkwc{d} \hlstd{= p,} \hlkwc{bins} \hlstd{= bins,}
+      \hlkwc{at.data} \hlstd{=} \hlstr{"TRUE"}\hlstd{)}
+    \hlstd{local.inx.nonparabin} \hlkwb{<-} \hlkwd{local.coverage}\hlstd{(}\hlkwc{region} \hlstd{= nonparabinCI,}
+      \hlkwc{nonparametric} \hlstd{=} \hlstr{"TRUE"}\hlstd{,} \hlkwc{data} \hlstd{= dat,} \hlkwc{d} \hlstd{= p,} \hlkwc{bins} \hlstd{=} \hlnum{25}\hlstd{,}
+      \hlkwc{at.data} \hlstd{=} \hlstr{"TRUE"}\hlstd{)}
+    \hlstd{output.nonparabin} \hlkwb{<-}
+      \hlkwd{c}\hlstd{(marginal.nonparabin, local.nonparabin,}
+        \hlstd{local.inx.nonparabin,}
+        \hlkwd{area.nonparametric}\hlstd{(nonparabinCI),}
+        \hlkwd{absolute.error.nonparametric}\hlstd{(}\hlkwc{data} \hlstd{= dat,}
+          \hlkwc{region} \hlstd{= nonparabinCI))}
   \hlstd{\}}
   \hlkwa{if}\hlstd{(LS)\{}
     \hlstd{p1.tibs} \hlkwb{<-} \hlkwd{conformal.pred}\hlstd{(}\hlkwc{x} \hlstd{=} \hlkwd{cbind}\hlstd{(x,x}\hlopt{^}\hlnum{2}\hlstd{,x}\hlopt{^}\hlnum{3}\hlstd{),} \hlkwc{y} \hlstd{= y,}
@@ -800,6 +858,16 @@ for every generated dataset.
       \hlkwc{train.fun} \hlstd{= train.fun,} \hlkwc{predict.fun} \hlstd{= predict.fun,}
       \hlkwc{alpha} \hlstd{= alpha)}
     \hlstd{LSCI} \hlkwb{<-} \hlkwd{cbind}\hlstd{(p1.tibs}\hlopt{$}\hlstd{lo, p1.tibs}\hlopt{$}\hlstd{up)}
+
+    \hlstd{marginal.LS} \hlkwb{<-} \hlkwd{local.coverage}\hlstd{(}\hlkwc{region} \hlstd{= LSCI,}
+      \hlkwc{data} \hlstd{= dat,} \hlkwc{d} \hlstd{= p,} \hlkwc{bins} \hlstd{=} \hlnum{1}\hlstd{,} \hlkwc{at.data} \hlstd{=} \hlstr{"TRUE"}\hlstd{)}
+    \hlstd{local.LS} \hlkwb{<-} \hlkwd{local.coverage}\hlstd{(}\hlkwc{region} \hlstd{= LSCI,}
+      \hlkwc{data} \hlstd{= dat,} \hlkwc{d} \hlstd{= p,} \hlkwc{bins} \hlstd{= bins,} \hlkwc{at.data} \hlstd{=} \hlstr{"TRUE"}\hlstd{)}
+    \hlstd{local.inx.LS} \hlkwb{<-} \hlkwd{local.coverage}\hlstd{(}\hlkwc{region} \hlstd{= LSCI,}
+      \hlkwc{data} \hlstd{= dat,} \hlkwc{d} \hlstd{= p,} \hlkwc{bins} \hlstd{=} \hlnum{25}\hlstd{,} \hlkwc{at.data} \hlstd{=} \hlstr{"TRUE"}\hlstd{)}
+    \hlstd{output.LS} \hlkwb{<-} \hlkwd{c}\hlstd{(marginal.LS, local.LS, local.inx.LS,}
+      \hlkwd{mean}\hlstd{(}\hlkwd{apply}\hlstd{(LSCI,} \hlnum{1}\hlstd{, diff)),}
+      \hlkwd{absolute.error}\hlstd{(}\hlkwc{y} \hlstd{= y,} \hlkwc{region} \hlstd{= LSCI))}
   \hlstd{\}}
   \hlkwa{if}\hlstd{(LSLW)\{}
     \hlstd{cubic.model} \hlkwb{<-} \hlkwd{lm}\hlstd{(y} \hlopt{~} \hlstd{x} \hlopt{+} \hlkwd{I}\hlstd{(x}\hlopt{^}\hlnum{2}\hlstd{)} \hlopt{+} \hlkwd{I}\hlstd{(x}\hlopt{^}\hlnum{3}\hlstd{))}
@@ -819,6 +887,16 @@ for every generated dataset.
       \hlkwc{mad.predict.fun} \hlstd{= mad.predict.fun,}
       \hlkwc{alpha} \hlstd{= alpha)}
     \hlstd{LSLWCI} \hlkwb{<-} \hlkwd{cbind}\hlstd{(p2.tibs}\hlopt{$}\hlstd{lo, p2.tibs}\hlopt{$}\hlstd{up)}
+
+    \hlstd{marginal.LSLW} \hlkwb{<-} \hlkwd{local.coverage}\hlstd{(}\hlkwc{region} \hlstd{= LSLWCI,}
+      \hlkwc{data} \hlstd{= dat,} \hlkwc{d} \hlstd{= p,} \hlkwc{bins} \hlstd{=} \hlnum{1}\hlstd{,} \hlkwc{at.data} \hlstd{=} \hlstr{"TRUE"}\hlstd{)}
+    \hlstd{local.LSLW} \hlkwb{<-} \hlkwd{local.coverage}\hlstd{(}\hlkwc{region} \hlstd{= LSLWCI,}
+      \hlkwc{data} \hlstd{= dat,} \hlkwc{d} \hlstd{= p,} \hlkwc{bins} \hlstd{= bins,} \hlkwc{at.data} \hlstd{=} \hlstr{"TRUE"}\hlstd{)}
+    \hlstd{local.inx.LSLW} \hlkwb{<-} \hlkwd{local.coverage}\hlstd{(}\hlkwc{region} \hlstd{= LSLWCI,}
+      \hlkwc{data} \hlstd{= dat,} \hlkwc{d} \hlstd{= p,} \hlkwc{bins} \hlstd{=} \hlnum{25}\hlstd{,} \hlkwc{at.data} \hlstd{=} \hlstr{"TRUE"}\hlstd{)}
+    \hlstd{output.LSLW} \hlkwb{<-} \hlkwd{c}\hlstd{(marginal.LSLW, local.LSLW, local.inx.LSLW,}
+      \hlkwd{mean}\hlstd{(}\hlkwd{apply}\hlstd{(LSLWCI,} \hlnum{1}\hlstd{, diff)),}
+      \hlkwd{absolute.error}\hlstd{(}\hlkwc{y} \hlstd{= y,} \hlkwc{region} \hlstd{= LSLWCI))}
   \hlstd{\}}
   \hlkwa{if}\hlstd{(HD)\{}
     \hlstd{betaMLE} \hlkwb{<-} \hlkwd{coefficients}\hlstd{(fit)}
@@ -827,81 +905,25 @@ for every generated dataset.
     \hlstd{HDCI} \hlkwb{<-} \hlkwd{do.call}\hlstd{(rbind,} \hlkwd{lapply}\hlstd{(}\hlnum{1}\hlopt{:}\hlkwd{nrow}\hlstd{(newdata),} \hlkwa{function}\hlstd{(}\hlkwc{j}\hlstd{)\{}
       \hlkwd{hdi}\hlstd{(qgamma,} \hlnum{1} \hlopt{-} \hlstd{alpha,} \hlkwc{shape} \hlstd{= shapeMLE,} \hlkwc{rate} \hlstd{= rateMLE[j,} \hlnum{1}\hlstd{])}
     \hlstd{\}))}
-  \hlstd{\}}
 
-  \hlcom{## local coverage prediction regions}
-  \hlstd{output.parametric} \hlkwb{<-} \hlstd{output.nonparametric} \hlkwb{<-}
-    \hlstd{output.LS} \hlkwb{<-} \hlstd{output.LSLW} \hlkwb{<-} \hlstd{output.HD} \hlkwb{<-} \hlkwd{rep}\hlstd{(}\hlnum{NA}\hlstd{, bins} \hlopt{+} \hlnum{1}\hlstd{)}
-  \hlkwa{if}\hlstd{(parametric)\{}
-    \hlstd{marginal.parametric} \hlkwb{<-} \hlkwd{local.coverage}\hlstd{(}\hlkwc{region} \hlstd{= paraCI,}
-      \hlkwc{data} \hlstd{= data,} \hlkwc{d} \hlstd{= p,} \hlkwc{bins} \hlstd{=} \hlnum{1}\hlstd{,} \hlkwc{at.data} \hlstd{=} \hlstr{"TRUE"}\hlstd{)}
-    \hlstd{local.parametric} \hlkwb{<-} \hlkwd{local.coverage}\hlstd{(}\hlkwc{region} \hlstd{= paraCI,}
-      \hlkwc{data} \hlstd{= data,} \hlkwc{d} \hlstd{= p,} \hlkwc{bins} \hlstd{= bins,} \hlkwc{at.data} \hlstd{=} \hlstr{"TRUE"}\hlstd{)}
-    \hlstd{local.inx.parametric} \hlkwb{<-} \hlkwd{local.coverage}\hlstd{(}\hlkwc{region} \hlstd{= paraCI,}
-      \hlkwc{data} \hlstd{= data,} \hlkwc{d} \hlstd{= p,} \hlkwc{bins} \hlstd{=} \hlnum{25}\hlstd{,} \hlkwc{at.data} \hlstd{=} \hlstr{"TRUE"}\hlstd{)}
-    \hlstd{output.parametric} \hlkwb{<-} \hlkwd{c}\hlstd{(marginal.parametric, local.parametric,}
-      \hlstd{local.inx.parametric,}
-      \hlkwd{mean}\hlstd{(}\hlkwd{apply}\hlstd{(paraCI,} \hlnum{1}\hlstd{, diff)),}
-      \hlkwd{absolute.error}\hlstd{(}\hlkwc{y} \hlstd{= y,} \hlkwc{region} \hlstd{= paraCI))}
-  \hlstd{\}}
-  \hlkwa{if}\hlstd{(nonparametric)\{}
-    \hlstd{marginal.nonparametric} \hlkwb{<-} \hlkwd{local.coverage}\hlstd{(}\hlkwc{region} \hlstd{= nonparaCI,}
-      \hlkwc{nonparametric} \hlstd{=} \hlstr{"TRUE"}\hlstd{,} \hlkwc{data} \hlstd{= data,} \hlkwc{d} \hlstd{= p,} \hlkwc{bins} \hlstd{=} \hlnum{1}\hlstd{,}
-      \hlkwc{at.data} \hlstd{=} \hlstr{"TRUE"}\hlstd{)}
-    \hlstd{local.nonparametric} \hlkwb{<-} \hlkwd{local.coverage}\hlstd{(}\hlkwc{region} \hlstd{= nonparaCI,}
-      \hlkwc{nonparametric} \hlstd{=} \hlstr{"TRUE"}\hlstd{,} \hlkwc{data} \hlstd{= data,} \hlkwc{d} \hlstd{= p,} \hlkwc{bins} \hlstd{= bins,}
-      \hlkwc{at.data} \hlstd{=} \hlstr{"TRUE"}\hlstd{)}
-    \hlstd{local.inx.nonparametric} \hlkwb{<-} \hlkwd{local.coverage}\hlstd{(}\hlkwc{region} \hlstd{= nonparaCI,}
-      \hlkwc{nonparametric} \hlstd{=} \hlstr{"TRUE"}\hlstd{,} \hlkwc{data} \hlstd{= data,} \hlkwc{d} \hlstd{= p,} \hlkwc{bins} \hlstd{=} \hlnum{25}\hlstd{,}
-      \hlkwc{at.data} \hlstd{=} \hlstr{"TRUE"}\hlstd{)}
-    \hlstd{output.nonparametric} \hlkwb{<-}
-      \hlkwd{c}\hlstd{(marginal.nonparametric, local.nonparametric,}
-        \hlstd{local.inx.nonparametric,}
-        \hlkwd{area.nonparametric}\hlstd{(nonparaCI),}
-        \hlkwd{absolute.error.nonparametric}\hlstd{(}\hlkwc{data} \hlstd{= data,}
-          \hlkwc{region} \hlstd{= nonparaCI))}
-  \hlstd{\}}
-  \hlkwa{if}\hlstd{(LS)\{}
-    \hlstd{marginal.LS} \hlkwb{<-} \hlkwd{local.coverage}\hlstd{(}\hlkwc{region} \hlstd{= LSCI,}
-      \hlkwc{data} \hlstd{= data,} \hlkwc{d} \hlstd{= p,} \hlkwc{bins} \hlstd{=} \hlnum{1}\hlstd{,} \hlkwc{at.data} \hlstd{=} \hlstr{"TRUE"}\hlstd{)}
-    \hlstd{local.LS} \hlkwb{<-} \hlkwd{local.coverage}\hlstd{(}\hlkwc{region} \hlstd{= LSCI,}
-      \hlkwc{data} \hlstd{= data,} \hlkwc{d} \hlstd{= p,} \hlkwc{bins} \hlstd{= bins,} \hlkwc{at.data} \hlstd{=} \hlstr{"TRUE"}\hlstd{)}
-    \hlstd{local.inx.LS} \hlkwb{<-} \hlkwd{local.coverage}\hlstd{(}\hlkwc{region} \hlstd{= LSCI,}
-      \hlkwc{data} \hlstd{= data,} \hlkwc{d} \hlstd{= p,} \hlkwc{bins} \hlstd{=} \hlnum{25}\hlstd{,} \hlkwc{at.data} \hlstd{=} \hlstr{"TRUE"}\hlstd{)}
-    \hlstd{output.LS} \hlkwb{<-} \hlkwd{c}\hlstd{(marginal.LS, local.LS, local.inx.LS,}
-      \hlkwd{mean}\hlstd{(}\hlkwd{apply}\hlstd{(LSCI,} \hlnum{1}\hlstd{, diff)),}
-      \hlkwd{absolute.error}\hlstd{(}\hlkwc{y} \hlstd{= y,} \hlkwc{region} \hlstd{= LSCI))}
-  \hlstd{\}}
-  \hlkwa{if}\hlstd{(LSLW)\{}
-    \hlstd{marginal.LSLW} \hlkwb{<-} \hlkwd{local.coverage}\hlstd{(}\hlkwc{region} \hlstd{= LSLWCI,}
-      \hlkwc{data} \hlstd{= data,} \hlkwc{d} \hlstd{= p,} \hlkwc{bins} \hlstd{=} \hlnum{1}\hlstd{,} \hlkwc{at.data} \hlstd{=} \hlstr{"TRUE"}\hlstd{)}
-    \hlstd{local.LSLW} \hlkwb{<-} \hlkwd{local.coverage}\hlstd{(}\hlkwc{region} \hlstd{= LSLWCI,}
-      \hlkwc{data} \hlstd{= data,} \hlkwc{d} \hlstd{= p,} \hlkwc{bins} \hlstd{= bins,} \hlkwc{at.data} \hlstd{=} \hlstr{"TRUE"}\hlstd{)}
-    \hlstd{local.inx.LSLW} \hlkwb{<-} \hlkwd{local.coverage}\hlstd{(}\hlkwc{region} \hlstd{= LSLWCI,}
-      \hlkwc{data} \hlstd{= data,} \hlkwc{d} \hlstd{= p,} \hlkwc{bins} \hlstd{=} \hlnum{25}\hlstd{,} \hlkwc{at.data} \hlstd{=} \hlstr{"TRUE"}\hlstd{)}
-    \hlstd{output.LSLW} \hlkwb{<-} \hlkwd{c}\hlstd{(marginal.LSLW, local.LSLW, local.inx.LSLW,}
-      \hlkwd{mean}\hlstd{(}\hlkwd{apply}\hlstd{(LSLWCI,} \hlnum{1}\hlstd{, diff)),}
-      \hlkwd{absolute.error}\hlstd{(}\hlkwc{y} \hlstd{= y,} \hlkwc{region} \hlstd{= LSLWCI))}
-  \hlstd{\}}
-  \hlkwa{if}\hlstd{(HD)\{}
     \hlstd{marginal.HD} \hlkwb{<-} \hlkwd{local.coverage}\hlstd{(}\hlkwc{region} \hlstd{= HDCI,}
-      \hlkwc{data} \hlstd{= data,} \hlkwc{d} \hlstd{= p,} \hlkwc{bins} \hlstd{=} \hlnum{1}\hlstd{,} \hlkwc{at.data} \hlstd{=} \hlstr{"TRUE"}\hlstd{)}
+      \hlkwc{data} \hlstd{= dat,} \hlkwc{d} \hlstd{= p,} \hlkwc{bins} \hlstd{=} \hlnum{1}\hlstd{,} \hlkwc{at.data} \hlstd{=} \hlstr{"TRUE"}\hlstd{)}
     \hlstd{local.HD} \hlkwb{<-} \hlkwd{local.coverage}\hlstd{(}\hlkwc{region} \hlstd{= HDCI,}
-      \hlkwc{data} \hlstd{= data,} \hlkwc{d} \hlstd{= p,} \hlkwc{bins} \hlstd{= bins,} \hlkwc{at.data} \hlstd{=} \hlstr{"TRUE"}\hlstd{)}
+      \hlkwc{data} \hlstd{= dat,} \hlkwc{d} \hlstd{= p,} \hlkwc{bins} \hlstd{= bins,} \hlkwc{at.data} \hlstd{=} \hlstr{"TRUE"}\hlstd{)}
     \hlstd{local.inx.HD} \hlkwb{<-} \hlkwd{local.coverage}\hlstd{(}\hlkwc{region} \hlstd{= HDCI,}
-      \hlkwc{data} \hlstd{= data,} \hlkwc{d} \hlstd{= p,} \hlkwc{bins} \hlstd{=} \hlnum{25}\hlstd{,} \hlkwc{at.data} \hlstd{=} \hlstr{"TRUE"}\hlstd{)}
+      \hlkwc{data} \hlstd{= dat,} \hlkwc{d} \hlstd{= p,} \hlkwc{bins} \hlstd{=} \hlnum{25}\hlstd{,} \hlkwc{at.data} \hlstd{=} \hlstr{"TRUE"}\hlstd{)}
     \hlstd{output.HD} \hlkwb{<-} \hlkwd{c}\hlstd{(marginal.HD, local.HD, local.inx.HD,}
       \hlkwd{mean}\hlstd{(}\hlkwd{apply}\hlstd{(HDCI,} \hlnum{1}\hlstd{, diff)),}
       \hlkwd{absolute.error}\hlstd{(}\hlkwc{y} \hlstd{= y,} \hlkwc{region} \hlstd{= HDCI))}
   \hlstd{\}}
 
-  \hlstd{output} \hlkwb{<-} \hlkwd{list}\hlstd{(}\hlkwc{output.parametric} \hlstd{= output.parametric,}
-    \hlkwc{output.nonparametric} \hlstd{= output.nonparametric,}
+  \hlstd{output} \hlkwb{<-} \hlkwd{list}\hlstd{(}\hlkwc{output.parabin} \hlstd{= output.parabin,}
+    \hlkwc{output.transform} \hlstd{= output.transform,}
+    \hlkwc{output.nonparabin} \hlstd{= output.nonparabin,}
     \hlkwc{output.LS} \hlstd{= output.LS,}
     \hlkwc{output.LSLW} \hlstd{= output.LSLW,}
     \hlkwc{output.HD} \hlstd{= output.HD)}
   \hlstd{output}
-
 \hlstd{\}}
 \end{alltt}
 \end{kframe}
@@ -912,15 +934,16 @@ The following performs our Monte Carlo simulation with $B = 50$ iterations.
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 \begin{alltt}
+\hlkwd{set.seed}\hlstd{(}\hlnum{13}\hlstd{)}
 \hlstd{B} \hlkwb{<-} \hlnum{50}
 \hlkwd{system.time}\hlstd{(local.500.3.2} \hlkwb{<-} \hlkwd{do.call}\hlstd{(cbind,} \hlkwd{lapply}\hlstd{(}\hlnum{1}\hlopt{:}\hlstd{B,}
   \hlkwc{FUN} \hlstd{=} \hlkwa{function}\hlstd{(}\hlkwc{j}\hlstd{)\{}
-    \hlkwd{unlist}\hlstd{(}\hlkwd{gamma.simulator}\hlstd{(}\hlkwc{beta} \hlstd{= beta))}
+    \hlkwd{unlist}\hlstd{(}\hlkwd{gamma_simulator}\hlstd{(}\hlkwc{beta} \hlstd{= beta))}
 \hlstd{\})))}
 \end{alltt}
 \begin{verbatim}
 ##      user    system   elapsed 
-## 13157.579    25.694  6385.948
+## 20480.974    88.025  6143.265
 \end{verbatim}
 \end{kframe}
 \end{knitrout}
@@ -946,7 +969,7 @@ The following performs our Monte Carlo simulation with $B = 50$ iterations.
 
 
 %Describe the table
-Diagnostics for each of the five prediction regions are given in Table 1 and 
+Diagnostics for each of the siz prediction regions are given in Table 1 and 
 Figure~\ref{Fig:coverageinx500.3}.  We see that the parametric 
 conformal prediction region performs as advertised.  When the model is 
 correctly specified, the parametric conformal prediction region is similar to 
@@ -979,41 +1002,41 @@ evidenced by Figure~\ref{Fig:coverageinx500.3}.
   & parametric conformal & nonparametric conformal & LS conformal & 
     LSLW conformal & HD region \\ 
     marginal coverage & 
-  $0.908 \; (0.0003)$ & 
-  $0.903 \; (0.0002)$ & 
+  $0.909 \; (0.0005)$ & 
+  $0.912 \; (0.0006)$ & 
+  $0.901 \; (0.0005)$ & 
   $0.904 \; (0.0004)$ & 
-  $0.915 \; (0.0008)$ & 
-  $0.9 \; (0.0012)$ \\
+  $0.915 \; (0.0007)$ \\
     local coverage when $0 < x < 1/3$ & 
-  $0.909 \; (0.0007)$ & 
-  $0.903 \; (0.0006)$ & 
+  $0.909 \; (0.001)$ & 
+  $0.911 \; (0.0023)$ & 
+  $0.903 \; (0.0011)$ & 
   $0.75 \; (0.0024)$ & 
-  $0.913 \; (0.0016)$ & 
-  $0.902 \; (0.0026)$ \\
+  $0.913 \; (0.0015)$ \\
     local coverage when $1/3 \leq x < 2/3$ & 
-  $0.908 \; (0.0004)$ & 
-  $0.902 \; (0.0003)$ & 
+  $0.908 \; (0.0006)$ & 
+  $0.913 \; (0.0026)$ & 
+  $0.9 \; (0.0006)$ & 
   $0.967 \; (0.0015)$ & 
-  $0.908 \; (0.0024)$ & 
-  $0.904 \; (0.003)$ \\
+  $0.907 \; (0.0024)$ \\
     local coverage when $2/3 \leq x < 1$ & 
-  $0.908 \; (0.0004)$ & 
-  $0.903 \; (0.0003)$ & 
+  $0.909 \; (0.0008)$ & 
+  $0.912 \; (0.0028)$ & 
+  $0.898 \; (0.0007)$ & 
   $0.994 \; (0.0008)$ & 
-  $0.925 \; (0.0022)$ & 
-  $0.895 \; (0.0029)$ \\
+  $0.925 \; (0.0022)$ \\
     area & 
-  $1.825 \; (0.02)$ & 
-  $2.057 \; (0.0229)$ & 
-  $2.342 \; (0.0175)$ & 
-  $1.963 \; (0.0152)$ & 
-  $1.792 \; (0.0167)$ \\
+  $1.832 \; (0.0203)$ & 
+  $1.853 \; (0.0186)$ & 
+  $2.035 \; (0.0231)$ & 
+  $2.341 \; (0.0175)$ & 
+  $1.963 \; (0.0152)$ \\
     prediction error & 
-  $0.083 \; (0.0055)$ & 
-  $0.136 \; (0.0076)$ & 
-  $0.129 \; (0.0057)$ & 
-  $0.054 \; (0.0034)$ & 
-  $0.07 \; (0.0038)$ 
+  $0.084 \; (0.0054)$ & 
+  $0.065 \; (0.0039)$ & 
+  $0.137 \; (0.0077)$ & 
+  $0.13 \; (0.0057)$ & 
+  $0.054 \; (0.0034)$ 
 \end{tabular}
 \end{center}
 \caption{Diagnostics of prediction regions. This table gives 
@@ -1449,7 +1472,7 @@ Table 2 and Figure 4 in \citet{eck2019conformal} are shown below.
 \hlkwd{xtable}\hlstd{(diagnostics,} \hlkwc{digits} \hlstd{=} \hlkwd{c}\hlstd{(}\hlnum{0}\hlstd{,} \hlnum{3}\hlstd{,} \hlnum{3}\hlstd{,} \hlnum{3}\hlstd{,} \hlnum{3}\hlstd{))}
 \end{alltt}
 \end{kframe}% latex table generated in R 3.4.4 by xtable 1.8-3 package
-% Mon Jun 10 14:02:24 2019
+% Wed Sep  4 08:35:37 2019
 \begin{table}[ht]
 \centering
 \begin{tabular}{rrrrr}
@@ -1529,15 +1552,15 @@ when $n = 150$ and shape = $0.5$.
 \hlstd{B} \hlkwb{<-} \hlnum{250}
 \hlkwd{system.time}\hlstd{(out.gamma.150.2.0.5} \hlkwb{<-} \hlkwd{do.call}\hlstd{(cbind,}
   \hlkwd{lapply}\hlstd{(}\hlnum{1}\hlopt{:}\hlstd{B,} \hlkwc{FUN} \hlstd{=} \hlkwa{function}\hlstd{(}\hlkwc{j}\hlstd{)\{}
-    \hlkwd{unlist}\hlstd{(}\hlkwd{gamma.simulator}\hlstd{(}\hlkwc{beta} \hlstd{= beta,} \hlkwc{n} \hlstd{= n,}
+    \hlkwd{unlist}\hlstd{(}\hlkwd{gamma_simulator}\hlstd{(}\hlkwc{beta} \hlstd{= beta,} \hlkwc{n} \hlstd{= n,}
       \hlkwc{bins} \hlstd{= bins,} \hlkwc{shape} \hlstd{=} \hlnum{0.5}\hlstd{))}
 \hlstd{\})))}
 \end{alltt}
-\begin{verbatim}
-##     user   system  elapsed 
-## 7473.082   70.418 4733.124
-\end{verbatim}
-\end{kframe}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in r[, l]/mad.predict.fun(out.mad, xx): non-numeric argument to binary operator}}
+
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 47.47 1.415 9.022}}\end{kframe}
 \end{knitrout}
 
 \begin{knitrout}
@@ -1552,7 +1575,9 @@ when $n = 150$ and shape = $0.5$.
     \hlstd{sds} \hlopt{/} \hlkwd{sqrt}\hlstd{(lengths)}
   \hlstd{\}))}
 \end{alltt}
-\end{kframe}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in is.data.frame(x): object 'out.gamma.150.2.0.5' not found}}\end{kframe}
 \end{knitrout}
 
 The following performs our Monte Carlo simulation of $B = 250$ iterations 
@@ -1563,15 +1588,15 @@ when $n = 150$ and shape = $0.75$.
 \begin{alltt}
 \hlkwd{system.time}\hlstd{(out.gamma.150.2.0.75} \hlkwb{<-} \hlkwd{do.call}\hlstd{(cbind,}
   \hlkwd{lapply}\hlstd{(}\hlnum{1}\hlopt{:}\hlstd{B,} \hlkwc{FUN} \hlstd{=} \hlkwa{function}\hlstd{(}\hlkwc{j}\hlstd{)\{}
-    \hlkwd{unlist}\hlstd{(}\hlkwd{gamma.simulator}\hlstd{(}\hlkwc{beta} \hlstd{= beta,} \hlkwc{n} \hlstd{= n,}
+    \hlkwd{unlist}\hlstd{(}\hlkwd{gamma_simulator}\hlstd{(}\hlkwc{beta} \hlstd{= beta,} \hlkwc{n} \hlstd{= n,}
       \hlkwc{bins} \hlstd{= bins,} \hlkwc{shape} \hlstd{=} \hlnum{0.75}\hlstd{))}
 \hlstd{\})))}
 \end{alltt}
-\begin{verbatim}
-##     user   system  elapsed 
-## 7308.074   67.704 4385.919
-\end{verbatim}
-\end{kframe}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in r[, l]/mad.predict.fun(out.mad, xx): non-numeric argument to binary operator}}
+
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 54.82 0.8 9.444}}\end{kframe}
 \end{knitrout}
 
 \begin{knitrout}
@@ -1586,7 +1611,9 @@ when $n = 150$ and shape = $0.75$.
     \hlstd{sds} \hlopt{/} \hlkwd{sqrt}\hlstd{(lengths)}
   \hlstd{\}))}
 \end{alltt}
-\end{kframe}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in is.data.frame(x): object 'out.gamma.150.2.0.75' not found}}\end{kframe}
 \end{knitrout}
 
 The following performs our Monte Carlo simulation of $B = 250$ iterations 
@@ -1597,15 +1624,15 @@ when $n = 150$ and shape = $1$.
 \begin{alltt}
 \hlkwd{system.time}\hlstd{(out.gamma.150.2.1} \hlkwb{<-} \hlkwd{do.call}\hlstd{(cbind,}
   \hlkwd{lapply}\hlstd{(}\hlnum{1}\hlopt{:}\hlstd{B,} \hlkwc{FUN} \hlstd{=} \hlkwa{function}\hlstd{(}\hlkwc{j}\hlstd{)\{}
-    \hlkwd{unlist}\hlstd{(}\hlkwd{gamma.simulator}\hlstd{(}\hlkwc{beta} \hlstd{= beta,} \hlkwc{n} \hlstd{= n,}
+    \hlkwd{unlist}\hlstd{(}\hlkwd{gamma_simulator}\hlstd{(}\hlkwc{beta} \hlstd{= beta,} \hlkwc{n} \hlstd{= n,}
       \hlkwc{bins} \hlstd{= bins,} \hlkwc{shape} \hlstd{=} \hlnum{1}\hlstd{))}
 \hlstd{\})))}
 \end{alltt}
-\begin{verbatim}
-##     user   system  elapsed 
-## 6992.204   67.186 4018.650
-\end{verbatim}
-\end{kframe}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in r[, l]/mad.predict.fun(out.mad, xx): non-numeric argument to binary operator}}
+
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 54.56 0.745 9.501}}\end{kframe}
 \end{knitrout}
 
 \begin{knitrout}
@@ -1620,7 +1647,9 @@ when $n = 150$ and shape = $1$.
     \hlstd{sds} \hlopt{/} \hlkwd{sqrt}\hlstd{(lengths)}
   \hlstd{\}))}
 \end{alltt}
-\end{kframe}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in is.data.frame(x): object 'out.gamma.150.2.1' not found}}\end{kframe}
 \end{knitrout}
 
 The following performs our Monte Carlo simulation of $B = 250$ iterations 
@@ -1631,15 +1660,15 @@ when $n = 150$ and shape = $1.5$.
 \begin{alltt}
 \hlkwd{system.time}\hlstd{(out.gamma.150.2.1.5} \hlkwb{<-} \hlkwd{do.call}\hlstd{(cbind,}
   \hlkwd{lapply}\hlstd{(}\hlnum{1}\hlopt{:}\hlstd{B,} \hlkwc{FUN} \hlstd{=} \hlkwa{function}\hlstd{(}\hlkwc{j}\hlstd{)\{}
-    \hlkwd{unlist}\hlstd{(}\hlkwd{gamma.simulator}\hlstd{(}\hlkwc{beta} \hlstd{= beta,} \hlkwc{n} \hlstd{= n,}
+    \hlkwd{unlist}\hlstd{(}\hlkwd{gamma_simulator}\hlstd{(}\hlkwc{beta} \hlstd{= beta,} \hlkwc{n} \hlstd{= n,}
       \hlkwc{bins} \hlstd{= bins,} \hlkwc{shape} \hlstd{=} \hlnum{1.5}\hlstd{))}
 \hlstd{\})))}
 \end{alltt}
-\begin{verbatim}
-##      user    system   elapsed 
-##  7456.522    67.902 10638.787
-\end{verbatim}
-\end{kframe}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in r[, l]/mad.predict.fun(out.mad, xx): non-numeric argument to binary operator}}
+
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 40.15 1.424 7.519}}\end{kframe}
 \end{knitrout}
 
 \begin{knitrout}
@@ -1654,7 +1683,9 @@ when $n = 150$ and shape = $1.5$.
     \hlstd{sds} \hlopt{/} \hlkwd{sqrt}\hlstd{(lengths)}
   \hlstd{\}))}
 \end{alltt}
-\end{kframe}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in is.data.frame(x): object 'out.gamma.150.2.1.5' not found}}\end{kframe}
 \end{knitrout}
 
 The following performs our Monte Carlo simulation of $B = 250$ iterations 
@@ -1665,15 +1696,15 @@ when $n = 150$ and shape = $2$.
 \begin{alltt}
 \hlkwd{system.time}\hlstd{(out.gamma.150.2.2} \hlkwb{<-} \hlkwd{do.call}\hlstd{(cbind,}
   \hlkwd{lapply}\hlstd{(}\hlnum{1}\hlopt{:}\hlstd{B,} \hlkwc{FUN} \hlstd{=} \hlkwa{function}\hlstd{(}\hlkwc{j}\hlstd{)\{}
-    \hlkwd{unlist}\hlstd{(}\hlkwd{gamma.simulator}\hlstd{(}\hlkwc{beta} \hlstd{= beta,} \hlkwc{n} \hlstd{= n,}
+    \hlkwd{unlist}\hlstd{(}\hlkwd{gamma_simulator}\hlstd{(}\hlkwc{beta} \hlstd{= beta,} \hlkwc{n} \hlstd{= n,}
       \hlkwc{bins} \hlstd{= bins,} \hlkwc{shape} \hlstd{=} \hlnum{2}\hlstd{))}
 \hlstd{\})))}
 \end{alltt}
-\begin{verbatim}
-##     user   system  elapsed 
-## 8411.829   71.428 4583.947
-\end{verbatim}
-\end{kframe}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in r[, l]/mad.predict.fun(out.mad, xx): non-numeric argument to binary operator}}
+
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 42.46 0.648 7.737}}\end{kframe}
 \end{knitrout}
 
 \begin{knitrout}
@@ -1688,7 +1719,9 @@ when $n = 150$ and shape = $2$.
     \hlstd{sds} \hlopt{/} \hlkwd{sqrt}\hlstd{(lengths)}
   \hlstd{\}))}
 \end{alltt}
-\end{kframe}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in is.data.frame(x): object 'out.gamma.150.2.2' not found}}\end{kframe}
 \end{knitrout}
 
 The following performs our Monte Carlo simulation of $B = 250$ iterations 
@@ -1699,15 +1732,15 @@ when $n = 150$ and shape = $5$.
 \begin{alltt}
 \hlkwd{system.time}\hlstd{(out.gamma.150.2.5} \hlkwb{<-} \hlkwd{do.call}\hlstd{(cbind,}
   \hlkwd{lapply}\hlstd{(}\hlnum{1}\hlopt{:}\hlstd{B,} \hlkwc{FUN} \hlstd{=} \hlkwa{function}\hlstd{(}\hlkwc{j}\hlstd{)\{}
-    \hlkwd{unlist}\hlstd{(}\hlkwd{gamma.simulator}\hlstd{(}\hlkwc{beta} \hlstd{= beta,} \hlkwc{n} \hlstd{= n,}
+    \hlkwd{unlist}\hlstd{(}\hlkwd{gamma_simulator}\hlstd{(}\hlkwc{beta} \hlstd{= beta,} \hlkwc{n} \hlstd{= n,}
       \hlkwc{bins} \hlstd{= bins,} \hlkwc{shape} \hlstd{=} \hlnum{5}\hlstd{))}
 \hlstd{\})))}
 \end{alltt}
-\begin{verbatim}
-##     user   system  elapsed 
-## 7584.710   64.449 4059.795
-\end{verbatim}
-\end{kframe}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in r[, l]/mad.predict.fun(out.mad, xx): non-numeric argument to binary operator}}
+
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 38.53 0.663 7.254}}\end{kframe}
 \end{knitrout}
 
 \begin{knitrout}
@@ -1722,7 +1755,9 @@ when $n = 150$ and shape = $5$.
     \hlstd{sds} \hlopt{/} \hlkwd{sqrt}\hlstd{(lengths)}
   \hlstd{\}))}
 \end{alltt}
-\end{kframe}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in is.data.frame(x): object 'out.gamma.150.2.5' not found}}\end{kframe}
 \end{knitrout}
 
 The following performs our Monte Carlo simulation of $B = 250$ iterations 
@@ -1733,15 +1768,15 @@ when $n = 150$ and shape = $7$.
 \begin{alltt}
 \hlkwd{system.time}\hlstd{(out.gamma.150.2.7} \hlkwb{<-} \hlkwd{do.call}\hlstd{(cbind,}
   \hlkwd{lapply}\hlstd{(}\hlnum{1}\hlopt{:}\hlstd{B,} \hlkwc{FUN} \hlstd{=} \hlkwa{function}\hlstd{(}\hlkwc{j}\hlstd{)\{}
-    \hlkwd{unlist}\hlstd{(}\hlkwd{gamma.simulator}\hlstd{(}\hlkwc{beta} \hlstd{= beta,} \hlkwc{n} \hlstd{= n,}
+    \hlkwd{unlist}\hlstd{(}\hlkwd{gamma_simulator}\hlstd{(}\hlkwc{beta} \hlstd{= beta,} \hlkwc{n} \hlstd{= n,}
       \hlkwc{bins} \hlstd{= bins,} \hlkwc{shape} \hlstd{=} \hlnum{7}\hlstd{))}
 \hlstd{\})))}
 \end{alltt}
-\begin{verbatim}
-##     user   system  elapsed 
-## 7562.858   65.481 4018.408
-\end{verbatim}
-\end{kframe}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in r[, l]/mad.predict.fun(out.mad, xx): non-numeric argument to binary operator}}
+
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 47.88 0.738 8.801}}\end{kframe}
 \end{knitrout}
 
 \begin{knitrout}
@@ -1756,7 +1791,9 @@ when $n = 150$ and shape = $7$.
     \hlstd{sds} \hlopt{/} \hlkwd{sqrt}\hlstd{(lengths)}
   \hlstd{\}))}
 \end{alltt}
-\end{kframe}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in is.data.frame(x): object 'out.gamma.150.2.7' not found}}\end{kframe}
 \end{knitrout}
 
 The following performs our Monte Carlo simulation of $B = 250$ iterations 
@@ -1767,15 +1804,15 @@ when $n = 150$ and shape = $10$.
 \begin{alltt}
 \hlkwd{system.time}\hlstd{(out.gamma.150.2.10} \hlkwb{<-} \hlkwd{do.call}\hlstd{(cbind,}
   \hlkwd{lapply}\hlstd{(}\hlnum{1}\hlopt{:}\hlstd{B,} \hlkwc{FUN} \hlstd{=} \hlkwa{function}\hlstd{(}\hlkwc{j}\hlstd{)\{}
-    \hlkwd{unlist}\hlstd{(}\hlkwd{gamma.simulator}\hlstd{(}\hlkwc{beta} \hlstd{= beta,} \hlkwc{n} \hlstd{= n,}
+    \hlkwd{unlist}\hlstd{(}\hlkwd{gamma_simulator}\hlstd{(}\hlkwc{beta} \hlstd{= beta,} \hlkwc{n} \hlstd{= n,}
       \hlkwc{bins} \hlstd{= bins,} \hlkwc{shape} \hlstd{=} \hlnum{10}\hlstd{))}
 \hlstd{\})))}
 \end{alltt}
-\begin{verbatim}
-##     user   system  elapsed 
-## 7645.495   66.652 4035.760
-\end{verbatim}
-\end{kframe}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in r[, l]/mad.predict.fun(out.mad, xx): non-numeric argument to binary operator}}
+
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 47.18 1.557 8.531}}\end{kframe}
 \end{knitrout}
 
 \begin{knitrout}
@@ -1790,7 +1827,9 @@ when $n = 150$ and shape = $10$.
     \hlstd{sds} \hlopt{/} \hlkwd{sqrt}\hlstd{(lengths)}
   \hlstd{\}))}
 \end{alltt}
-\end{kframe}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in is.data.frame(x): object 'out.gamma.150.2.10' not found}}\end{kframe}
 \end{knitrout}
 
 The following performs our Monte Carlo simulation of $B = 250$ iterations 
@@ -1801,15 +1840,15 @@ when $n = 150$ and shape = $12$.
 \begin{alltt}
 \hlkwd{system.time}\hlstd{(out.gamma.150.2.12} \hlkwb{<-} \hlkwd{do.call}\hlstd{(cbind,}
   \hlkwd{lapply}\hlstd{(}\hlnum{1}\hlopt{:}\hlstd{B,} \hlkwc{FUN} \hlstd{=} \hlkwa{function}\hlstd{(}\hlkwc{j}\hlstd{)\{}
-    \hlkwd{unlist}\hlstd{(}\hlkwd{gamma.simulator}\hlstd{(}\hlkwc{beta} \hlstd{= beta,} \hlkwc{n} \hlstd{= n,}
+    \hlkwd{unlist}\hlstd{(}\hlkwd{gamma_simulator}\hlstd{(}\hlkwc{beta} \hlstd{= beta,} \hlkwc{n} \hlstd{= n,}
       \hlkwc{bins} \hlstd{= bins,} \hlkwc{shape} \hlstd{=} \hlnum{12}\hlstd{))}
 \hlstd{\})))}
 \end{alltt}
-\begin{verbatim}
-##     user   system  elapsed 
-## 7641.583   65.990 4035.577
-\end{verbatim}
-\end{kframe}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in r[, l]/mad.predict.fun(out.mad, xx): non-numeric argument to binary operator}}
+
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 49.33 0.623 8.555}}\end{kframe}
 \end{knitrout}
 
 \begin{knitrout}
@@ -1824,7 +1863,9 @@ when $n = 150$ and shape = $12$.
     \hlstd{sds} \hlopt{/} \hlkwd{sqrt}\hlstd{(lengths)}
   \hlstd{\}))}
 \end{alltt}
-\end{kframe}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in is.data.frame(x): object 'out.gamma.150.2.12' not found}}\end{kframe}
 \end{knitrout}
 
 The following performs our Monte Carlo simulation of $B = 250$ iterations 
@@ -1835,15 +1876,15 @@ when $n = 150$ and shape = $15$.
 \begin{alltt}
 \hlkwd{system.time}\hlstd{(out.gamma.150.2.15} \hlkwb{<-} \hlkwd{do.call}\hlstd{(cbind,}
   \hlkwd{lapply}\hlstd{(}\hlnum{1}\hlopt{:}\hlstd{B,} \hlkwc{FUN} \hlstd{=} \hlkwa{function}\hlstd{(}\hlkwc{j}\hlstd{)\{}
-    \hlkwd{unlist}\hlstd{(}\hlkwd{gamma.simulator}\hlstd{(}\hlkwc{beta} \hlstd{= beta,} \hlkwc{n} \hlstd{= n,}
+    \hlkwd{unlist}\hlstd{(}\hlkwd{gamma_simulator}\hlstd{(}\hlkwc{beta} \hlstd{= beta,} \hlkwc{n} \hlstd{= n,}
       \hlkwc{bins} \hlstd{= bins,} \hlkwc{shape} \hlstd{=} \hlnum{15}\hlstd{))}
 \hlstd{\})))}
 \end{alltt}
-\begin{verbatim}
-##     user   system  elapsed 
-## 7535.949   65.387 4003.467
-\end{verbatim}
-\end{kframe}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in r[, l]/mad.predict.fun(out.mad, xx): non-numeric argument to binary operator}}
+
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 38.89 0.791 7.055}}\end{kframe}
 \end{knitrout}
 
 \begin{knitrout}
@@ -1858,7 +1899,9 @@ when $n = 150$ and shape = $15$.
     \hlstd{sds} \hlopt{/} \hlkwd{sqrt}\hlstd{(lengths)}
   \hlstd{\}))}
 \end{alltt}
-\end{kframe}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in is.data.frame(x): object 'out.gamma.150.2.15' not found}}\end{kframe}
 \end{knitrout}
 
 The following performs our Monte Carlo simulation of $B = 250$ iterations 
@@ -1869,15 +1912,15 @@ when $n = 150$ and shape = $20$.
 \begin{alltt}
 \hlkwd{system.time}\hlstd{(out.gamma.150.2.20} \hlkwb{<-} \hlkwd{do.call}\hlstd{(cbind,}
   \hlkwd{lapply}\hlstd{(}\hlnum{1}\hlopt{:}\hlstd{B,} \hlkwc{FUN} \hlstd{=} \hlkwa{function}\hlstd{(}\hlkwc{j}\hlstd{)\{}
-    \hlkwd{unlist}\hlstd{(}\hlkwd{gamma.simulator}\hlstd{(}\hlkwc{beta} \hlstd{= beta,} \hlkwc{n} \hlstd{= n,}
+    \hlkwd{unlist}\hlstd{(}\hlkwd{gamma_simulator}\hlstd{(}\hlkwc{beta} \hlstd{= beta,} \hlkwc{n} \hlstd{= n,}
       \hlkwc{bins} \hlstd{= bins,} \hlkwc{shape} \hlstd{=} \hlnum{20}\hlstd{))}
 \hlstd{\})))}
 \end{alltt}
-\begin{verbatim}
-##     user   system  elapsed 
-## 7850.360   66.055 4065.622
-\end{verbatim}
-\end{kframe}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in r[, l]/mad.predict.fun(out.mad, xx): non-numeric argument to binary operator}}
+
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 34.47 0.768 6.439}}\end{kframe}
 \end{knitrout}
 
 \begin{knitrout}
@@ -1892,7 +1935,9 @@ when $n = 150$ and shape = $20$.
     \hlstd{sds} \hlopt{/} \hlkwd{sqrt}\hlstd{(lengths)}
   \hlstd{\}))}
 \end{alltt}
-\end{kframe}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in is.data.frame(x): object 'out.gamma.150.2.20' not found}}\end{kframe}
 \end{knitrout}
 
 The following performs our Monte Carlo simulation of $B = 250$ iterations 
@@ -1903,15 +1948,15 @@ when $n = 150$ and shape = $25$.
 \begin{alltt}
 \hlkwd{system.time}\hlstd{(out.gamma.150.2.25} \hlkwb{<-} \hlkwd{do.call}\hlstd{(cbind,}
   \hlkwd{lapply}\hlstd{(}\hlnum{1}\hlopt{:}\hlstd{B,} \hlkwc{FUN} \hlstd{=} \hlkwa{function}\hlstd{(}\hlkwc{j}\hlstd{)\{}
-    \hlkwd{unlist}\hlstd{(}\hlkwd{gamma.simulator}\hlstd{(}\hlkwc{beta} \hlstd{= beta,} \hlkwc{n} \hlstd{= n,}
+    \hlkwd{unlist}\hlstd{(}\hlkwd{gamma_simulator}\hlstd{(}\hlkwc{beta} \hlstd{= beta,} \hlkwc{n} \hlstd{= n,}
       \hlkwc{bins} \hlstd{= bins,} \hlkwc{shape} \hlstd{=} \hlnum{25}\hlstd{))}
 \hlstd{\})))}
 \end{alltt}
-\begin{verbatim}
-##     user   system  elapsed 
-## 7805.004   66.341 4057.034
-\end{verbatim}
-\end{kframe}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in r[, l]/mad.predict.fun(out.mad, xx): non-numeric argument to binary operator}}
+
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 31.57 0.787 5.861}}\end{kframe}
 \end{knitrout}
 
 \begin{knitrout}
@@ -1926,7 +1971,9 @@ when $n = 150$ and shape = $25$.
     \hlstd{sds} \hlopt{/} \hlkwd{sqrt}\hlstd{(lengths)}
   \hlstd{\}))}
 \end{alltt}
-\end{kframe}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in is.data.frame(x): object 'out.gamma.150.2.25' not found}}\end{kframe}
 \end{knitrout}
 
 The following performs our Monte Carlo simulation of $B = 250$ iterations 
@@ -1937,15 +1984,15 @@ when $n = 150$ and shape = $30$.
 \begin{alltt}
 \hlkwd{system.time}\hlstd{(out.gamma.150.2.30} \hlkwb{<-} \hlkwd{do.call}\hlstd{(cbind,}
   \hlkwd{lapply}\hlstd{(}\hlnum{1}\hlopt{:}\hlstd{B,} \hlkwc{FUN} \hlstd{=} \hlkwa{function}\hlstd{(}\hlkwc{j}\hlstd{)\{}
-    \hlkwd{unlist}\hlstd{(}\hlkwd{gamma.simulator}\hlstd{(}\hlkwc{beta} \hlstd{= beta,} \hlkwc{n} \hlstd{= n,}
+    \hlkwd{unlist}\hlstd{(}\hlkwd{gamma_simulator}\hlstd{(}\hlkwc{beta} \hlstd{= beta,} \hlkwc{n} \hlstd{= n,}
       \hlkwc{bins} \hlstd{= bins,} \hlkwc{shape} \hlstd{=} \hlnum{30}\hlstd{))}
 \hlstd{\})))}
 \end{alltt}
-\begin{verbatim}
-##     user   system  elapsed 
-## 8044.189   68.723 4100.474
-\end{verbatim}
-\end{kframe}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in r[, l]/mad.predict.fun(out.mad, xx): non-numeric argument to binary operator}}
+
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 38.46 0.766 6.823}}\end{kframe}
 \end{knitrout}
 
 \begin{knitrout}
@@ -1960,7 +2007,9 @@ when $n = 150$ and shape = $30$.
     \hlstd{sds} \hlopt{/} \hlkwd{sqrt}\hlstd{(lengths)}
   \hlstd{\}))}
 \end{alltt}
-\end{kframe}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in is.data.frame(x): object 'out.gamma.150.2.30' not found}}\end{kframe}
 \end{knitrout}
 
 The following performs our Monte Carlo simulation of $B = 250$ iterations 
@@ -1971,15 +2020,15 @@ when $n = 150$ and shape = $40$.
 \begin{alltt}
 \hlkwd{system.time}\hlstd{(out.gamma.150.2.40} \hlkwb{<-} \hlkwd{do.call}\hlstd{(cbind,}
   \hlkwd{lapply}\hlstd{(}\hlnum{1}\hlopt{:}\hlstd{B,} \hlkwc{FUN} \hlstd{=} \hlkwa{function}\hlstd{(}\hlkwc{j}\hlstd{)\{}
-    \hlkwd{unlist}\hlstd{(}\hlkwd{gamma.simulator}\hlstd{(}\hlkwc{beta} \hlstd{= beta,} \hlkwc{n} \hlstd{= n,}
+    \hlkwd{unlist}\hlstd{(}\hlkwd{gamma_simulator}\hlstd{(}\hlkwc{beta} \hlstd{= beta,} \hlkwc{n} \hlstd{= n,}
       \hlkwc{bins} \hlstd{= bins,} \hlkwc{shape} \hlstd{=} \hlnum{40}\hlstd{))}
 \hlstd{\})))}
 \end{alltt}
-\begin{verbatim}
-##     user   system  elapsed 
-## 7968.318   65.667 4073.458
-\end{verbatim}
-\end{kframe}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in r[, l]/mad.predict.fun(out.mad, xx): non-numeric argument to binary operator}}
+
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 35.17 0.76 6.279}}\end{kframe}
 \end{knitrout}
 
 \begin{knitrout}
@@ -1994,7 +2043,9 @@ when $n = 150$ and shape = $40$.
     \hlstd{sds} \hlopt{/} \hlkwd{sqrt}\hlstd{(lengths)}
   \hlstd{\}))}
 \end{alltt}
-\end{kframe}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in is.data.frame(x): object 'out.gamma.150.2.40' not found}}\end{kframe}
 \end{knitrout}
 
 The following performs our Monte Carlo simulation of $B = 250$ iterations 
@@ -2005,15 +2056,15 @@ when $n = 150$ and shape = $50$.
 \begin{alltt}
 \hlkwd{system.time}\hlstd{(out.gamma.150.2.50} \hlkwb{<-} \hlkwd{do.call}\hlstd{(cbind,}
   \hlkwd{lapply}\hlstd{(}\hlnum{1}\hlopt{:}\hlstd{B,} \hlkwc{FUN} \hlstd{=} \hlkwa{function}\hlstd{(}\hlkwc{j}\hlstd{)\{}
-    \hlkwd{unlist}\hlstd{(}\hlkwd{gamma.simulator}\hlstd{(}\hlkwc{beta} \hlstd{= beta,} \hlkwc{n} \hlstd{= n,}
+    \hlkwd{unlist}\hlstd{(}\hlkwd{gamma_simulator}\hlstd{(}\hlkwc{beta} \hlstd{= beta,} \hlkwc{n} \hlstd{= n,}
       \hlkwc{bins} \hlstd{= bins,} \hlkwc{shape} \hlstd{=} \hlnum{50}\hlstd{))}
 \hlstd{\})))}
 \end{alltt}
-\begin{verbatim}
-##     user   system  elapsed 
-## 8087.560   66.821 4086.898
-\end{verbatim}
-\end{kframe}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in r[, l]/mad.predict.fun(out.mad, xx): non-numeric argument to binary operator}}
+
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 39.38 1.183 7.213}}\end{kframe}
 \end{knitrout}
 
 \begin{knitrout}
@@ -2028,7 +2079,9 @@ when $n = 150$ and shape = $50$.
     \hlstd{sds} \hlopt{/} \hlkwd{sqrt}\hlstd{(lengths)}
   \hlstd{\}))}
 \end{alltt}
-\end{kframe}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in is.data.frame(x): object 'out.gamma.150.2.50' not found}}\end{kframe}
 \end{knitrout}
 
 The following performs our Monte Carlo simulation of $B = 250$ iterations 
@@ -2039,15 +2092,15 @@ when $n = 150$ and shape = $60$.
 \begin{alltt}
 \hlkwd{system.time}\hlstd{(out.gamma.150.2.60} \hlkwb{<-} \hlkwd{do.call}\hlstd{(cbind,}
   \hlkwd{lapply}\hlstd{(}\hlnum{1}\hlopt{:}\hlstd{B,} \hlkwc{FUN} \hlstd{=} \hlkwa{function}\hlstd{(}\hlkwc{j}\hlstd{)\{}
-    \hlkwd{unlist}\hlstd{(}\hlkwd{gamma.simulator}\hlstd{(}\hlkwc{beta} \hlstd{= beta,} \hlkwc{n} \hlstd{= n,}
+    \hlkwd{unlist}\hlstd{(}\hlkwd{gamma_simulator}\hlstd{(}\hlkwc{beta} \hlstd{= beta,} \hlkwc{n} \hlstd{= n,}
       \hlkwc{bins} \hlstd{= bins,} \hlkwc{shape} \hlstd{=} \hlnum{60}\hlstd{))}
 \hlstd{\})))}
 \end{alltt}
-\begin{verbatim}
-##     user   system  elapsed 
-## 8543.967   70.317 4309.284
-\end{verbatim}
-\end{kframe}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in r[, l]/mad.predict.fun(out.mad, xx): non-numeric argument to binary operator}}
+
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 45.26 0.76 7.967}}\end{kframe}
 \end{knitrout}
 
 \begin{knitrout}
@@ -2062,7 +2115,9 @@ when $n = 150$ and shape = $60$.
     \hlstd{sds} \hlopt{/} \hlkwd{sqrt}\hlstd{(lengths)}
   \hlstd{\}))}
 \end{alltt}
-\end{kframe}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in is.data.frame(x): object 'out.gamma.150.2.60' not found}}\end{kframe}
 \end{knitrout}
 
 The following performs our Monte Carlo simulation of $B = 250$ iterations 
@@ -2073,15 +2128,15 @@ when $n = 150$ and shape = $70$.
 \begin{alltt}
 \hlkwd{system.time}\hlstd{(out.gamma.150.2.70} \hlkwb{<-} \hlkwd{do.call}\hlstd{(cbind,}
   \hlkwd{lapply}\hlstd{(}\hlnum{1}\hlopt{:}\hlstd{B,} \hlkwc{FUN} \hlstd{=} \hlkwa{function}\hlstd{(}\hlkwc{j}\hlstd{)\{}
-    \hlkwd{unlist}\hlstd{(}\hlkwd{gamma.simulator}\hlstd{(}\hlkwc{beta} \hlstd{= beta,} \hlkwc{n} \hlstd{= n,}
+    \hlkwd{unlist}\hlstd{(}\hlkwd{gamma_simulator}\hlstd{(}\hlkwc{beta} \hlstd{= beta,} \hlkwc{n} \hlstd{= n,}
       \hlkwc{bins} \hlstd{= bins,} \hlkwc{shape} \hlstd{=} \hlnum{70}\hlstd{))}
 \hlstd{\})))}
 \end{alltt}
-\begin{verbatim}
-##     user   system  elapsed 
-## 9038.847   73.108 4394.150
-\end{verbatim}
-\end{kframe}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in r[, l]/mad.predict.fun(out.mad, xx): non-numeric argument to binary operator}}
+
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 37.39 0.786 6.828}}\end{kframe}
 \end{knitrout}
 
 \begin{knitrout}
@@ -2096,7 +2151,9 @@ when $n = 150$ and shape = $70$.
     \hlstd{sds} \hlopt{/} \hlkwd{sqrt}\hlstd{(lengths)}
   \hlstd{\}))}
 \end{alltt}
-\end{kframe}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in is.data.frame(x): object 'out.gamma.150.2.70' not found}}\end{kframe}
 \end{knitrout}
 
 The following performs our Monte Carlo simulation of $B = 250$ iterations 
@@ -2107,15 +2164,15 @@ when $n = 150$ and shape = $80$.
 \begin{alltt}
 \hlkwd{system.time}\hlstd{(out.gamma.150.2.80} \hlkwb{<-} \hlkwd{do.call}\hlstd{(cbind,}
   \hlkwd{lapply}\hlstd{(}\hlnum{1}\hlopt{:}\hlstd{B,} \hlkwc{FUN} \hlstd{=} \hlkwa{function}\hlstd{(}\hlkwc{j}\hlstd{)\{}
-    \hlkwd{unlist}\hlstd{(}\hlkwd{gamma.simulator}\hlstd{(}\hlkwc{beta} \hlstd{= beta,} \hlkwc{n} \hlstd{= n,}
+    \hlkwd{unlist}\hlstd{(}\hlkwd{gamma_simulator}\hlstd{(}\hlkwc{beta} \hlstd{= beta,} \hlkwc{n} \hlstd{= n,}
       \hlkwc{bins} \hlstd{= bins,} \hlkwc{shape} \hlstd{=} \hlnum{80}\hlstd{))}
 \hlstd{\})))}
 \end{alltt}
-\begin{verbatim}
-##     user   system  elapsed 
-## 9580.813   75.711 4638.776
-\end{verbatim}
-\end{kframe}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in r[, l]/mad.predict.fun(out.mad, xx): non-numeric argument to binary operator}}
+
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 34.85 0.883 6.449}}\end{kframe}
 \end{knitrout}
 
 \begin{knitrout}
@@ -2130,7 +2187,9 @@ when $n = 150$ and shape = $80$.
     \hlstd{sds} \hlopt{/} \hlkwd{sqrt}\hlstd{(lengths)}
   \hlstd{\}))}
 \end{alltt}
-\end{kframe}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in is.data.frame(x): object 'out.gamma.150.2.80' not found}}\end{kframe}
 \end{knitrout}
 
 The following performs our Monte Carlo simulation of $B = 250$ iterations 
@@ -2141,15 +2200,15 @@ when $n = 150$ and shape = $90$.
 \begin{alltt}
 \hlkwd{system.time}\hlstd{(out.gamma.150.2.90} \hlkwb{<-} \hlkwd{do.call}\hlstd{(cbind,}
   \hlkwd{lapply}\hlstd{(}\hlnum{1}\hlopt{:}\hlstd{B,} \hlkwc{FUN} \hlstd{=} \hlkwa{function}\hlstd{(}\hlkwc{j}\hlstd{)\{}
-    \hlkwd{unlist}\hlstd{(}\hlkwd{gamma.simulator}\hlstd{(}\hlkwc{beta} \hlstd{= beta,} \hlkwc{n} \hlstd{= n,}
+    \hlkwd{unlist}\hlstd{(}\hlkwd{gamma_simulator}\hlstd{(}\hlkwc{beta} \hlstd{= beta,} \hlkwc{n} \hlstd{= n,}
       \hlkwc{bins} \hlstd{= bins,} \hlkwc{shape} \hlstd{=} \hlnum{90}\hlstd{))}
 \hlstd{\})))}
 \end{alltt}
-\begin{verbatim}
-##     user   system  elapsed 
-## 9410.124   74.038 4608.842
-\end{verbatim}
-\end{kframe}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in r[, l]/mad.predict.fun(out.mad, xx): non-numeric argument to binary operator}}
+
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 33.05 1.506 6.207}}\end{kframe}
 \end{knitrout}
 
 \begin{knitrout}
@@ -2164,7 +2223,9 @@ when $n = 150$ and shape = $90$.
     \hlstd{sds} \hlopt{/} \hlkwd{sqrt}\hlstd{(lengths)}
   \hlstd{\}))}
 \end{alltt}
-\end{kframe}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in is.data.frame(x): object 'out.gamma.150.2.90' not found}}\end{kframe}
 \end{knitrout}
 
 The following performs our Monte Carlo simulation of $B = 250$ iterations 
@@ -2175,15 +2236,15 @@ when $n = 150$ and shape = $100$.
 \begin{alltt}
 \hlkwd{system.time}\hlstd{(out.gamma.150.2.100} \hlkwb{<-} \hlkwd{do.call}\hlstd{(cbind,}
   \hlkwd{lapply}\hlstd{(}\hlnum{1}\hlopt{:}\hlstd{B,} \hlkwc{FUN} \hlstd{=} \hlkwa{function}\hlstd{(}\hlkwc{j}\hlstd{)\{}
-    \hlkwd{unlist}\hlstd{(}\hlkwd{gamma.simulator}\hlstd{(}\hlkwc{beta} \hlstd{= beta,} \hlkwc{n} \hlstd{= n,}
+    \hlkwd{unlist}\hlstd{(}\hlkwd{gamma_simulator}\hlstd{(}\hlkwc{beta} \hlstd{= beta,} \hlkwc{n} \hlstd{= n,}
       \hlkwc{bins} \hlstd{= bins,} \hlkwc{shape} \hlstd{=} \hlnum{100}\hlstd{))}
 \hlstd{\})))}
 \end{alltt}
-\begin{verbatim}
-##     user   system  elapsed 
-## 9667.834   76.044 4650.667
-\end{verbatim}
-\end{kframe}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in r[, l]/mad.predict.fun(out.mad, xx): non-numeric argument to binary operator}}
+
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 43.15 0.733 7.725}}\end{kframe}
 \end{knitrout}
 
 \begin{knitrout}
@@ -2198,7 +2259,9 @@ when $n = 150$ and shape = $100$.
     \hlstd{sds} \hlopt{/} \hlkwd{sqrt}\hlstd{(lengths)}
   \hlstd{\}))}
 \end{alltt}
-\end{kframe}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in is.data.frame(x): object 'out.gamma.150.2.100' not found}}\end{kframe}
 \end{knitrout}
 
 
@@ -2265,7 +2328,9 @@ Reorganize the output.
   \hlstd{HD.area.gamma.150[k]} \hlkwb{<-} \hlkwd{as.numeric}\hlstd{(internal.output[}\hlnum{150}\hlstd{,} \hlnum{1}\hlstd{])}
 \hlstd{\}}
 \end{alltt}
-\end{kframe}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(parse(text = paste("{}gamma.150.2"{}, j, sep = "{}."{}))): object 'gamma.150.2.0.5' not found}}\end{kframe}
 \end{knitrout}
 
 
