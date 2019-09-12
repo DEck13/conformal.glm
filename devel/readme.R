@@ -278,7 +278,7 @@ lines(x[ix], parabinCI[ix, 2], type = "l", lwd = 2, lty = 2, col = "blue")
 lines(x[ix], HDCI[ix, 1], type = "l", lwd = 2, lty = 3, col = "black")
 lines(x[ix], HDCI[ix, 2], type = "l", lwd = 2, lty = 3, col = "black")
 axis(1); axis(2)
-legend(0.55, 12.5, legend=c("transformation conformal", 
+legend(0.47, 12.5, legend=c("transformation conformal", 
   "binned parametric conformal", "HD region"), 
   col=c("red", "blue", "black"), cex = 1, lwd = c(2, 2, 2),
   lty=c(1, 2, 3), bty = "n")
@@ -299,7 +299,7 @@ lines(x[ix], parabinCI[ix, 2], type = "l", lwd = 2, lty = 2, col = "blue")
 lines(x[ix], HDCI[ix, 1], type = "l", lwd = 2, lty = 3, col = "black")
 lines(x[ix], HDCI[ix, 2], type = "l", lwd = 2, lty = 3, col = "black")
 axis(1); axis(2)
-legend(0.55, 12.5, legend=c("transformation conformal", 
+legend(0.47, 12.5, legend=c("transformation conformal", 
   "binned parametric conformal", "HD region"), 
   col=c("red", "blue", "black"), cex = 1, lwd = c(2, 2, 2),
   lty=c(1, 2, 3), bty = "n")

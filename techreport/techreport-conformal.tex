@@ -566,7 +566,7 @@ region.
 \hlkwd{xtable}\hlstd{(diagnostics,} \hlkwc{digits} \hlstd{=} \hlkwd{c}\hlstd{(}\hlnum{0}\hlstd{,} \hlnum{2}\hlstd{,} \hlnum{2}\hlstd{,} \hlnum{2}\hlstd{,} \hlnum{2}\hlstd{,} \hlnum{2}\hlstd{))}
 \end{alltt}
 \end{kframe}% latex table generated in R 3.4.4 by xtable 1.8-3 package
-% Wed Sep  4 08:35:36 2019
+% Thu Sep 12 01:00:11 2019
 \begin{table}[ht]
 \centering
 \begin{tabular}{rrrrrr}
@@ -720,14 +720,7 @@ for every generated dataset.
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 \begin{alltt}
-\hlstd{funs} \hlkwb{<-} \hlkwd{lm.funs}\hlstd{(}\hlkwc{intercept} \hlstd{=} \hlnum{TRUE}\hlstd{)}
-\hlstd{train.fun} \hlkwb{<-} \hlstd{funs}\hlopt{$}\hlstd{train.fun}
-\hlstd{predict.fun} \hlkwb{<-} \hlstd{funs}\hlopt{$}\hlstd{predict.fun}
-\hlstd{mad.predict.fun} \hlkwb{<-} \hlkwa{function}\hlstd{(}\hlkwc{out}\hlstd{,} \hlkwc{newx}\hlstd{)\{}
-  \hlstd{newx} \hlkwb{<-} \hlkwd{as.numeric}\hlstd{(newx)}
-  \hlkwd{predict}\hlstd{(out, newx[,} \hlnum{1}\hlstd{])}\hlopt{$}\hlstd{y}
-\hlstd{\}}
-
+\hlstd{dat} \hlkwb{<-} \hlstd{data.readme}
 \hlstd{gamma_simulator} \hlkwb{<-} \hlkwa{function}\hlstd{(}\hlkwc{beta}\hlstd{,} \hlkwc{n} \hlstd{=} \hlnum{500}\hlstd{,} \hlkwc{alpha} \hlstd{=} \hlnum{0.10}\hlstd{,} \hlkwc{bins} \hlstd{=} \hlnum{3}\hlstd{,}
   \hlkwc{family} \hlstd{=} \hlstr{"Gamma"}\hlstd{,} \hlkwc{link} \hlstd{=} \hlstr{"inverse"}\hlstd{,} \hlkwc{shape} \hlstd{=} \hlnum{2}\hlstd{,}
   \hlkwc{parametric} \hlstd{=} \hlnum{TRUE}\hlstd{,} \hlkwc{nonparametric} \hlstd{=} \hlnum{TRUE}\hlstd{,} \hlkwc{method} \hlstd{=} \hlstr{"both"}\hlstd{,}
@@ -737,7 +730,8 @@ for every generated dataset.
   \hlstd{p} \hlkwb{<-} \hlstd{d} \hlkwb{<-} \hlkwd{length}\hlstd{(beta)} \hlopt{-} \hlnum{1}
   \hlstd{x} \hlkwb{<-} \hlkwd{matrix}\hlstd{(}\hlkwd{runif}\hlstd{(n}\hlopt{*}\hlstd{p),} \hlkwc{ncol} \hlstd{= p)}
   \hlstd{y} \hlkwb{<-} \hlkwd{rep}\hlstd{(}\hlnum{0}\hlstd{,n)}
-  \hlstd{dat} \hlkwb{<-} \hlkwa{NULL}
+  \hlstd{dat} \hlkwb{<-} \hlkwd{data.frame}\hlstd{(}\hlkwc{Date}\hlstd{=}\hlkwd{as.Date}\hlstd{(}\hlkwd{character}\hlstd{()),}
+    \hlkwc{File}\hlstd{=}\hlkwd{character}\hlstd{(),} \hlkwc{User}\hlstd{=}\hlkwd{character}\hlstd{(),} \hlkwc{stringsAsFactors}\hlstd{=}\hlnum{FALSE}\hlstd{)}
 
   \hlcom{## set up partition}
   \hlkwa{if}\hlstd{(}\hlkwd{class}\hlstd{(bins)} \hlopt{==} \hlstr{"NULL"}\hlstd{)\{}
@@ -786,7 +780,7 @@ for every generated dataset.
 
   \hlcom{## fit the Gamma regression model}
   \hlstd{fit} \hlkwb{<-} \hlkwd{glm}\hlstd{(y} \hlopt{~} \hlstd{x1,} \hlkwc{family} \hlstd{=} \hlstr{"Gamma"}\hlstd{,} \hlkwc{data} \hlstd{= dat)}
-  \hlkwd{assign}\hlstd{(}\hlstr{"dat"}\hlstd{, dat, .GlobalEnv)}
+  \hlstd{fit}\hlopt{$}\hlstd{data} \hlkwb{<-} \hlstd{dat}
   \hlstd{parabinCI} \hlkwb{<-} \hlstd{transformCI} \hlkwb{<-} \hlstd{nonparabinCI} \hlkwb{<-} \hlstd{LSCI} \hlkwb{<-}
     \hlstd{LSLWCI} \hlkwb{<-} \hlstd{HDCI} \hlkwb{<-} \hlkwa{NULL}
   \hlstd{formula} \hlkwb{<-} \hlstd{fit}\hlopt{$}\hlstd{formula}
@@ -1194,14 +1188,15 @@ These conformal prediction regions are now constructed.
 \begin{alltt}
 \hlcom{## Gamma conformal}
 \hlkwd{system.time}\hlstd{(conformal.gamma} \hlkwb{<-}
-  \hlkwd{conformal.glm}\hlstd{(m.gamma.log,} \hlkwc{cores} \hlstd{=} \hlnum{6}\hlstd{,} \hlkwc{bins} \hlstd{=} \hlnum{1}\hlstd{))}
+  \hlkwd{conformal.glm}\hlstd{(m.gamma.log,} \hlkwc{cores} \hlstd{=} \hlnum{6}\hlstd{,} \hlkwc{bins} \hlstd{=} \hlnum{1}\hlstd{,}
+    \hlkwc{method} \hlstd{=} \hlstr{"both"}\hlstd{))}
 \end{alltt}
 \begin{verbatim}
-##    user  system elapsed 
-##  85.879   0.303  19.841
+##     user   system  elapsed 
+## 1049.673    1.417  189.749
 \end{verbatim}
 \begin{alltt}
-\hlstd{conformal.gamma} \hlkwb{<-} \hlstd{conformal.gamma}\hlopt{$}\hlstd{paraconformal}
+\hlstd{conformal.gamma} \hlkwb{<-} \hlstd{conformal.gamma}\hlopt{$}\hlstd{paraconfbin}
 \hlkwd{head}\hlstd{(conformal.gamma)}
 \end{alltt}
 \begin{verbatim}
@@ -1216,14 +1211,15 @@ These conformal prediction regions are now constructed.
 \begin{alltt}
 \hlcom{## Gaussian conformal}
 \hlkwd{system.time}\hlstd{(conformal.gaussian} \hlkwb{<-}
-  \hlkwd{conformal.glm}\hlstd{(m.gaussian,} \hlkwc{cores} \hlstd{=} \hlnum{6}\hlstd{,} \hlkwc{bins} \hlstd{=} \hlnum{1}\hlstd{))}
+  \hlkwd{conformal.glm}\hlstd{(m.gaussian,} \hlkwc{cores} \hlstd{=} \hlnum{6}\hlstd{,} \hlkwc{bins} \hlstd{=} \hlnum{1}\hlstd{,}
+    \hlkwc{method} \hlstd{=} \hlstr{"both"}\hlstd{))}
 \end{alltt}
 \begin{verbatim}
 ##    user  system elapsed 
-##  58.904   0.392   9.269
+## 561.389   1.320  96.774
 \end{verbatim}
 \begin{alltt}
-\hlstd{conformal.gaussian} \hlkwb{<-} \hlstd{conformal.gaussian}\hlopt{$}\hlstd{paraconformal}
+\hlstd{conformal.gaussian} \hlkwb{<-} \hlstd{conformal.gaussian}\hlopt{$}\hlstd{paraconfbin}
 \hlkwd{head}\hlstd{(conformal.gaussian)}
 \end{alltt}
 \begin{verbatim}
@@ -1249,7 +1245,7 @@ These conformal prediction regions are now constructed.
 \end{alltt}
 \begin{verbatim}
 ##    user  system elapsed 
-##   2.481   0.011   2.493
+##   6.197   0.000   6.199
 \end{verbatim}
 \begin{alltt}
 \hlstd{LS} \hlkwb{=} \hlkwd{cbind}\hlstd{(p1.tibs}\hlopt{$}\hlstd{lo, p1.tibs}\hlopt{$}\hlstd{up)}
@@ -1258,12 +1254,12 @@ These conformal prediction regions are now constructed.
 \end{alltt}
 \begin{verbatim}
 ##           lwr      upr
-## [1,] 2.034091 7.792133
-## [2,] 2.253147 7.917308
-## [3,] 3.751768 9.545698
-## [4,] 3.022078 8.730944
-## [5,] 3.513430 9.319835
-## [6,] 2.298523 8.045960
+## [1,] 2.237500 7.526137
+## [2,] 2.644318 7.526137
+## [3,] 3.864773 9.153409
+## [4,] 3.051136 8.339773
+## [5,] 3.864773 9.153409
+## [6,] 2.644318 7.932955
 \end{verbatim}
 \begin{alltt}
 \hlcom{## LSLW conformal}
@@ -1282,7 +1278,7 @@ These conformal prediction regions are now constructed.
 \end{alltt}
 \begin{verbatim}
 ##    user  system elapsed 
-##  47.584   0.008  47.591
+##  68.467   0.014  68.514
 \end{verbatim}
 \begin{alltt}
 \hlstd{LSLW} \hlkwb{=} \hlkwd{cbind}\hlstd{(p2.tibs}\hlopt{$}\hlstd{lo, p2.tibs}\hlopt{$}\hlstd{up)}
@@ -1291,12 +1287,12 @@ These conformal prediction regions are now constructed.
 \end{alltt}
 \begin{verbatim}
 ##           lwr       upr
-## [1,] 2.802525  7.058296
-## [2,] 2.974858  7.246449
-## [3,] 2.169697 11.255303
-## [4,] 2.359546  9.509375
-## [5,] 2.196818 10.577273
-## [6,] 2.905844  7.413132
+## [1,] 3.051136  6.712500
+## [2,] 3.051136  7.119318
+## [3,] 2.237500 11.187500
+## [4,] 2.644318  9.153409
+## [5,] 2.237500 10.373864
+## [6,] 3.051136  7.119318
 \end{verbatim}
 \end{kframe}
 \end{knitrout}
@@ -1472,17 +1468,17 @@ Table 2 and Figure 4 in \citet{eck2019conformal} are shown below.
 \hlkwd{xtable}\hlstd{(diagnostics,} \hlkwc{digits} \hlstd{=} \hlkwd{c}\hlstd{(}\hlnum{0}\hlstd{,} \hlnum{3}\hlstd{,} \hlnum{3}\hlstd{,} \hlnum{3}\hlstd{,} \hlnum{3}\hlstd{))}
 \end{alltt}
 \end{kframe}% latex table generated in R 3.4.4 by xtable 1.8-3 package
-% Wed Sep  4 08:35:37 2019
+% Thu Sep 12 01:06:14 2019
 \begin{table}[ht]
 \centering
 \begin{tabular}{rrrrr}
   \hline
  & gamma & gaussian & LSLW & LS \\ 
   \hline
-marginal coverage & 0.909 & 0.906 & 0.906 & 0.909 \\ 
-  volume & 7.349 & 7.730 & 8.983 & 7.601 \\ 
-  pred error & 0.931 & 0.849 & 0.744 & 0.883 \\ 
-  avg.cond.coverage & 0.874 & 0.849 & 0.889 & 0.860 \\ 
+marginal coverage & 0.909 & 0.906 & 0.880 & 0.888 \\ 
+  volume & 7.349 & 7.730 & 8.574 & 7.103 \\ 
+  pred error & 0.931 & 0.849 & 0.803 & 1.012 \\ 
+  avg.cond.coverage & 0.874 & 0.849 & 0.863 & 0.827 \\ 
    \hline
 \end{tabular}
 \end{table}
@@ -1558,9 +1554,9 @@ when $n = 150$ and shape = $0.5$.
 \end{alltt}
 
 
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in r[, l]/mad.predict.fun(out.mad, xx): non-numeric argument to binary operator}}
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(predvars, data, env): object 'x1' not found}}
 
-{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 47.47 1.415 9.022}}\end{kframe}
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.125 0 0.125}}\end{kframe}
 \end{knitrout}
 
 \begin{knitrout}
@@ -1594,9 +1590,9 @@ when $n = 150$ and shape = $0.75$.
 \end{alltt}
 
 
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in r[, l]/mad.predict.fun(out.mad, xx): non-numeric argument to binary operator}}
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(predvars, data, env): object 'x1' not found}}
 
-{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 54.82 0.8 9.444}}\end{kframe}
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.002 0 0.002}}\end{kframe}
 \end{knitrout}
 
 \begin{knitrout}
@@ -1630,9 +1626,9 @@ when $n = 150$ and shape = $1$.
 \end{alltt}
 
 
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in r[, l]/mad.predict.fun(out.mad, xx): non-numeric argument to binary operator}}
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(predvars, data, env): object 'x1' not found}}
 
-{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 54.56 0.745 9.501}}\end{kframe}
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.003 0 0.003}}\end{kframe}
 \end{knitrout}
 
 \begin{knitrout}
@@ -1666,9 +1662,9 @@ when $n = 150$ and shape = $1.5$.
 \end{alltt}
 
 
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in r[, l]/mad.predict.fun(out.mad, xx): non-numeric argument to binary operator}}
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(predvars, data, env): object 'x1' not found}}
 
-{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 40.15 1.424 7.519}}\end{kframe}
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.002 0 0.002}}\end{kframe}
 \end{knitrout}
 
 \begin{knitrout}
@@ -1702,9 +1698,9 @@ when $n = 150$ and shape = $2$.
 \end{alltt}
 
 
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in r[, l]/mad.predict.fun(out.mad, xx): non-numeric argument to binary operator}}
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(predvars, data, env): object 'x1' not found}}
 
-{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 42.46 0.648 7.737}}\end{kframe}
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.002 0 0.002}}\end{kframe}
 \end{knitrout}
 
 \begin{knitrout}
@@ -1738,9 +1734,9 @@ when $n = 150$ and shape = $5$.
 \end{alltt}
 
 
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in r[, l]/mad.predict.fun(out.mad, xx): non-numeric argument to binary operator}}
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(predvars, data, env): object 'x1' not found}}
 
-{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 38.53 0.663 7.254}}\end{kframe}
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.002 0 0.002}}\end{kframe}
 \end{knitrout}
 
 \begin{knitrout}
@@ -1774,9 +1770,9 @@ when $n = 150$ and shape = $7$.
 \end{alltt}
 
 
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in r[, l]/mad.predict.fun(out.mad, xx): non-numeric argument to binary operator}}
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(predvars, data, env): object 'x1' not found}}
 
-{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 47.88 0.738 8.801}}\end{kframe}
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.002 0 0.002}}\end{kframe}
 \end{knitrout}
 
 \begin{knitrout}
@@ -1810,9 +1806,9 @@ when $n = 150$ and shape = $10$.
 \end{alltt}
 
 
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in r[, l]/mad.predict.fun(out.mad, xx): non-numeric argument to binary operator}}
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(predvars, data, env): object 'x1' not found}}
 
-{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 47.18 1.557 8.531}}\end{kframe}
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.002 0 0.003}}\end{kframe}
 \end{knitrout}
 
 \begin{knitrout}
@@ -1846,9 +1842,9 @@ when $n = 150$ and shape = $12$.
 \end{alltt}
 
 
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in r[, l]/mad.predict.fun(out.mad, xx): non-numeric argument to binary operator}}
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(predvars, data, env): object 'x1' not found}}
 
-{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 49.33 0.623 8.555}}\end{kframe}
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.003 0 0.003}}\end{kframe}
 \end{knitrout}
 
 \begin{knitrout}
@@ -1882,9 +1878,9 @@ when $n = 150$ and shape = $15$.
 \end{alltt}
 
 
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in r[, l]/mad.predict.fun(out.mad, xx): non-numeric argument to binary operator}}
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(predvars, data, env): object 'x1' not found}}
 
-{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 38.89 0.791 7.055}}\end{kframe}
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.003 0 0.002}}\end{kframe}
 \end{knitrout}
 
 \begin{knitrout}
@@ -1918,9 +1914,9 @@ when $n = 150$ and shape = $20$.
 \end{alltt}
 
 
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in r[, l]/mad.predict.fun(out.mad, xx): non-numeric argument to binary operator}}
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(predvars, data, env): object 'x1' not found}}
 
-{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 34.47 0.768 6.439}}\end{kframe}
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.002 0 0.002}}\end{kframe}
 \end{knitrout}
 
 \begin{knitrout}
@@ -1954,9 +1950,9 @@ when $n = 150$ and shape = $25$.
 \end{alltt}
 
 
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in r[, l]/mad.predict.fun(out.mad, xx): non-numeric argument to binary operator}}
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(predvars, data, env): object 'x1' not found}}
 
-{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 31.57 0.787 5.861}}\end{kframe}
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.002 0 0.002}}\end{kframe}
 \end{knitrout}
 
 \begin{knitrout}
@@ -1990,9 +1986,9 @@ when $n = 150$ and shape = $30$.
 \end{alltt}
 
 
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in r[, l]/mad.predict.fun(out.mad, xx): non-numeric argument to binary operator}}
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(predvars, data, env): object 'x1' not found}}
 
-{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 38.46 0.766 6.823}}\end{kframe}
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.003 0 0.002}}\end{kframe}
 \end{knitrout}
 
 \begin{knitrout}
@@ -2026,9 +2022,9 @@ when $n = 150$ and shape = $40$.
 \end{alltt}
 
 
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in r[, l]/mad.predict.fun(out.mad, xx): non-numeric argument to binary operator}}
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(predvars, data, env): object 'x1' not found}}
 
-{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 35.17 0.76 6.279}}\end{kframe}
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.003 0 0.003}}\end{kframe}
 \end{knitrout}
 
 \begin{knitrout}
@@ -2062,9 +2058,9 @@ when $n = 150$ and shape = $50$.
 \end{alltt}
 
 
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in r[, l]/mad.predict.fun(out.mad, xx): non-numeric argument to binary operator}}
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(predvars, data, env): object 'x1' not found}}
 
-{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 39.38 1.183 7.213}}\end{kframe}
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.002 0 0.002}}\end{kframe}
 \end{knitrout}
 
 \begin{knitrout}
@@ -2098,9 +2094,9 @@ when $n = 150$ and shape = $60$.
 \end{alltt}
 
 
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in r[, l]/mad.predict.fun(out.mad, xx): non-numeric argument to binary operator}}
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(predvars, data, env): object 'x1' not found}}
 
-{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 45.26 0.76 7.967}}\end{kframe}
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.004 0 0.004}}\end{kframe}
 \end{knitrout}
 
 \begin{knitrout}
@@ -2134,9 +2130,9 @@ when $n = 150$ and shape = $70$.
 \end{alltt}
 
 
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in r[, l]/mad.predict.fun(out.mad, xx): non-numeric argument to binary operator}}
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(predvars, data, env): object 'x1' not found}}
 
-{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 37.39 0.786 6.828}}\end{kframe}
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.002 0 0.003}}\end{kframe}
 \end{knitrout}
 
 \begin{knitrout}
@@ -2170,9 +2166,9 @@ when $n = 150$ and shape = $80$.
 \end{alltt}
 
 
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in r[, l]/mad.predict.fun(out.mad, xx): non-numeric argument to binary operator}}
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(predvars, data, env): object 'x1' not found}}
 
-{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 34.85 0.883 6.449}}\end{kframe}
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.002 0 0.002}}\end{kframe}
 \end{knitrout}
 
 \begin{knitrout}
@@ -2206,9 +2202,9 @@ when $n = 150$ and shape = $90$.
 \end{alltt}
 
 
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in r[, l]/mad.predict.fun(out.mad, xx): non-numeric argument to binary operator}}
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(predvars, data, env): object 'x1' not found}}
 
-{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 33.05 1.506 6.207}}\end{kframe}
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.002 0 0.003}}\end{kframe}
 \end{knitrout}
 
 \begin{knitrout}
@@ -2242,9 +2238,9 @@ when $n = 150$ and shape = $100$.
 \end{alltt}
 
 
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in r[, l]/mad.predict.fun(out.mad, xx): non-numeric argument to binary operator}}
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(predvars, data, env): object 'x1' not found}}
 
-{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 43.15 0.733 7.725}}\end{kframe}
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.005 0 0.005}}\end{kframe}
 \end{knitrout}
 
 \begin{knitrout}

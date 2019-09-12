@@ -649,14 +649,7 @@ for every generated dataset.
 
 
 <<>>=
-funs <- lm.funs(intercept = TRUE)
-train.fun <- funs$train.fun
-predict.fun <- funs$predict.fun
-mad.predict.fun <- function(out, newx){
-  newx <- as.numeric(newx)
-  as.numeric(predict(out, newx[, 1])$y)
-}
-
+dat <- data.readme
 gamma_simulator <- function(beta, n = 500, alpha = 0.10, bins = 3, 
   family = "Gamma", link = "inverse", shape = 2, 
   parametric = TRUE, nonparametric = TRUE, method = "both", 
@@ -666,7 +659,8 @@ gamma_simulator <- function(beta, n = 500, alpha = 0.10, bins = 3,
   p <- d <- length(beta) - 1
   x <- matrix(runif(n*p), ncol = p)
   y <- rep(0,n)
-  dat <- NULL
+  dat <- data.frame(Date=as.Date(character()),
+    File=character(), User=character(), stringsAsFactors=FALSE) 
 
   ## set up partition
   if(class(bins) == "NULL"){
@@ -715,7 +709,7 @@ gamma_simulator <- function(beta, n = 500, alpha = 0.10, bins = 3,
 
   ## fit the Gamma regression model
   fit <- glm(y ~ x1, family = "Gamma", data = dat)
-  assign("dat", dat, .GlobalEnv)
+  fit$data <- dat
   parabinCI <- transformCI <- nonparabinCI <- LSCI <- 
     LSLWCI <- HDCI <- NULL
   formula <- fit$formula
@@ -1127,14 +1121,16 @@ These conformal prediction regions are now constructed.
 <<diabetes.conformal, cache = TRUE>>=
 ## Gamma conformal
 system.time(conformal.gamma <- 
-  conformal.glm(m.gamma.log, cores = 6, bins = 1))
-conformal.gamma <- conformal.gamma$paraconformal
+  conformal.glm(m.gamma.log, cores = 6, bins = 1, 
+    method = "both"))
+conformal.gamma <- conformal.gamma$paraconfbin
 head(conformal.gamma)
 
 ## Gaussian conformal
 system.time(conformal.gaussian <- 
-  conformal.glm(m.gaussian, cores = 6, bins = 1))
-conformal.gaussian <- conformal.gaussian$paraconformal
+  conformal.glm(m.gaussian, cores = 6, bins = 1, 
+    method = "both"))
+conformal.gaussian <- conformal.gaussian$paraconfbin
 head(conformal.gaussian)
 
 ## LS conformal
