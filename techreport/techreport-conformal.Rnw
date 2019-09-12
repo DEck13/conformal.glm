@@ -659,7 +659,7 @@ gamma_simulator <- function(beta, n = 500, alpha = 0.10, bins = 3,
   p <- d <- length(beta) - 1
   x <- matrix(runif(n*p), ncol = p)
   y <- rep(0,n)
-  dat <- data.frame(Date=as.Date(character()),
+  data <- data.frame(Date=as.Date(character()),
     File=character(), User=character(), stringsAsFactors=FALSE) 
 
   ## set up partition
@@ -675,47 +675,46 @@ gamma_simulator <- function(beta, n = 500, alpha = 0.10, bins = 3,
       rate <- (1 / (cbind(1, x) %*% beta)) * shape
       y <- rgamma(n = n, shape = shape, rate = rate)
       y <- y / sd(y)
-      dat <- data.frame(y = y, x = x)
-      colnames(dat)[2:(p+1)] <- paste("x", 1:p, sep = "")
+      data <- data.frame(y = y, x = x)
+      colnames(data)[2:(p+1)] <- paste("x", 1:p, sep = "")
     }
     if(link == "inverse"){
       rate <- (cbind(1, x) %*% beta) * shape
       y <- rgamma(n = n, shape = shape, rate = rate)
       y <- y / sd(y)
-      dat <- data.frame(y = y, x = x)
-      colnames(dat)[2:(p+1)] <- paste("x", 1:p, sep = "")
+      data <- data.frame(y = y, x = x)
+      colnames(data)[2:(p+1)] <- paste("x", 1:p, sep = "")
     }
     if(link == "log"){
       rate <- (1 / exp(cbind(1, x) %*% beta)) * shape
       y <- rgamma(n = n, shape = shape, rate = rate)
       y <- y / sd(y)
-      dat <- data.frame(y = y, x = x)
-      colnames(dat)[2:(p+1)] <- paste("x", 1:p, sep = "")
+      data <- data.frame(y = y, x = x)
+      colnames(data)[2:(p+1)] <- paste("x", 1:p, sep = "")
     }
   }
   if(family == "gaussian"){
     mu <- cbind(1, x) %*% beta
     y <- rnorm(n = n, mean = mu, sd = sd)
-    dat <- data.frame(y = y, x = x)
+    data <- data.frame(y = y, x = x)
     colnames(dat)[2:(p+1)] <- paste("x", 1:p, sep = "")
   }
   if(family == "inverse.gaussian"){
     mu = 1 / sqrt(cbind(1, x) %*% beta)
     y <- rinvgauss(n = n, mean = mu)
     y <- y / sd(y)
-    dat <- data.frame(y = y, x = x)
-    colnames(dat)[2:(p+1)] <- paste("x", 1:p, sep = "")
+    data <- data.frame(y = y, x = x)
+    colnames(data)[2:(p+1)] <- paste("x", 1:p, sep = "")
   }
 
   ## fit the Gamma regression model
   fit <- glm(y ~ x1, family = "Gamma", data = dat)
-  fit$data <- dat
   parabinCI <- transformCI <- nonparabinCI <- LSCI <- 
     LSLWCI <- HDCI <- NULL
   formula <- fit$formula
-  newdata <- dat
+  newdata <- data
   respname <- all.vars(formula)[1]
-  newdata <- newdata[, !(colnames(dat) %in% respname)]
+  newdata <- newdata[, !(colnames(data) %in% respname)]
   newdata <- as.matrix(newdata)
 
   ## obtain the prediction regions
@@ -730,11 +729,11 @@ gamma_simulator <- function(beta, n = 500, alpha = 0.10, bins = 3,
     # bin parametric conformal
     parabinCI <- cpred$paraconfbin
     marginal.parabin <- local.coverage(region = parabinCI, 
-      data = dat, d = p, bins = 1, at.data = "TRUE")  
+      data = data, d = p, bins = 1, at.data = "TRUE")  
     local.parabin <- local.coverage(region = parabinCI, 
-      data = dat, d = p, bins = bins, at.data = "TRUE")
+      data = data, d = p, bins = bins, at.data = "TRUE")
     local.inx.parabin <- local.coverage(region = parabinCI, 
-      data = dat, d = p, bins = 25, at.data = "TRUE")
+      data = data, d = p, bins = 25, at.data = "TRUE")
     output.parabin <- c(marginal.parabin, local.parabin, 
       local.inx.parabin, 
       mean(apply(parabinCI, 1, diff)), 
@@ -743,11 +742,11 @@ gamma_simulator <- function(beta, n = 500, alpha = 0.10, bins = 3,
     # transform parametric conformal
     transformCI <- cpred$transformconf      
     marginal.transform <- local.coverage(region = transformCI, 
-      data = dat, d = p, bins = 1, at.data = "TRUE")  
+      data = data, d = p, bins = 1, at.data = "TRUE")  
     local.transform <- local.coverage(region = transformCI, 
-      data = dat, d = p, bins = bins, at.data = "TRUE")
+      data = data, d = p, bins = bins, at.data = "TRUE")
     local.inx.transform <- local.coverage(region = transformCI, 
-      data = dat, d = p, bins = 25, at.data = "TRUE")
+      data = data, d = p, bins = 25, at.data = "TRUE")
     output.transform <- c(marginal.transform, local.transform, 
       local.inx.transform, 
       mean(apply(transformCI, 1, diff)), 
@@ -760,19 +759,19 @@ gamma_simulator <- function(beta, n = 500, alpha = 0.10, bins = 3,
     nonparabinCI <- cpred$nonparaconfbin
 
     marginal.nonparabin <- local.coverage(region = nonparabinCI, 
-      nonparametric = "TRUE", data = dat, d = p, bins = 1, 
+      nonparametric = "TRUE", data = data, d = p, bins = 1, 
       at.data = "TRUE")
     local.nonparabin <- local.coverage(region = nonparabinCI, 
-      nonparametric = "TRUE", data = dat, d = p, bins = bins, 
+      nonparametric = "TRUE", data = data, d = p, bins = bins, 
       at.data = "TRUE")
     local.inx.nonparabin <- local.coverage(region = nonparabinCI, 
-      nonparametric = "TRUE", data = dat, d = p, bins = 25, 
+      nonparametric = "TRUE", data = data, d = p, bins = 25, 
       at.data = "TRUE")
     output.nonparabin <- 
       c(marginal.nonparabin, local.nonparabin, 
         local.inx.nonparabin, 
         area.nonparametric(nonparabinCI),
-        absolute.error.nonparametric(data = dat, 
+        absolute.error.nonparametric(data = data, 
           region = nonparabinCI))    
   }      
   if(LS){
@@ -783,11 +782,11 @@ gamma_simulator <- function(beta, n = 500, alpha = 0.10, bins = 3,
     LSCI <- cbind(p1.tibs$lo, p1.tibs$up)
 
     marginal.LS <- local.coverage(region = LSCI, 
-      data = dat, d = p, bins = 1, at.data = "TRUE")
+      data = data, d = p, bins = 1, at.data = "TRUE")
     local.LS <- local.coverage(region = LSCI, 
-      data = dat, d = p, bins = bins, at.data = "TRUE")
+      data = data, d = p, bins = bins, at.data = "TRUE")
     local.inx.LS <- local.coverage(region = LSCI, 
-      data = dat, d = p, bins = 25, at.data = "TRUE")
+      data = data, d = p, bins = 25, at.data = "TRUE")
     output.LS <- c(marginal.LS, local.LS, local.inx.LS, 
       mean(apply(LSCI, 1, diff)), 
       absolute.error(y = y, region = LSCI))
@@ -812,11 +811,11 @@ gamma_simulator <- function(beta, n = 500, alpha = 0.10, bins = 3,
     LSLWCI <- cbind(p2.tibs$lo, p2.tibs$up)
 
     marginal.LSLW <- local.coverage(region = LSLWCI, 
-      data = dat, d = p, bins = 1, at.data = "TRUE")
+      data = data, d = p, bins = 1, at.data = "TRUE")
     local.LSLW <- local.coverage(region = LSLWCI, 
-      data = dat, d = p, bins = bins, at.data = "TRUE")
+      data = data, d = p, bins = bins, at.data = "TRUE")
     local.inx.LSLW <- local.coverage(region = LSLWCI, 
-      data = dat, d = p, bins = 25, at.data = "TRUE")
+      data = data, d = p, bins = 25, at.data = "TRUE")
     output.LSLW <- c(marginal.LSLW, local.LSLW, local.inx.LSLW, 
       mean(apply(LSLWCI, 1, diff)), 
       absolute.error(y = y, region = LSLWCI))          
@@ -830,11 +829,11 @@ gamma_simulator <- function(beta, n = 500, alpha = 0.10, bins = 3,
     }))
 
     marginal.HD <- local.coverage(region = HDCI, 
-      data = dat, d = p, bins = 1, at.data = "TRUE")
+      data = data, d = p, bins = 1, at.data = "TRUE")
     local.HD <- local.coverage(region = HDCI, 
-      data = dat, d = p, bins = bins, at.data = "TRUE")
+      data = data, d = p, bins = bins, at.data = "TRUE")
     local.inx.HD <- local.coverage(region = HDCI, 
-      data = dat, d = p, bins = 25, at.data = "TRUE")
+      data = data, d = p, bins = 25, at.data = "TRUE")
     output.HD <- c(marginal.HD, local.HD, local.inx.HD, 
       mean(apply(HDCI, 1, diff)), 
       absolute.error(y = y, region = HDCI))
