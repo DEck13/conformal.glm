@@ -3,18 +3,18 @@
 \contentsline {section}{\numberline {3}Extension of the illustrative example from the README file}{9}
 \contentsline {subsection}{\numberline {3.1}Diagnostic measures}{9}
 \contentsline {section}{\numberline {4}Predicting the risk of diabetes}{17}
-\contentsline {subsection}{\numberline {4.1}Results in \citet {eck2019conformal}}{21}
-\contentsline {section}{\numberline {5}Additional Gamma simulations}{26}
-\contentsline {subsection}{\numberline {5.1}Simulations}{26}
-\contentsline {subsection}{\numberline {5.2}Results}{52}
-\contentsline {section}{\numberline {6}Gamma-Gaussian model misspecification}{59}
-\contentsline {subsection}{\numberline {6.1}Simulations}{59}
-\contentsline {subsection}{\numberline {6.2}Results}{82}
-\contentsline {section}{\numberline {7}Linear Regression Simulations}{89}
-\contentsline {subsection}{\numberline {7.1}Simulations}{89}
-\contentsline {subsection}{\numberline {7.2}Results}{94}
-\contentsline {section}{\numberline {8}Example plots of prediction regions}{96}
-\contentsline {subsection}{\numberline {8.1}Plots corresponding to Section\nobreakspace {}5\hbox {}}{98}
-\contentsline {subsection}{\numberline {8.2}Plots corresponding to Section\nobreakspace {}6\hbox {}}{101}
-\contentsline {subsection}{\numberline {8.3}Plots corresponding to Section\nobreakspace {}7\hbox {}}{104}
-\contentsline {section}{\numberline {9}Creating this Document}{104}
+\contentsline {subsection}{\numberline {4.1}Results in \citet {eck2019conformal}}{20}
+\contentsline {section}{\numberline {5}Additional Gamma simulations}{25}
+\contentsline {subsection}{\numberline {5.1}Simulations}{25}
+\contentsline {subsection}{\numberline {5.2}Results}{51}
+\contentsline {section}{\numberline {6}Gamma-Gaussian model misspecification}{58}
+\contentsline {subsection}{\numberline {6.1}Simulations}{58}
+\contentsline {subsection}{\numberline {6.2}Results}{81}
+\contentsline {section}{\numberline {7}Linear Regression Simulations}{88}
+\contentsline {subsection}{\numberline {7.1}Simulations}{88}
+\contentsline {subsection}{\numberline {7.2}Results}{93}
+\contentsline {section}{\numberline {8}Example plots of prediction regions}{95}
+\contentsline {subsection}{\numberline {8.1}Plots corresponding to Section\nobreakspace {}5\hbox {}}{97}
+\contentsline {subsection}{\numberline {8.2}Plots corresponding to Section\nobreakspace {}6\hbox {}}{100}
+\contentsline {subsection}{\numberline {8.3}Plots corresponding to Section\nobreakspace {}7\hbox {}}{103}
+\contentsline {section}{\numberline {9}Creating this Document}{103}

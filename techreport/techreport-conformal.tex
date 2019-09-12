@@ -566,7 +566,7 @@ region.
 \hlkwd{xtable}\hlstd{(diagnostics,} \hlkwc{digits} \hlstd{=} \hlkwd{c}\hlstd{(}\hlnum{0}\hlstd{,} \hlnum{2}\hlstd{,} \hlnum{2}\hlstd{,} \hlnum{2}\hlstd{,} \hlnum{2}\hlstd{,} \hlnum{2}\hlstd{))}
 \end{alltt}
 \end{kframe}% latex table generated in R 3.4.4 by xtable 1.8-3 package
-% Thu Sep 12 01:00:11 2019
+% Thu Sep 12 08:36:34 2019
 \begin{table}[ht]
 \centering
 \begin{tabular}{rrrrrr}
@@ -720,7 +720,6 @@ for every generated dataset.
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 \begin{alltt}
-\hlstd{dat} \hlkwb{<-} \hlstd{data.readme}
 \hlstd{gamma_simulator} \hlkwb{<-} \hlkwa{function}\hlstd{(}\hlkwc{beta}\hlstd{,} \hlkwc{n} \hlstd{=} \hlnum{500}\hlstd{,} \hlkwc{alpha} \hlstd{=} \hlnum{0.10}\hlstd{,} \hlkwc{bins} \hlstd{=} \hlnum{3}\hlstd{,}
   \hlkwc{family} \hlstd{=} \hlstr{"Gamma"}\hlstd{,} \hlkwc{link} \hlstd{=} \hlstr{"inverse"}\hlstd{,} \hlkwc{shape} \hlstd{=} \hlnum{2}\hlstd{,}
   \hlkwc{parametric} \hlstd{=} \hlnum{TRUE}\hlstd{,} \hlkwc{nonparametric} \hlstd{=} \hlnum{TRUE}\hlstd{,} \hlkwc{method} \hlstd{=} \hlstr{"both"}\hlstd{,}
@@ -730,8 +729,8 @@ for every generated dataset.
   \hlstd{p} \hlkwb{<-} \hlstd{d} \hlkwb{<-} \hlkwd{length}\hlstd{(beta)} \hlopt{-} \hlnum{1}
   \hlstd{x} \hlkwb{<-} \hlkwd{matrix}\hlstd{(}\hlkwd{runif}\hlstd{(n}\hlopt{*}\hlstd{p),} \hlkwc{ncol} \hlstd{= p)}
   \hlstd{y} \hlkwb{<-} \hlkwd{rep}\hlstd{(}\hlnum{0}\hlstd{,n)}
-  \hlstd{dat} \hlkwb{<-} \hlkwd{data.frame}\hlstd{(}\hlkwc{Date}\hlstd{=}\hlkwd{as.Date}\hlstd{(}\hlkwd{character}\hlstd{()),}
-    \hlkwc{File}\hlstd{=}\hlkwd{character}\hlstd{(),} \hlkwc{User}\hlstd{=}\hlkwd{character}\hlstd{(),} \hlkwc{stringsAsFactors}\hlstd{=}\hlnum{FALSE}\hlstd{)}
+  \hlstd{dat} \hlkwb{<-} \hlkwd{data.frame}\hlstd{(}\hlkwc{y} \hlstd{= y,} \hlkwc{x} \hlstd{= x)}
+  \hlkwd{colnames}\hlstd{(dat)[}\hlnum{2}\hlopt{:}\hlstd{(p}\hlopt{+}\hlnum{1}\hlstd{)]} \hlkwb{<-} \hlkwd{paste}\hlstd{(}\hlstr{"x"}\hlstd{,} \hlnum{1}\hlopt{:}\hlstd{p,} \hlkwc{sep} \hlstd{=} \hlstr{""}\hlstd{)}
 
   \hlcom{## set up partition}
   \hlkwa{if}\hlstd{(}\hlkwd{class}\hlstd{(bins)} \hlopt{==} \hlstr{"NULL"}\hlstd{)\{}
@@ -745,42 +744,33 @@ for every generated dataset.
     \hlkwa{if}\hlstd{(link} \hlopt{==} \hlstr{"identity"}\hlstd{)\{}
       \hlstd{rate} \hlkwb{<-} \hlstd{(}\hlnum{1} \hlopt{/} \hlstd{(}\hlkwd{cbind}\hlstd{(}\hlnum{1}\hlstd{, x)} \hlopt{%*%} \hlstd{beta))} \hlopt{*} \hlstd{shape}
       \hlstd{y} \hlkwb{<-} \hlkwd{rgamma}\hlstd{(}\hlkwc{n} \hlstd{= n,} \hlkwc{shape} \hlstd{= shape,} \hlkwc{rate} \hlstd{= rate)}
-      \hlstd{y} \hlkwb{<-} \hlstd{y} \hlopt{/} \hlkwd{sd}\hlstd{(y)}
-      \hlstd{dat} \hlkwb{<-} \hlkwd{data.frame}\hlstd{(}\hlkwc{y} \hlstd{= y,} \hlkwc{x} \hlstd{= x)}
-      \hlkwd{colnames}\hlstd{(dat)[}\hlnum{2}\hlopt{:}\hlstd{(p}\hlopt{+}\hlnum{1}\hlstd{)]} \hlkwb{<-} \hlkwd{paste}\hlstd{(}\hlstr{"x"}\hlstd{,} \hlnum{1}\hlopt{:}\hlstd{p,} \hlkwc{sep} \hlstd{=} \hlstr{""}\hlstd{)}
+      \hlstd{dat}\hlopt{$}\hlstd{y} \hlkwb{<-} \hlstd{y} \hlopt{/} \hlkwd{sd}\hlstd{(y)}
     \hlstd{\}}
     \hlkwa{if}\hlstd{(link} \hlopt{==} \hlstr{"inverse"}\hlstd{)\{}
       \hlstd{rate} \hlkwb{<-} \hlstd{(}\hlkwd{cbind}\hlstd{(}\hlnum{1}\hlstd{, x)} \hlopt{%*%} \hlstd{beta)} \hlopt{*} \hlstd{shape}
       \hlstd{y} \hlkwb{<-} \hlkwd{rgamma}\hlstd{(}\hlkwc{n} \hlstd{= n,} \hlkwc{shape} \hlstd{= shape,} \hlkwc{rate} \hlstd{= rate)}
       \hlstd{y} \hlkwb{<-} \hlstd{y} \hlopt{/} \hlkwd{sd}\hlstd{(y)}
-      \hlstd{dat} \hlkwb{<-} \hlkwd{data.frame}\hlstd{(}\hlkwc{y} \hlstd{= y,} \hlkwc{x} \hlstd{= x)}
-      \hlkwd{colnames}\hlstd{(dat)[}\hlnum{2}\hlopt{:}\hlstd{(p}\hlopt{+}\hlnum{1}\hlstd{)]} \hlkwb{<-} \hlkwd{paste}\hlstd{(}\hlstr{"x"}\hlstd{,} \hlnum{1}\hlopt{:}\hlstd{p,} \hlkwc{sep} \hlstd{=} \hlstr{""}\hlstd{)}
+      \hlstd{dat}\hlopt{$}\hlstd{y} \hlkwb{<-} \hlstd{y} \hlopt{/} \hlkwd{sd}\hlstd{(y)}
     \hlstd{\}}
     \hlkwa{if}\hlstd{(link} \hlopt{==} \hlstr{"log"}\hlstd{)\{}
       \hlstd{rate} \hlkwb{<-} \hlstd{(}\hlnum{1} \hlopt{/} \hlkwd{exp}\hlstd{(}\hlkwd{cbind}\hlstd{(}\hlnum{1}\hlstd{, x)} \hlopt{%*%} \hlstd{beta))} \hlopt{*} \hlstd{shape}
       \hlstd{y} \hlkwb{<-} \hlkwd{rgamma}\hlstd{(}\hlkwc{n} \hlstd{= n,} \hlkwc{shape} \hlstd{= shape,} \hlkwc{rate} \hlstd{= rate)}
-      \hlstd{y} \hlkwb{<-} \hlstd{y} \hlopt{/} \hlkwd{sd}\hlstd{(y)}
-      \hlstd{dat} \hlkwb{<-} \hlkwd{data.frame}\hlstd{(}\hlkwc{y} \hlstd{= y,} \hlkwc{x} \hlstd{= x)}
-      \hlkwd{colnames}\hlstd{(dat)[}\hlnum{2}\hlopt{:}\hlstd{(p}\hlopt{+}\hlnum{1}\hlstd{)]} \hlkwb{<-} \hlkwd{paste}\hlstd{(}\hlstr{"x"}\hlstd{,} \hlnum{1}\hlopt{:}\hlstd{p,} \hlkwc{sep} \hlstd{=} \hlstr{""}\hlstd{)}
+      \hlstd{dat}\hlopt{$}\hlstd{y} \hlkwb{<-} \hlstd{y} \hlopt{/} \hlkwd{sd}\hlstd{(y)}
     \hlstd{\}}
   \hlstd{\}}
   \hlkwa{if}\hlstd{(family} \hlopt{==} \hlstr{"gaussian"}\hlstd{)\{}
     \hlstd{mu} \hlkwb{<-} \hlkwd{cbind}\hlstd{(}\hlnum{1}\hlstd{, x)} \hlopt{%*%} \hlstd{beta}
     \hlstd{y} \hlkwb{<-} \hlkwd{rnorm}\hlstd{(}\hlkwc{n} \hlstd{= n,} \hlkwc{mean} \hlstd{= mu,} \hlkwc{sd} \hlstd{= sd)}
-    \hlstd{dat} \hlkwb{<-} \hlkwd{data.frame}\hlstd{(}\hlkwc{y} \hlstd{= y,} \hlkwc{x} \hlstd{= x)}
-    \hlkwd{colnames}\hlstd{(dat)[}\hlnum{2}\hlopt{:}\hlstd{(p}\hlopt{+}\hlnum{1}\hlstd{)]} \hlkwb{<-} \hlkwd{paste}\hlstd{(}\hlstr{"x"}\hlstd{,} \hlnum{1}\hlopt{:}\hlstd{p,} \hlkwc{sep} \hlstd{=} \hlstr{""}\hlstd{)}
+    \hlstd{dat}\hlopt{$}\hlstd{y} \hlkwb{<-} \hlstd{y} \hlopt{/} \hlkwd{sd}\hlstd{(y)}
   \hlstd{\}}
   \hlkwa{if}\hlstd{(family} \hlopt{==} \hlstr{"inverse.gaussian"}\hlstd{)\{}
     \hlstd{mu} \hlkwb{=} \hlnum{1} \hlopt{/} \hlkwd{sqrt}\hlstd{(}\hlkwd{cbind}\hlstd{(}\hlnum{1}\hlstd{, x)} \hlopt{%*%} \hlstd{beta)}
     \hlstd{y} \hlkwb{<-} \hlkwd{rinvgauss}\hlstd{(}\hlkwc{n} \hlstd{= n,} \hlkwc{mean} \hlstd{= mu)}
-    \hlstd{y} \hlkwb{<-} \hlstd{y} \hlopt{/} \hlkwd{sd}\hlstd{(y)}
-    \hlstd{dat} \hlkwb{<-} \hlkwd{data.frame}\hlstd{(}\hlkwc{y} \hlstd{= y,} \hlkwc{x} \hlstd{= x)}
-    \hlkwd{colnames}\hlstd{(dat)[}\hlnum{2}\hlopt{:}\hlstd{(p}\hlopt{+}\hlnum{1}\hlstd{)]} \hlkwb{<-} \hlkwd{paste}\hlstd{(}\hlstr{"x"}\hlstd{,} \hlnum{1}\hlopt{:}\hlstd{p,} \hlkwc{sep} \hlstd{=} \hlstr{""}\hlstd{)}
+    \hlstd{dat}\hlopt{$}\hlstd{y} \hlkwb{<-} \hlstd{y} \hlopt{/} \hlkwd{sd}\hlstd{(y)}
   \hlstd{\}}
 
   \hlcom{## fit the Gamma regression model}
   \hlstd{fit} \hlkwb{<-} \hlkwd{glm}\hlstd{(y} \hlopt{~} \hlstd{x1,} \hlkwc{family} \hlstd{=} \hlstr{"Gamma"}\hlstd{,} \hlkwc{data} \hlstd{= dat)}
-  \hlstd{fit}\hlopt{$}\hlstd{data} \hlkwb{<-} \hlstd{dat}
   \hlstd{parabinCI} \hlkwb{<-} \hlstd{transformCI} \hlkwb{<-} \hlstd{nonparabinCI} \hlkwb{<-} \hlstd{LSCI} \hlkwb{<-}
     \hlstd{LSLWCI} \hlkwb{<-} \hlstd{HDCI} \hlkwb{<-} \hlkwa{NULL}
   \hlstd{formula} \hlkwb{<-} \hlstd{fit}\hlopt{$}\hlstd{formula}
@@ -1468,7 +1458,7 @@ Table 2 and Figure 4 in \citet{eck2019conformal} are shown below.
 \hlkwd{xtable}\hlstd{(diagnostics,} \hlkwc{digits} \hlstd{=} \hlkwd{c}\hlstd{(}\hlnum{0}\hlstd{,} \hlnum{3}\hlstd{,} \hlnum{3}\hlstd{,} \hlnum{3}\hlstd{,} \hlnum{3}\hlstd{))}
 \end{alltt}
 \end{kframe}% latex table generated in R 3.4.4 by xtable 1.8-3 package
-% Thu Sep 12 01:06:14 2019
+% Thu Sep 12 08:36:36 2019
 \begin{table}[ht]
 \centering
 \begin{tabular}{rrrrr}
@@ -1556,7 +1546,7 @@ when $n = 150$ and shape = $0.5$.
 
 {\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(predvars, data, env): object 'x1' not found}}
 
-{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.125 0 0.125}}\end{kframe}
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.096 0 0.095}}\end{kframe}
 \end{knitrout}
 
 \begin{knitrout}
@@ -1592,7 +1582,7 @@ when $n = 150$ and shape = $0.75$.
 
 {\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(predvars, data, env): object 'x1' not found}}
 
-{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.002 0 0.002}}\end{kframe}
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.371 0 0.372}}\end{kframe}
 \end{knitrout}
 
 \begin{knitrout}
@@ -1628,7 +1618,7 @@ when $n = 150$ and shape = $1$.
 
 {\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(predvars, data, env): object 'x1' not found}}
 
-{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.003 0 0.003}}\end{kframe}
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.002 0 0.002}}\end{kframe}
 \end{knitrout}
 
 \begin{knitrout}
@@ -1808,7 +1798,7 @@ when $n = 150$ and shape = $10$.
 
 {\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(predvars, data, env): object 'x1' not found}}
 
-{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.002 0 0.003}}\end{kframe}
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.002 0 0.002}}\end{kframe}
 \end{knitrout}
 
 \begin{knitrout}
@@ -1844,7 +1834,7 @@ when $n = 150$ and shape = $12$.
 
 {\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(predvars, data, env): object 'x1' not found}}
 
-{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.003 0 0.003}}\end{kframe}
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.002 0 0.002}}\end{kframe}
 \end{knitrout}
 
 \begin{knitrout}
@@ -1880,7 +1870,7 @@ when $n = 150$ and shape = $15$.
 
 {\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(predvars, data, env): object 'x1' not found}}
 
-{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.003 0 0.002}}\end{kframe}
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.002 0 0.002}}\end{kframe}
 \end{knitrout}
 
 \begin{knitrout}
@@ -1952,7 +1942,7 @@ when $n = 150$ and shape = $25$.
 
 {\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(predvars, data, env): object 'x1' not found}}
 
-{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.002 0 0.002}}\end{kframe}
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.001 0 0.002}}\end{kframe}
 \end{knitrout}
 
 \begin{knitrout}
@@ -1988,7 +1978,7 @@ when $n = 150$ and shape = $30$.
 
 {\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(predvars, data, env): object 'x1' not found}}
 
-{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.003 0 0.002}}\end{kframe}
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.002 0 0.002}}\end{kframe}
 \end{knitrout}
 
 \begin{knitrout}
@@ -2024,7 +2014,7 @@ when $n = 150$ and shape = $40$.
 
 {\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(predvars, data, env): object 'x1' not found}}
 
-{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.003 0 0.003}}\end{kframe}
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.005 0 0.005}}\end{kframe}
 \end{knitrout}
 
 \begin{knitrout}
@@ -2096,7 +2086,7 @@ when $n = 150$ and shape = $60$.
 
 {\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(predvars, data, env): object 'x1' not found}}
 
-{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.004 0 0.004}}\end{kframe}
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.002 0 0.001}}\end{kframe}
 \end{knitrout}
 
 \begin{knitrout}
@@ -2132,7 +2122,7 @@ when $n = 150$ and shape = $70$.
 
 {\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(predvars, data, env): object 'x1' not found}}
 
-{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.002 0 0.003}}\end{kframe}
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.002 0 0.002}}\end{kframe}
 \end{knitrout}
 
 \begin{knitrout}
@@ -2204,7 +2194,7 @@ when $n = 150$ and shape = $90$.
 
 {\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(predvars, data, env): object 'x1' not found}}
 
-{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.002 0 0.003}}\end{kframe}
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.003 0 0.002}}\end{kframe}
 \end{knitrout}
 
 \begin{knitrout}
@@ -2240,7 +2230,7 @@ when $n = 150$ and shape = $100$.
 
 {\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(predvars, data, env): object 'x1' not found}}
 
-{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.005 0 0.005}}\end{kframe}
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.006 0 0.006}}\end{kframe}
 \end{knitrout}
 
 \begin{knitrout}
