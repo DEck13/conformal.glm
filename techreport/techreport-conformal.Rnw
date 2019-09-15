@@ -649,6 +649,7 @@ for every generated dataset.
 
 
 <<>>=
+dat <- data.frame(y = y, x1 = x)
 gamma_simulator <- function(beta, n = 500, alpha = 0.10, bins = 3, 
   family = "Gamma", link = "inverse", shape = 2, 
   parametric = TRUE, nonparametric = TRUE, method = "both", 
@@ -678,7 +679,6 @@ gamma_simulator <- function(beta, n = 500, alpha = 0.10, bins = 3,
     if(link == "inverse"){
       rate <- (cbind(1, x) %*% beta) * shape
       y <- rgamma(n = n, shape = shape, rate = rate)
-      y <- y / sd(y)
       dat$y <- y / sd(y)
     }
     if(link == "log"){
@@ -1556,6 +1556,8 @@ beta <- c(1.25, -1)
 bins <- 2
 n <- 150
 B <- 250
+dat <- data.frame(y = rep(0, n), 
+  x1 = rep(0, n))
 system.time(out.gamma.150.2.0.5 <- do.call(cbind, 
   lapply(1:B, FUN = function(j){
     unlist(gamma_simulator(beta = beta, n = n, 
