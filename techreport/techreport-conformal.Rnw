@@ -897,51 +897,58 @@ evidenced by Figure~\ref{Fig:coverageinx500.3}.
 \begin{table}[t!]
 \tiny
 \begin{center}
-\begin{tabular}{lccccc}
-  & parametric conformal & nonparametric conformal & LS conformal & 
-    LSLW conformal & HD region \\ 
+\begin{tabular}{lcccccc}
+  & Parametric & Transformation & Nonparametric & LS        & LSLW      & HD     \\  
+  & Conformal  & Conformal      & Conformal     & Conformal & Conformal & Region \\
     marginal coverage & 
   $\Sexpr{local.gamma.500.3.2[1, 1]} \; (\Sexpr{local.gamma.500.3.2[1, 2]})$ & 
   $\Sexpr{local.gamma.500.3.2[32, 1]} \; (\Sexpr{local.gamma.500.3.2[32, 2]})$ & 
   $\Sexpr{local.gamma.500.3.2[63, 1]} \; (\Sexpr{local.gamma.500.3.2[63, 2]})$ & 
   $\Sexpr{local.gamma.500.3.2[94, 1]} \; (\Sexpr{local.gamma.500.3.2[94, 2]})$ & 
-  $\Sexpr{local.gamma.500.3.2[125, 1]} \; (\Sexpr{local.gamma.500.3.2[125, 2]})$ \\
+  $\Sexpr{local.gamma.500.3.2[125, 1]} \; (\Sexpr{local.gamma.500.3.2[125, 2]})$ &
+  $\Sexpr{local.gamma.500.3.2[156, 1]} \; (\Sexpr{local.gamma.500.3.2[156, 2]})$ \\ 
     local coverage when $0 < x < 1/3$ & 
   $\Sexpr{local.gamma.500.3.2[2, 1]} \; (\Sexpr{local.gamma.500.3.2[2, 2]})$ & 
   $\Sexpr{local.gamma.500.3.2[33, 1]} \; (\Sexpr{local.gamma.500.3.2[33, 2]})$ & 
   $\Sexpr{local.gamma.500.3.2[64, 1]} \; (\Sexpr{local.gamma.500.3.2[64, 2]})$ & 
   $\Sexpr{local.gamma.500.3.2[95, 1]} \; (\Sexpr{local.gamma.500.3.2[95, 2]})$ & 
-  $\Sexpr{local.gamma.500.3.2[126, 1]} \; (\Sexpr{local.gamma.500.3.2[126, 2]})$ \\
+  $\Sexpr{local.gamma.500.3.2[126, 1]} \; (\Sexpr{local.gamma.500.3.2[126, 2]})$ &
+  $\Sexpr{local.gamma.500.3.2[157, 1]} \; (\Sexpr{local.gamma.500.3.2[157, 2]})$ \\
     local coverage when $1/3 \leq x < 2/3$ & 
   $\Sexpr{local.gamma.500.3.2[3, 1]} \; (\Sexpr{local.gamma.500.3.2[3, 2]})$ & 
   $\Sexpr{local.gamma.500.3.2[34, 1]} \; (\Sexpr{local.gamma.500.3.2[34, 2]})$ & 
   $\Sexpr{local.gamma.500.3.2[65, 1]} \; (\Sexpr{local.gamma.500.3.2[65, 2]})$ & 
   $\Sexpr{local.gamma.500.3.2[96, 1]} \; (\Sexpr{local.gamma.500.3.2[96, 2]})$ & 
-  $\Sexpr{local.gamma.500.3.2[127, 1]} \; (\Sexpr{local.gamma.500.3.2[127, 2]})$ \\
+  $\Sexpr{local.gamma.500.3.2[127, 1]} \; (\Sexpr{local.gamma.500.3.2[127, 2]})$ &
+  $\Sexpr{local.gamma.500.3.2[158, 1]} \; (\Sexpr{local.gamma.500.3.2[158, 2]})$ \\
     local coverage when $2/3 \leq x < 1$ & 
   $\Sexpr{local.gamma.500.3.2[4, 1]} \; (\Sexpr{local.gamma.500.3.2[4, 2]})$ & 
   $\Sexpr{local.gamma.500.3.2[35, 1]} \; (\Sexpr{local.gamma.500.3.2[35, 2]})$ & 
   $\Sexpr{local.gamma.500.3.2[66, 1]} \; (\Sexpr{local.gamma.500.3.2[66, 2]})$ & 
   $\Sexpr{local.gamma.500.3.2[97, 1]} \; (\Sexpr{local.gamma.500.3.2[97, 2]})$ & 
-  $\Sexpr{local.gamma.500.3.2[128, 1]} \; (\Sexpr{local.gamma.500.3.2[128, 2]})$ \\
+  $\Sexpr{local.gamma.500.3.2[128, 1]} \; (\Sexpr{local.gamma.500.3.2[128, 2]})$ & 
+  $\Sexpr{local.gamma.500.3.2[159, 1]} \; (\Sexpr{local.gamma.500.3.2[159, 2]})$ \\
     area & 
   $\Sexpr{local.gamma.500.3.2[30, 1]} \; (\Sexpr{local.gamma.500.3.2[30, 2]})$ & 
   $\Sexpr{local.gamma.500.3.2[61, 1]} \; (\Sexpr{local.gamma.500.3.2[61, 2]})$ & 
   $\Sexpr{local.gamma.500.3.2[92, 1]} \; (\Sexpr{local.gamma.500.3.2[92, 2]})$ & 
   $\Sexpr{local.gamma.500.3.2[123, 1]} \; (\Sexpr{local.gamma.500.3.2[123, 2]})$ & 
-  $\Sexpr{local.gamma.500.3.2[154, 1]} \; (\Sexpr{local.gamma.500.3.2[154, 2]})$ \\
+  $\Sexpr{local.gamma.500.3.2[154, 1]} \; (\Sexpr{local.gamma.500.3.2[154, 2]})$ & 
+  $\Sexpr{local.gamma.500.3.2[185, 1]} \; (\Sexpr{local.gamma.500.3.2[185, 2]})$ \\
     prediction error & 
   $\Sexpr{local.gamma.500.3.2[31, 1]} \; (\Sexpr{local.gamma.500.3.2[31, 2]})$ & 
   $\Sexpr{local.gamma.500.3.2[62, 1]} \; (\Sexpr{local.gamma.500.3.2[62, 2]})$ & 
   $\Sexpr{local.gamma.500.3.2[93, 1]} \; (\Sexpr{local.gamma.500.3.2[93, 2]})$ & 
   $\Sexpr{local.gamma.500.3.2[124, 1]} \; (\Sexpr{local.gamma.500.3.2[124, 2]})$ & 
-  $\Sexpr{local.gamma.500.3.2[155, 1]} \; (\Sexpr{local.gamma.500.3.2[155, 2]})$ 
+  $\Sexpr{local.gamma.500.3.2[155, 1]} \; (\Sexpr{local.gamma.500.3.2[155, 2]})$ & 
+  $\Sexpr{local.gamma.500.3.2[186, 1]} \; (\Sexpr{local.gamma.500.3.2[186, 2]})$ 
 \end{tabular}
 \end{center}
 \caption{Diagnostics of prediction regions. This table gives 
     the area, prediction error, marginal coverage, and local coverages with 
-    respect to our binning scheme for the parametric, nonparametric, LS, and 
-    LSLW conformal prediction regions and the HD prediction region.}
+    respect to our binning scheme for the parametric, transformation, 
+    nonparametric, LS, and LSLW conformal prediction regions and the HD 
+    prediction region.}
 \label{Tab:gamma-results}
 \end{table}
 
@@ -956,14 +963,16 @@ par(mfrow = c(1,1), oma = c(4,4,0,0), mar = c(1,1,1,1))
 
 inx <- 0.02 + 0:24 * 0.04
 para.local.coverage.inx <- local.gamma.500.3.2[5:29, 1]
-nonpara.local.coverage.inx <- local.gamma.500.3.2[36:60, 1]
-LS.local.coverage.inx <- local.gamma.500.3.2[67:91, 1]
-LSLW.local.coverage.inx <- local.gamma.500.3.2[98:122, 1]
-HD.local.coverage.inx <- local.gamma.500.3.2[129:153, 1]
+transform.local.coverage.inx <- local.gamma.500.3.2[36:60, 1]
+nonpara.local.coverage.inx <- local.gamma.500.3.2[67:91, 1]
+LS.local.coverage.inx <- local.gamma.500.3.2[98:122, 1]
+LSLW.local.coverage.inx <- local.gamma.500.3.2[129:153, 1]
+HD.local.coverage.inx <- local.gamma.500.3.2[160:184, 1]
 
 plot.new()
 plot.window(xlim = c(0, 1), ylim = c(0.40, 1.00))
 lines(inx, para.local.coverage.inx, col = "red", lty = 1)
+lines(inx, transform.local.coverage.inx, col = "red", lty = 2)
 lines(inx, nonpara.local.coverage.inx, col = "green", lty = 2)
 lines(inx, LSLW.local.coverage.inx, col = "purple", lty = 1)
 lines(inx, LS.local.coverage.inx, col = "black", lty = 2)
@@ -973,11 +982,11 @@ axis(1); axis(2)
 mtext("x", side = 1, cex = 1.25, line = 2, outer = TRUE)
 mtext("coverage probability", side = 2, cex = 1.25, line = 2, outer = TRUE)
 
-legend(0.20, 0.75, legend=c("parametric", 
+legend(0.20, 0.75, legend=c("parametric", "transform", 
   "nonparametric", "LSLW", "LS", 
-  "HD", "nominal coverage"), col=c("red", "green", "purple", 
+  "HD", "nominal coverage"), col=c("red", "red", "green", "purple", 
   "black", "blue", "grey"), cex = 1, 
-  lty=c(1,2,1,2,4,1), bty = "n")
+  lty=c(1,2,2,1,2,4,1), bty = "n")
 @
 \end{center}
 \caption{Plot of the estimated coverage probabilities of prediction regions 
@@ -992,7 +1001,7 @@ legend(0.20, 0.75, legend=c("parametric",
 \section{Predicting the risk of diabetes}
 \label{sec:diabetes}
 
-In this Section we reproduce the data analysis that appears in Section 5 of 
+In this Section we reproduce the data analysis that appears in Section 6 of 
 \citet{eck2019conformal}.  
 We examine the influence of several variables on blood sugar, or glycosylated 
 hemoglobin percentage (also known as HbA1c), an important risk factor for 
@@ -1091,19 +1100,20 @@ abline(h = 0, col = "red", lty = 3, lwd = 2)
 \end{figure}
 
 
-Four conformal prediction regions are considered for predicting glycosylated 
-hemoglobin percentage.  These conformal prediction regions are the parametric 
-conformal prediction region with a Gamma model fit, the parametric conformal 
-prediction region with a Gaussian model fit, the least squares conformal 
-prediction region, and the least square conformal prediction region with 
-local weighting.  
+Six conformal prediction regions are considered for predicting glycosylated 
+hemoglobin percentage.  These conformal prediction regions are the binned and 
+transformation parametric conformal prediction region with a Gamma model fit, 
+the binned and transformation parametric conformal prediction region with a 
+Gaussian model fit, the least squares conformal prediction region, 
+and the least square conformal prediction region with local weighting.  
 All conformal prediction regions correspond to models that only include 
 linear terms for each of the covariates.  
-The Gamma and Gaussian parametric conformal prediction regions were 
+The binned Gamma and Gaussian parametric conformal prediction regions were 
 computed with binning across the binary gender factor variable, the predictor 
 space is partitioned across genders. 
 However, no additional binning structure within the levels of gender was 
 employed.  
+
 
 These conformal prediction regions are now constructed.
 
@@ -1113,15 +1123,19 @@ These conformal prediction regions are now constructed.
 system.time(conformal.gamma <- 
   conformal.glm(m.gamma.log, cores = 6, bins = 1, 
     method = "both"))
-conformal.gamma <- conformal.gamma$paraconfbin
-head(conformal.gamma)
+gamma.paraconfbin <- conformal.gamma$paraconfbin
+gamma.transform <- conformal.gamma$transformconf
+head(gamma.paraconfbin)
+head(gamma.transform)
 
 ## Gaussian conformal
 system.time(conformal.gaussian <- 
   conformal.glm(m.gaussian, cores = 6, bins = 1, 
     method = "both"))
-conformal.gaussian <- conformal.gaussian$paraconfbin
-head(conformal.gaussian)
+gaussian.paraconfbin <- conformal.gaussian$paraconfbin
+gaussian.transform <- conformal.gaussian$transformconf
+head(gaussian.paraconfbin)
+head(gaussian.transform)
 
 ## LS conformal
 funs <- lm.funs(intercept = TRUE)
@@ -1156,11 +1170,47 @@ head(LSLW)
 @
 
 
+We also consider the highest density prediction region under the Gamma 
+model, this region is constructed below.
+
+<<>>=
+## HD region
+library(HDInterval)
+betaMLE <- coefficients(m.gamma.log)
+shapeMLE <- as.numeric(gamma.shape(m.gamma.log)[1])
+rateMLE <- (1 / exp(X %*% betaMLE)) * shapeMLE
+#rateMLE <- cbind(1, x) %*% betaMLE * shapeMLE
+HD <- do.call(rbind, 
+  lapply(1:nrow(X), function(j){ 
+    hdi(qgamma, 0.90, shape = shapeMLE, rate = rateMLE[j, 1])
+  }))
+colnames(HD) <- c("lwr", "upr")
+head(HD)
+@
+
+
 
 \subsection{Results in \citet{eck2019conformal}}
 
-We now compute the diagnostics of these four conformal prediction 
-regions and reproduce Table 2 in \citet{eck2019conformal}.  
+Diagnostics from the six conformal prediction regions are depicted in 
+Table 2 of the manuscript \citet{eck2019conformal}.  The error tolerance 
+for all prediction regions was set at $\alpha = 0.10$.  We see that 
+parametric conformal prediction regions maintain their advertised finite 
+sample marginal validity for the predictions of glycosylated hemoglobin.  
+These prediction regions provide a balance between marginal coverage, size, 
+prediction error, and average conditional coverage (the average of the 
+coverage probabilities taken over small subregions of the predictor space).  
+The transformation Gamma conformal prediction region balances these criteria 
+particularly nicely. This prediction region is relatively small, has relatively 
+small prediction error, and it gives near nominal desired coverage.  This 
+finding is expected when the underlying estimated density used as the 
+parametric conformity measure is a good approximation of the data generating 
+model.
+
+
+We now compute the diagnostics of these six conformal prediction 
+regions and the highest density prediction region, and we reproduce 
+Table 2 in \citet{eck2019conformal}.  
 We start with the computation of marginal and approximate average 
 conditional coverage using functionality in the \texttt{conformal.glm} 
 software.
@@ -1168,44 +1218,63 @@ software.
 
 <<>>=
 ## marginal coverages
-marginal.gamma <- local.coverage(region = conformal.gamma, data = dat, 
-  bins = 1, d = 2)
-marginal.gaussian <- local.coverage(region = conformal.gaussian, 
+marginal.gamma.trans <- local.coverage(region = gamma.transform, 
+  data = dat, bins = 1, d = 2)
+marginal.gaussian.trans <- local.coverage(
+  region = gaussian.transform, data = dat, bins = 1, d = 2)
+marginal.gamma.bin <- local.coverage(region = gamma.paraconfbin, 
+  data = dat, bins = 1, d = 2)
+marginal.gaussian.bin <- local.coverage(region = gaussian.paraconfbin, 
   data = dat, bins = 1, d = 2)
 marginal.LS <- local.coverage(region = LS, data = dat, bins = 1, d = 2)
 marginal.LSLW <- local.coverage(region = LSLW, data = dat, bins = 1, d = 2)
-table.marginal <- matrix(c(marginal.gamma, marginal.gaussian, 
-  marginal.LSLW, marginal.LS), ncol = 4)
+marginal.HD <- local.coverage(region = HD, data = dat, bins = 1, d = 2)
+table.marginal <- matrix(c(marginal.gamma.trans, marginal.gaussian.trans, 
+  marginal.gamma.bin, marginal.gaussian.bin, marginal.LSLW, marginal.LS, 
+  marginal.HD), ncol = 7)
 table.marginal <- round(table.marginal, 3)
-colnames(table.marginal) <- c("gamma", "gaussian", "LSLW", "LS")
+colnames(table.marginal) <- c("gamma trans", "gaussian trans", "gamma bin", 
+  "gaussian bin", "LSLW", "LS", "HD")
 rownames(table.marginal) <- "marginal coverage"
 
 ## conditional coverages
 d <- ncol(dat) - 2
-conditional.gamma <- local.coverage(region = conformal.gamma, data = dat, 
-  bins = 3, d = d)
-conditional.gaussian <- local.coverage(region = conformal.gaussian, 
+conditional.gamma.trans <- local.coverage(region = gamma.transform, 
+  data = dat, bins = 3, d = d)
+conditional.gaussian.trans <- local.coverage(
+  region = gaussian.transform, data = dat, bins = 3, d = d)
+conditional.gamma.bin <- local.coverage(region = gamma.paraconfbin, 
+  data = dat, bins = 3, d = d)
+conditional.gaussian.bin <- local.coverage(region = gaussian.paraconfbin, 
   data = dat, bins = 3, d = d)
 conditional.LS <- local.coverage(region = LS, data = dat, bins = 3, d = d)
 conditional.LSLW <- local.coverage(region = LSLW, data = dat, bins = 3, d = d)
-table.conditional <- matrix(cbind(conditional.gamma, conditional.gaussian, 
-  conditional.LSLW, conditional.LS), ncol = 4)
+conditional.HD <- local.coverage(region = HD, data = dat, bins = 3, d = d)
+table.conditional <- matrix(cbind(conditional.gamma.trans, 
+  conditional.gaussian.trans, conditional.gamma.bin, conditional.gaussian.bin, 
+  conditional.LSLW, conditional.LS, conditional.HD), ncol = 7)
 table.conditional <- round(table.conditional, 3)
-colnames(table.conditional) <- c("gamma", "gaussian", "LSLW", "LS")
-avg.cond.coverage <- colMeans(table.conditional,na.rm = TRUE)
+colnames(table.conditional) <- c("gamma trans", "gaussian trans", 
+  "gamma bin", "gaussian bin", "LSLW", "LS", "HD")
+avg.cond.coverage <- colMeans(table.conditional,na.rm = TRUE)  
 @
 
 
 We now compute the prediction error of each conformal prediction region.
 
 <<>>=
-pred.error.gamma <- absolute.error(y = dat$glyhb, region = conformal.gamma)
-pred.error.gaussian <- absolute.error(y = y, region = conformal.gaussian)
+pred.error.gamma.trans <- absolute.error(y = dat$glyhb, region = gamma.transform)
+pred.error.gaussian.trans <- absolute.error(y = y, region = gaussian.transform)
+pred.error.gamma.bin <- absolute.error(y = dat$glyhb, region = gamma.paraconfbin)
+pred.error.gaussian.bin <- absolute.error(y = y, region = gaussian.paraconfbin)
 pred.error.LSLW <- absolute.error(y = y, region = LSLW)
 pred.error.LS <- absolute.error(y = y, region = LS)
-table.pred.error <- matrix(c(pred.error.gamma, pred.error.gaussian, 
-  pred.error.LSLW, pred.error.LS), ncol = 4)
-colnames(table.pred.error) <- c("gamma", "gaussian", "LSLW", "LS")
+pred.error.HD <- absolute.error(y = y, region = HD)
+table.pred.error <- matrix(c(pred.error.gamma.trans, pred.error.gaussian.trans,
+  pred.error.gamma.bin, pred.error.gaussian.bin, pred.error.LSLW, pred.error.LS, 
+  pred.error.HD), ncol = 7)
+colnames(table.pred.error) <- c("gamma trans", "gaussian trans", "gamma bin", 
+  "gaussian bin ", "LSLW", "LS", "HD")
 rownames(table.pred.error) <- "pred error"
 @
 
@@ -1228,14 +1297,19 @@ volume.regions <- function(region, preds){
 }
 
 preds <- dat[, 2:4]
-volume.gamma <- volume.regions(region = conformal.gamma, preds = preds)
-volume.gaussian <- volume.regions(region = conformal.gaussian, preds = preds)
+volume.gamma.trans <- volume.regions(region = gamma.transform, preds = preds)
+volume.gaussian.trans <- volume.regions(region = gaussian.transform, preds = preds)
+volume.gamma.bin <- volume.regions(region = gamma.paraconfbin, preds = preds)
+volume.gaussian.bin <- volume.regions(region = gaussian.paraconfbin, preds = preds)
 volume.LSLW <- volume.regions(region = LSLW, preds = preds)
 volume.LS <- volume.regions(region = LS, preds = preds)
-table.volume <- matrix(c(volume.gamma, volume.gaussian, 
-  volume.LSLW, volume.LS), ncol = 4)
-colnames(table.volume) <- c("gamma", "gaussian", "LSLW", "LS")
+volume.HD <- volume.regions(region = HD, preds = preds)
+table.volume <- matrix(c(volume.gamma.trans, volume.gaussian.trans, 
+  volume.gamma.bin, volume.gaussian.bin, volume.LSLW, volume.LS, volume.HD), ncol = 7)
+colnames(table.volume) <- c("gamma trans", "gaussian trans", "gamma bin", 
+  "gaussian bin", "LSLW", "LS", "HD")
 rownames(table.volume) <- "volume"
+
 
 volume.factors <- function(region, bins = 1, data, object){
   if(class(region) == "list"){ 
@@ -1287,17 +1361,26 @@ volume.factors <- function(region, bins = 1, data, object){
   sum(volume.factor)  
 }
 
-volume.gamma <- volume.factors(region = conformal.gamma, 
+volume.gamma.trans <- volume.factors(region = gamma.transform, 
   data = dat, object = m.gamma.log)
-volume.gaussian <- volume.factors(conformal.gaussian, 
+volume.gaussian.trans <- volume.factors(gaussian.transform, 
+  data = dat, object = m.gaussian)
+volume.gamma.bin <- volume.factors(region = gamma.paraconfbin, 
+  data = dat, object = m.gamma.log)
+volume.gaussian.bin <- volume.factors(gaussian.paraconfbin, 
   data = dat, object = m.gaussian)
 volume.LSLW <- volume.factors(LSLW, 
   data = dat, object = m.gaussian)
 volume.LS <- volume.factors(LS, 
   data = dat, object = m.gaussian)
-table.volume <- matrix(c(volume.gamma, volume.gaussian, 
-  volume.LSLW, volume.LS), ncol = 4)
-colnames(table.volume) <- c("gamma", "gaussian", "LSLW", "LS")
+volume.HD <- volume.factors(HD, 
+  data = dat, object = m.gamma.log)
+
+table.volume <- matrix(c(volume.gamma.trans, volume.gaussian.trans, 
+  volume.gamma.bin, volume.gaussian.bin, volume.LSLW, volume.LS, 
+  volume.HD), ncol = 7)
+colnames(table.volume) <- c("gamma trans", "gaussian trans", "gamma bin", 
+  "gaussian bin", "LSLW", "LS", "HD")
 rownames(table.volume) <- "volume"
 table.volume <- table.volume / 1e4
 @
@@ -1310,7 +1393,7 @@ Table 2 and Figure 4 in \citet{eck2019conformal} are shown below.
 diagnostics <- rbind(table.marginal, table.volume, 
   table.pred.error, avg.cond.coverage)
 #diagnostics <- t(diagnostics)
-xtable(diagnostics, digits = c(0, 3, 3, 3, 3))
+xtable(diagnostics, digits = c(0, 3, 3, 3, 3, 3, 3, 3))
 @
 
 
@@ -1323,8 +1406,8 @@ mfrow3d(2, 2)
 # need to make weights unique so polygon is well defined. 
 dat$weight = jitter(dat$weight)
 
-## Gamma region
-dat.gamma <- cbind(dat, conformal.gamma)
+## Gamma transform conformal
+dat.gamma <- cbind(dat, gamma.transformconf)
 upr <- dat.gamma$upr
 lwr <- dat.gamma$lwr
 x <- dat$age
@@ -1353,7 +1436,7 @@ cex = 1.3
 mtext3d("Age (years)",  edge = "x--", line = 2, cex=cex, at=50)
 mtext3d("Weight (lbs)", edge = "z--", line = 2.5, cex=cex, at=250)
 mtext3d("HbA1c (%)",    edge = "y+-", line = 2.5, cex=cex, at=7.5)
-title3d(main="Gamma conformal", cex=2, line = 2)
+title3d(main="Gamma transform conformal", cex=2, line = 2)
 material3d("red", alpha=0.3, shininess=5)
 
 spn = 0.5
@@ -1369,15 +1452,20 @@ for(j in 1:length(dat_by_age)) {
   zvals = c(dat_by_age[[j]]$weight, rev(dat_by_age[[j]]$weight))
 
   # polygon is in (y,z)
-  polygon3d(x=xvals, y=yvals, z=zvals, coords=c(2,3), fill=TRUE, col="red", random=FALSE)
+  polygon3d(x=xvals, y=yvals, z=zvals, coords=c(2,3), fill=TRUE, col="red", 
+            random=FALSE)
 }
 
 
-## Gausian region
-dat.gaussian <- cbind(dat, conformal.gaussian)
-upr <- dat.gaussian$upr
-lwr <- dat.gaussian$lwr
-dat_age <- split(dat.gaussian, f = as.factor(age.factor))
+## Gamma binned conformal
+dat.gamma <- cbind(dat, gamma.paraconfbin)
+#dat.gaussian <- cbind(dat, conformal.gaussian)
+#upr <- dat.gaussian$upr
+#lwr <- dat.gaussian$lwr
+#dat_age <- split(dat.gaussian, f = as.factor(age.factor))
+upr <- dat.gamma$upr
+lwr <- dat.gamma$lwr
+dat_age <- split(dat.gamma, f = as.factor(age.factor))
 dat_by_age <- lapply(1:length(levels(age.factor)), 
                      function(j){
   qux <- as.data.frame(cbind(dat_age[[j]], AGEFACTOR = AGEFACTOR[j]))
@@ -1397,7 +1485,8 @@ axis3d(edge = "z--", nticks = 3)
 mtext3d("Age (years)",  edge = "x--", line = 2, cex=cex, at=50)
 mtext3d("Weight (lbs)", edge = "z--", line = 2.5, cex=cex, at=250)
 mtext3d("HbA1c (%)",    edge = "y+-", line = 2.5, cex=cex, at=7.5)
-title3d(main="Gaussian conformal", cex=2, line = 2)
+#title3d(main="Gaussian conformal", cex=2, line = 2)
+title3d(main="Gamma binned conformal", cex=2, line = 2)
 material3d("red", alpha=0.3, shininess=5)
 
 for(j in 1:length(dat_by_age)) {
@@ -1414,6 +1503,7 @@ for(j in 1:length(dat_by_age)) {
   # polygon is in (y,z)
   polygon3d(x=xvals, y=yvals, z=zvals, coords=c(2,3), fill=TRUE, col="red")
 }
+
 
 
 ## LS region
@@ -1518,6 +1608,7 @@ for(j in 1:length(dat_by_age)) {
 
 
 
+
 \newpage
 \section{Additional Gamma simulations}
 \label{sec:Gamma}
@@ -1556,8 +1647,6 @@ beta <- c(1.25, -1)
 bins <- 2
 n <- 150
 B <- 250
-dat <- data.frame(y = rep(0, n), 
-  x1 = rep(0, n))
 system.time(out.gamma.150.2.0.5 <- do.call(cbind, 
   lapply(1:B, FUN = function(j){
     unlist(gamma_simulator(beta = beta, n = n, 

@@ -566,7 +566,7 @@ region.
 \hlkwd{xtable}\hlstd{(diagnostics,} \hlkwc{digits} \hlstd{=} \hlkwd{c}\hlstd{(}\hlnum{0}\hlstd{,} \hlnum{2}\hlstd{,} \hlnum{2}\hlstd{,} \hlnum{2}\hlstd{,} \hlnum{2}\hlstd{,} \hlnum{2}\hlstd{))}
 \end{alltt}
 \end{kframe}% latex table generated in R 3.4.4 by xtable 1.8-3 package
-% Sun Sep 15 14:49:07 2019
+% Sun Sep 15 18:25:38 2019
 \begin{table}[ht]
 \centering
 \begin{tabular}{rrrrrr}
@@ -982,51 +982,58 @@ evidenced by Figure~\ref{Fig:coverageinx500.3}.
 \begin{table}[t!]
 \tiny
 \begin{center}
-\begin{tabular}{lccccc}
-  & parametric conformal & nonparametric conformal & LS conformal & 
-    LSLW conformal & HD region \\ 
+\begin{tabular}{lcccccc}
+  & Parametric & Transformation & Nonparametric & LS        & LSLW      & HD     \\  
+  & Conformal  & Conformal      & Conformal     & Conformal & Conformal & Region \\
     marginal coverage & 
   $0.909 \; (0.0005)$ & 
   $0.912 \; (0.0006)$ & 
   $0.901 \; (0.0005)$ & 
   $0.904 \; (0.0004)$ & 
-  $0.915 \; (0.0007)$ \\
+  $0.915 \; (0.0007)$ &
+  $0.9 \; (0.0012)$ \\ 
     local coverage when $0 < x < 1/3$ & 
   $0.909 \; (0.001)$ & 
   $0.911 \; (0.0023)$ & 
   $0.903 \; (0.0011)$ & 
   $0.75 \; (0.0024)$ & 
-  $0.913 \; (0.0015)$ \\
+  $0.913 \; (0.0015)$ &
+  $0.902 \; (0.0026)$ \\
     local coverage when $1/3 \leq x < 2/3$ & 
   $0.908 \; (0.0006)$ & 
   $0.913 \; (0.0026)$ & 
   $0.9 \; (0.0006)$ & 
   $0.967 \; (0.0015)$ & 
-  $0.907 \; (0.0024)$ \\
+  $0.907 \; (0.0024)$ &
+  $0.903 \; (0.003)$ \\
     local coverage when $2/3 \leq x < 1$ & 
   $0.909 \; (0.0008)$ & 
   $0.912 \; (0.0028)$ & 
   $0.898 \; (0.0007)$ & 
   $0.994 \; (0.0008)$ & 
-  $0.925 \; (0.0022)$ \\
+  $0.925 \; (0.0022)$ & 
+  $0.895 \; (0.0028)$ \\
     area & 
   $1.832 \; (0.0203)$ & 
   $1.853 \; (0.0186)$ & 
   $2.035 \; (0.0231)$ & 
   $2.341 \; (0.0175)$ & 
-  $1.963 \; (0.0152)$ \\
+  $1.963 \; (0.0152)$ & 
+  $1.79 \; (0.017)$ \\
     prediction error & 
   $0.084 \; (0.0054)$ & 
   $0.065 \; (0.0039)$ & 
   $0.137 \; (0.0077)$ & 
   $0.13 \; (0.0057)$ & 
-  $0.054 \; (0.0034)$ 
+  $0.054 \; (0.0034)$ & 
+  $0.07 \; (0.0038)$ 
 \end{tabular}
 \end{center}
 \caption{Diagnostics of prediction regions. This table gives 
     the area, prediction error, marginal coverage, and local coverages with 
-    respect to our binning scheme for the parametric, nonparametric, LS, and 
-    LSLW conformal prediction regions and the HD prediction region.}
+    respect to our binning scheme for the parametric, transformation, 
+    nonparametric, LS, and LSLW conformal prediction regions and the HD 
+    prediction region.}
 \label{Tab:gamma-results}
 \end{table}
 
@@ -1054,7 +1061,7 @@ evidenced by Figure~\ref{Fig:coverageinx500.3}.
 \section{Predicting the risk of diabetes}
 \label{sec:diabetes}
 
-In this Section we reproduce the data analysis that appears in Section 5 of 
+In this Section we reproduce the data analysis that appears in Section 6 of 
 \citet{eck2019conformal}.  
 We examine the influence of several variables on blood sugar, or glycosylated 
 hemoglobin percentage (also known as HbA1c), an important risk factor for 
@@ -1156,19 +1163,20 @@ Figure~\ref{diabetes:diagnostics}.
 \end{figure}
 
 
-Four conformal prediction regions are considered for predicting glycosylated 
-hemoglobin percentage.  These conformal prediction regions are the parametric 
-conformal prediction region with a Gamma model fit, the parametric conformal 
-prediction region with a Gaussian model fit, the least squares conformal 
-prediction region, and the least square conformal prediction region with 
-local weighting.  
+Six conformal prediction regions are considered for predicting glycosylated 
+hemoglobin percentage.  These conformal prediction regions are the binned and 
+transformation parametric conformal prediction region with a Gamma model fit, 
+the binned and transformation parametric conformal prediction region with a 
+Gaussian model fit, the least squares conformal prediction region, 
+and the least square conformal prediction region with local weighting.  
 All conformal prediction regions correspond to models that only include 
 linear terms for each of the covariates.  
-The Gamma and Gaussian parametric conformal prediction regions were 
+The binned Gamma and Gaussian parametric conformal prediction regions were 
 computed with binning across the binary gender factor variable, the predictor 
 space is partitioned across genders. 
 However, no additional binning structure within the levels of gender was 
 employed.  
+
 
 These conformal prediction regions are now constructed.
 
@@ -1183,11 +1191,12 @@ These conformal prediction regions are now constructed.
 \end{alltt}
 \begin{verbatim}
 ##     user   system  elapsed 
-## 1049.673    1.417  189.749
+## 1077.259    1.730  195.047
 \end{verbatim}
 \begin{alltt}
-\hlstd{conformal.gamma} \hlkwb{<-} \hlstd{conformal.gamma}\hlopt{$}\hlstd{paraconfbin}
-\hlkwd{head}\hlstd{(conformal.gamma)}
+\hlstd{gamma.paraconfbin} \hlkwb{<-} \hlstd{conformal.gamma}\hlopt{$}\hlstd{paraconfbin}
+\hlstd{gamma.transform} \hlkwb{<-} \hlstd{conformal.gamma}\hlopt{$}\hlstd{transformconf}
+\hlkwd{head}\hlstd{(gamma.paraconfbin)}
 \end{alltt}
 \begin{verbatim}
 ##        lwr      upr
@@ -1199,6 +1208,18 @@ These conformal prediction regions are now constructed.
 ## [6,] 2.500 7.777500
 \end{verbatim}
 \begin{alltt}
+\hlkwd{head}\hlstd{(gamma.transform)}
+\end{alltt}
+\begin{verbatim}
+##           lwr       upr
+## [1,] 3.112995  7.807848
+## [2,] 3.186762  8.064868
+## [3,] 4.253349 10.786782
+## [4,] 3.707534  9.338419
+## [5,] 4.051886 10.160153
+## [6,] 3.226689  8.169503
+\end{verbatim}
+\begin{alltt}
 \hlcom{## Gaussian conformal}
 \hlkwd{system.time}\hlstd{(conformal.gaussian} \hlkwb{<-}
   \hlkwd{conformal.glm}\hlstd{(m.gaussian,} \hlkwc{cores} \hlstd{=} \hlnum{6}\hlstd{,} \hlkwc{bins} \hlstd{=} \hlnum{1}\hlstd{,}
@@ -1206,11 +1227,12 @@ These conformal prediction regions are now constructed.
 \end{alltt}
 \begin{verbatim}
 ##    user  system elapsed 
-## 561.389   1.320  96.774
+## 653.202   1.632 112.752
 \end{verbatim}
 \begin{alltt}
-\hlstd{conformal.gaussian} \hlkwb{<-} \hlstd{conformal.gaussian}\hlopt{$}\hlstd{paraconfbin}
-\hlkwd{head}\hlstd{(conformal.gaussian)}
+\hlstd{gaussian.paraconfbin} \hlkwb{<-} \hlstd{conformal.gaussian}\hlopt{$}\hlstd{paraconfbin}
+\hlstd{gaussian.transform} \hlkwb{<-} \hlstd{conformal.gaussian}\hlopt{$}\hlstd{transformconf}
+\hlkwd{head}\hlstd{(gaussian.paraconfbin)}
 \end{alltt}
 \begin{verbatim}
 ##        lwr      upr
@@ -1220,6 +1242,18 @@ These conformal prediction regions are now constructed.
 ## [4,] 2.925 8.880000
 ## [5,] 3.445 9.390000
 ## [6,] 2.190 8.092500
+\end{verbatim}
+\begin{alltt}
+\hlkwd{head}\hlstd{(gaussian.transform)}
+\end{alltt}
+\begin{verbatim}
+##           lwr       upr
+## [1,] 2.569146  9.189792
+## [2,] 2.748739  9.399384
+## [3,] 4.349760 11.010405
+## [4,] 3.535198 10.170843
+## [5,] 4.033451 10.649097
+## [6,] 2.801680  9.462326
 \end{verbatim}
 \begin{alltt}
 \hlcom{## LS conformal}
@@ -1235,7 +1269,7 @@ These conformal prediction regions are now constructed.
 \end{alltt}
 \begin{verbatim}
 ##    user  system elapsed 
-##   6.197   0.000   6.199
+##   8.551   0.002   8.577
 \end{verbatim}
 \begin{alltt}
 \hlstd{LS} \hlkwb{=} \hlkwd{cbind}\hlstd{(p1.tibs}\hlopt{$}\hlstd{lo, p1.tibs}\hlopt{$}\hlstd{up)}
@@ -1268,7 +1302,7 @@ These conformal prediction regions are now constructed.
 \end{alltt}
 \begin{verbatim}
 ##    user  system elapsed 
-##  68.467   0.014  68.514
+##  81.862   0.012  81.906
 \end{verbatim}
 \begin{alltt}
 \hlstd{LSLW} \hlkwb{=} \hlkwd{cbind}\hlstd{(p2.tibs}\hlopt{$}\hlstd{lo, p2.tibs}\hlopt{$}\hlstd{up)}
@@ -1288,11 +1322,60 @@ These conformal prediction regions are now constructed.
 \end{knitrout}
 
 
+We also consider the highest density prediction region under the Gamma 
+model, this region is constructed below.
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## HD region}
+\hlkwd{library}\hlstd{(HDInterval)}
+\hlstd{betaMLE} \hlkwb{<-} \hlkwd{coefficients}\hlstd{(m.gamma.log)}
+\hlstd{shapeMLE} \hlkwb{<-} \hlkwd{as.numeric}\hlstd{(}\hlkwd{gamma.shape}\hlstd{(m.gamma.log)[}\hlnum{1}\hlstd{])}
+\hlstd{rateMLE} \hlkwb{<-} \hlstd{(}\hlnum{1} \hlopt{/} \hlkwd{exp}\hlstd{(X} \hlopt{%*%} \hlstd{betaMLE))} \hlopt{*} \hlstd{shapeMLE}
+\hlcom{#rateMLE <- cbind(1, x) %*% betaMLE * shapeMLE}
+\hlstd{HD} \hlkwb{<-} \hlkwd{do.call}\hlstd{(rbind,}
+  \hlkwd{lapply}\hlstd{(}\hlnum{1}\hlopt{:}\hlkwd{nrow}\hlstd{(X),} \hlkwa{function}\hlstd{(}\hlkwc{j}\hlstd{)\{}
+    \hlkwd{hdi}\hlstd{(qgamma,} \hlnum{0.90}\hlstd{,} \hlkwc{shape} \hlstd{= shapeMLE,} \hlkwc{rate} \hlstd{= rateMLE[j,} \hlnum{1}\hlstd{])}
+  \hlstd{\}))}
+\hlkwd{colnames}\hlstd{(HD)} \hlkwb{<-} \hlkwd{c}\hlstd{(}\hlstr{"lwr"}\hlstd{,} \hlstr{"upr"}\hlstd{)}
+\hlkwd{head}\hlstd{(HD)}
+\end{alltt}
+\begin{verbatim}
+##           lwr      upr
+## [1,] 2.556343 7.182955
+## [2,] 2.628804 7.386560
+## [3,] 3.510997 9.865393
+## [4,] 3.050565 8.571645
+## [5,] 3.328264 9.351939
+## [6,] 2.659659 7.473256
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+
 
 \subsection{Results in \citet{eck2019conformal}}
 
-We now compute the diagnostics of these four conformal prediction 
-regions and reproduce Table 2 in \citet{eck2019conformal}.  
+Diagnostics from the six conformal prediction regions are depicted in 
+Table 2 of the manuscript \citet{eck2019conformal}.  The error tolerance 
+for all prediction regions was set at $\alpha = 0.10$.  We see that 
+parametric conformal prediction regions maintain their advertised finite 
+sample marginal validity for the predictions of glycosylated hemoglobin.  
+These prediction regions provide a balance between marginal coverage, size, 
+prediction error, and average conditional coverage (the average of the 
+coverage probabilities taken over small subregions of the predictor space).  
+The transformation Gamma conformal prediction region balances these criteria 
+particularly nicely. This prediction region is relatively small, has relatively 
+small prediction error, and it gives near nominal desired coverage.  This 
+finding is expected when the underlying estimated density used as the 
+parametric conformity measure is a good approximation of the data generating 
+model.
+
+
+We now compute the diagnostics of these six conformal prediction 
+regions and the highest density prediction region, and we reproduce 
+Table 2 in \citet{eck2019conformal}.  
 We start with the computation of marginal and approximate average 
 conditional coverage using functionality in the \texttt{conformal.glm} 
 software.
@@ -1302,30 +1385,44 @@ software.
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 \begin{alltt}
 \hlcom{## marginal coverages}
-\hlstd{marginal.gamma} \hlkwb{<-} \hlkwd{local.coverage}\hlstd{(}\hlkwc{region} \hlstd{= conformal.gamma,} \hlkwc{data} \hlstd{= dat,}
-  \hlkwc{bins} \hlstd{=} \hlnum{1}\hlstd{,} \hlkwc{d} \hlstd{=} \hlnum{2}\hlstd{)}
-\hlstd{marginal.gaussian} \hlkwb{<-} \hlkwd{local.coverage}\hlstd{(}\hlkwc{region} \hlstd{= conformal.gaussian,}
+\hlstd{marginal.gamma.trans} \hlkwb{<-} \hlkwd{local.coverage}\hlstd{(}\hlkwc{region} \hlstd{= gamma.transform,}
+  \hlkwc{data} \hlstd{= dat,} \hlkwc{bins} \hlstd{=} \hlnum{1}\hlstd{,} \hlkwc{d} \hlstd{=} \hlnum{2}\hlstd{)}
+\hlstd{marginal.gaussian.trans} \hlkwb{<-} \hlkwd{local.coverage}\hlstd{(}
+  \hlkwc{region} \hlstd{= gaussian.transform,} \hlkwc{data} \hlstd{= dat,} \hlkwc{bins} \hlstd{=} \hlnum{1}\hlstd{,} \hlkwc{d} \hlstd{=} \hlnum{2}\hlstd{)}
+\hlstd{marginal.gamma.bin} \hlkwb{<-} \hlkwd{local.coverage}\hlstd{(}\hlkwc{region} \hlstd{= gamma.paraconfbin,}
+  \hlkwc{data} \hlstd{= dat,} \hlkwc{bins} \hlstd{=} \hlnum{1}\hlstd{,} \hlkwc{d} \hlstd{=} \hlnum{2}\hlstd{)}
+\hlstd{marginal.gaussian.bin} \hlkwb{<-} \hlkwd{local.coverage}\hlstd{(}\hlkwc{region} \hlstd{= gaussian.paraconfbin,}
   \hlkwc{data} \hlstd{= dat,} \hlkwc{bins} \hlstd{=} \hlnum{1}\hlstd{,} \hlkwc{d} \hlstd{=} \hlnum{2}\hlstd{)}
 \hlstd{marginal.LS} \hlkwb{<-} \hlkwd{local.coverage}\hlstd{(}\hlkwc{region} \hlstd{= LS,} \hlkwc{data} \hlstd{= dat,} \hlkwc{bins} \hlstd{=} \hlnum{1}\hlstd{,} \hlkwc{d} \hlstd{=} \hlnum{2}\hlstd{)}
 \hlstd{marginal.LSLW} \hlkwb{<-} \hlkwd{local.coverage}\hlstd{(}\hlkwc{region} \hlstd{= LSLW,} \hlkwc{data} \hlstd{= dat,} \hlkwc{bins} \hlstd{=} \hlnum{1}\hlstd{,} \hlkwc{d} \hlstd{=} \hlnum{2}\hlstd{)}
-\hlstd{table.marginal} \hlkwb{<-} \hlkwd{matrix}\hlstd{(}\hlkwd{c}\hlstd{(marginal.gamma, marginal.gaussian,}
-  \hlstd{marginal.LSLW, marginal.LS),} \hlkwc{ncol} \hlstd{=} \hlnum{4}\hlstd{)}
+\hlstd{marginal.HD} \hlkwb{<-} \hlkwd{local.coverage}\hlstd{(}\hlkwc{region} \hlstd{= HD,} \hlkwc{data} \hlstd{= dat,} \hlkwc{bins} \hlstd{=} \hlnum{1}\hlstd{,} \hlkwc{d} \hlstd{=} \hlnum{2}\hlstd{)}
+\hlstd{table.marginal} \hlkwb{<-} \hlkwd{matrix}\hlstd{(}\hlkwd{c}\hlstd{(marginal.gamma.trans, marginal.gaussian.trans,}
+  \hlstd{marginal.gamma.bin, marginal.gaussian.bin, marginal.LSLW, marginal.LS,}
+  \hlstd{marginal.HD),} \hlkwc{ncol} \hlstd{=} \hlnum{7}\hlstd{)}
 \hlstd{table.marginal} \hlkwb{<-} \hlkwd{round}\hlstd{(table.marginal,} \hlnum{3}\hlstd{)}
-\hlkwd{colnames}\hlstd{(table.marginal)} \hlkwb{<-} \hlkwd{c}\hlstd{(}\hlstr{"gamma"}\hlstd{,} \hlstr{"gaussian"}\hlstd{,} \hlstr{"LSLW"}\hlstd{,} \hlstr{"LS"}\hlstd{)}
+\hlkwd{colnames}\hlstd{(table.marginal)} \hlkwb{<-} \hlkwd{c}\hlstd{(}\hlstr{"gamma trans"}\hlstd{,} \hlstr{"gaussian trans"}\hlstd{,} \hlstr{"gamma bin"}\hlstd{,}
+  \hlstr{"gaussian bin"}\hlstd{,} \hlstr{"LSLW"}\hlstd{,} \hlstr{"LS"}\hlstd{,} \hlstr{"HD"}\hlstd{)}
 \hlkwd{rownames}\hlstd{(table.marginal)} \hlkwb{<-} \hlstr{"marginal coverage"}
 
 \hlcom{## conditional coverages}
 \hlstd{d} \hlkwb{<-} \hlkwd{ncol}\hlstd{(dat)} \hlopt{-} \hlnum{2}
-\hlstd{conditional.gamma} \hlkwb{<-} \hlkwd{local.coverage}\hlstd{(}\hlkwc{region} \hlstd{= conformal.gamma,} \hlkwc{data} \hlstd{= dat,}
-  \hlkwc{bins} \hlstd{=} \hlnum{3}\hlstd{,} \hlkwc{d} \hlstd{= d)}
-\hlstd{conditional.gaussian} \hlkwb{<-} \hlkwd{local.coverage}\hlstd{(}\hlkwc{region} \hlstd{= conformal.gaussian,}
+\hlstd{conditional.gamma.trans} \hlkwb{<-} \hlkwd{local.coverage}\hlstd{(}\hlkwc{region} \hlstd{= gamma.transform,}
+  \hlkwc{data} \hlstd{= dat,} \hlkwc{bins} \hlstd{=} \hlnum{3}\hlstd{,} \hlkwc{d} \hlstd{= d)}
+\hlstd{conditional.gaussian.trans} \hlkwb{<-} \hlkwd{local.coverage}\hlstd{(}
+  \hlkwc{region} \hlstd{= gaussian.transform,} \hlkwc{data} \hlstd{= dat,} \hlkwc{bins} \hlstd{=} \hlnum{3}\hlstd{,} \hlkwc{d} \hlstd{= d)}
+\hlstd{conditional.gamma.bin} \hlkwb{<-} \hlkwd{local.coverage}\hlstd{(}\hlkwc{region} \hlstd{= gamma.paraconfbin,}
+  \hlkwc{data} \hlstd{= dat,} \hlkwc{bins} \hlstd{=} \hlnum{3}\hlstd{,} \hlkwc{d} \hlstd{= d)}
+\hlstd{conditional.gaussian.bin} \hlkwb{<-} \hlkwd{local.coverage}\hlstd{(}\hlkwc{region} \hlstd{= gaussian.paraconfbin,}
   \hlkwc{data} \hlstd{= dat,} \hlkwc{bins} \hlstd{=} \hlnum{3}\hlstd{,} \hlkwc{d} \hlstd{= d)}
 \hlstd{conditional.LS} \hlkwb{<-} \hlkwd{local.coverage}\hlstd{(}\hlkwc{region} \hlstd{= LS,} \hlkwc{data} \hlstd{= dat,} \hlkwc{bins} \hlstd{=} \hlnum{3}\hlstd{,} \hlkwc{d} \hlstd{= d)}
 \hlstd{conditional.LSLW} \hlkwb{<-} \hlkwd{local.coverage}\hlstd{(}\hlkwc{region} \hlstd{= LSLW,} \hlkwc{data} \hlstd{= dat,} \hlkwc{bins} \hlstd{=} \hlnum{3}\hlstd{,} \hlkwc{d} \hlstd{= d)}
-\hlstd{table.conditional} \hlkwb{<-} \hlkwd{matrix}\hlstd{(}\hlkwd{cbind}\hlstd{(conditional.gamma, conditional.gaussian,}
-  \hlstd{conditional.LSLW, conditional.LS),} \hlkwc{ncol} \hlstd{=} \hlnum{4}\hlstd{)}
+\hlstd{conditional.HD} \hlkwb{<-} \hlkwd{local.coverage}\hlstd{(}\hlkwc{region} \hlstd{= HD,} \hlkwc{data} \hlstd{= dat,} \hlkwc{bins} \hlstd{=} \hlnum{3}\hlstd{,} \hlkwc{d} \hlstd{= d)}
+\hlstd{table.conditional} \hlkwb{<-} \hlkwd{matrix}\hlstd{(}\hlkwd{cbind}\hlstd{(conditional.gamma.trans,}
+  \hlstd{conditional.gaussian.trans, conditional.gamma.bin, conditional.gaussian.bin,}
+  \hlstd{conditional.LSLW, conditional.LS, conditional.HD),} \hlkwc{ncol} \hlstd{=} \hlnum{7}\hlstd{)}
 \hlstd{table.conditional} \hlkwb{<-} \hlkwd{round}\hlstd{(table.conditional,} \hlnum{3}\hlstd{)}
-\hlkwd{colnames}\hlstd{(table.conditional)} \hlkwb{<-} \hlkwd{c}\hlstd{(}\hlstr{"gamma"}\hlstd{,} \hlstr{"gaussian"}\hlstd{,} \hlstr{"LSLW"}\hlstd{,} \hlstr{"LS"}\hlstd{)}
+\hlkwd{colnames}\hlstd{(table.conditional)} \hlkwb{<-} \hlkwd{c}\hlstd{(}\hlstr{"gamma trans"}\hlstd{,} \hlstr{"gaussian trans"}\hlstd{,}
+  \hlstr{"gamma bin"}\hlstd{,} \hlstr{"gaussian bin"}\hlstd{,} \hlstr{"LSLW"}\hlstd{,} \hlstr{"LS"}\hlstd{,} \hlstr{"HD"}\hlstd{)}
 \hlstd{avg.cond.coverage} \hlkwb{<-} \hlkwd{colMeans}\hlstd{(table.conditional,}\hlkwc{na.rm} \hlstd{=} \hlnum{TRUE}\hlstd{)}
 \end{alltt}
 \end{kframe}
@@ -1337,13 +1434,18 @@ We now compute the prediction error of each conformal prediction region.
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 \begin{alltt}
-\hlstd{pred.error.gamma} \hlkwb{<-} \hlkwd{absolute.error}\hlstd{(}\hlkwc{y} \hlstd{= dat}\hlopt{$}\hlstd{glyhb,} \hlkwc{region} \hlstd{= conformal.gamma)}
-\hlstd{pred.error.gaussian} \hlkwb{<-} \hlkwd{absolute.error}\hlstd{(}\hlkwc{y} \hlstd{= y,} \hlkwc{region} \hlstd{= conformal.gaussian)}
+\hlstd{pred.error.gamma.trans} \hlkwb{<-} \hlkwd{absolute.error}\hlstd{(}\hlkwc{y} \hlstd{= dat}\hlopt{$}\hlstd{glyhb,} \hlkwc{region} \hlstd{= gamma.transform)}
+\hlstd{pred.error.gaussian.trans} \hlkwb{<-} \hlkwd{absolute.error}\hlstd{(}\hlkwc{y} \hlstd{= y,} \hlkwc{region} \hlstd{= gaussian.transform)}
+\hlstd{pred.error.gamma.bin} \hlkwb{<-} \hlkwd{absolute.error}\hlstd{(}\hlkwc{y} \hlstd{= dat}\hlopt{$}\hlstd{glyhb,} \hlkwc{region} \hlstd{= gamma.paraconfbin)}
+\hlstd{pred.error.gaussian.bin} \hlkwb{<-} \hlkwd{absolute.error}\hlstd{(}\hlkwc{y} \hlstd{= y,} \hlkwc{region} \hlstd{= gaussian.paraconfbin)}
 \hlstd{pred.error.LSLW} \hlkwb{<-} \hlkwd{absolute.error}\hlstd{(}\hlkwc{y} \hlstd{= y,} \hlkwc{region} \hlstd{= LSLW)}
 \hlstd{pred.error.LS} \hlkwb{<-} \hlkwd{absolute.error}\hlstd{(}\hlkwc{y} \hlstd{= y,} \hlkwc{region} \hlstd{= LS)}
-\hlstd{table.pred.error} \hlkwb{<-} \hlkwd{matrix}\hlstd{(}\hlkwd{c}\hlstd{(pred.error.gamma, pred.error.gaussian,}
-  \hlstd{pred.error.LSLW, pred.error.LS),} \hlkwc{ncol} \hlstd{=} \hlnum{4}\hlstd{)}
-\hlkwd{colnames}\hlstd{(table.pred.error)} \hlkwb{<-} \hlkwd{c}\hlstd{(}\hlstr{"gamma"}\hlstd{,} \hlstr{"gaussian"}\hlstd{,} \hlstr{"LSLW"}\hlstd{,} \hlstr{"LS"}\hlstd{)}
+\hlstd{pred.error.HD} \hlkwb{<-} \hlkwd{absolute.error}\hlstd{(}\hlkwc{y} \hlstd{= y,} \hlkwc{region} \hlstd{= HD)}
+\hlstd{table.pred.error} \hlkwb{<-} \hlkwd{matrix}\hlstd{(}\hlkwd{c}\hlstd{(pred.error.gamma.trans, pred.error.gaussian.trans,}
+  \hlstd{pred.error.gamma.bin, pred.error.gaussian.bin, pred.error.LSLW, pred.error.LS,}
+  \hlstd{pred.error.HD),} \hlkwc{ncol} \hlstd{=} \hlnum{7}\hlstd{)}
+\hlkwd{colnames}\hlstd{(table.pred.error)} \hlkwb{<-} \hlkwd{c}\hlstd{(}\hlstr{"gamma trans"}\hlstd{,} \hlstr{"gaussian trans"}\hlstd{,} \hlstr{"gamma bin"}\hlstd{,}
+  \hlstr{"gaussian bin "}\hlstd{,} \hlstr{"LSLW"}\hlstd{,} \hlstr{"LS"}\hlstd{,} \hlstr{"HD"}\hlstd{)}
 \hlkwd{rownames}\hlstd{(table.pred.error)} \hlkwb{<-} \hlstr{"pred error"}
 \end{alltt}
 \end{kframe}
@@ -1370,14 +1472,19 @@ We now compute the volume of each conformal prediction region.
 \hlstd{\}}
 
 \hlstd{preds} \hlkwb{<-} \hlstd{dat[,} \hlnum{2}\hlopt{:}\hlnum{4}\hlstd{]}
-\hlstd{volume.gamma} \hlkwb{<-} \hlkwd{volume.regions}\hlstd{(}\hlkwc{region} \hlstd{= conformal.gamma,} \hlkwc{preds} \hlstd{= preds)}
-\hlstd{volume.gaussian} \hlkwb{<-} \hlkwd{volume.regions}\hlstd{(}\hlkwc{region} \hlstd{= conformal.gaussian,} \hlkwc{preds} \hlstd{= preds)}
+\hlstd{volume.gamma.trans} \hlkwb{<-} \hlkwd{volume.regions}\hlstd{(}\hlkwc{region} \hlstd{= gamma.transform,} \hlkwc{preds} \hlstd{= preds)}
+\hlstd{volume.gaussian.trans} \hlkwb{<-} \hlkwd{volume.regions}\hlstd{(}\hlkwc{region} \hlstd{= gaussian.transform,} \hlkwc{preds} \hlstd{= preds)}
+\hlstd{volume.gamma.bin} \hlkwb{<-} \hlkwd{volume.regions}\hlstd{(}\hlkwc{region} \hlstd{= gamma.paraconfbin,} \hlkwc{preds} \hlstd{= preds)}
+\hlstd{volume.gaussian.bin} \hlkwb{<-} \hlkwd{volume.regions}\hlstd{(}\hlkwc{region} \hlstd{= gaussian.paraconfbin,} \hlkwc{preds} \hlstd{= preds)}
 \hlstd{volume.LSLW} \hlkwb{<-} \hlkwd{volume.regions}\hlstd{(}\hlkwc{region} \hlstd{= LSLW,} \hlkwc{preds} \hlstd{= preds)}
 \hlstd{volume.LS} \hlkwb{<-} \hlkwd{volume.regions}\hlstd{(}\hlkwc{region} \hlstd{= LS,} \hlkwc{preds} \hlstd{= preds)}
-\hlstd{table.volume} \hlkwb{<-} \hlkwd{matrix}\hlstd{(}\hlkwd{c}\hlstd{(volume.gamma, volume.gaussian,}
-  \hlstd{volume.LSLW, volume.LS),} \hlkwc{ncol} \hlstd{=} \hlnum{4}\hlstd{)}
-\hlkwd{colnames}\hlstd{(table.volume)} \hlkwb{<-} \hlkwd{c}\hlstd{(}\hlstr{"gamma"}\hlstd{,} \hlstr{"gaussian"}\hlstd{,} \hlstr{"LSLW"}\hlstd{,} \hlstr{"LS"}\hlstd{)}
+\hlstd{volume.HD} \hlkwb{<-} \hlkwd{volume.regions}\hlstd{(}\hlkwc{region} \hlstd{= HD,} \hlkwc{preds} \hlstd{= preds)}
+\hlstd{table.volume} \hlkwb{<-} \hlkwd{matrix}\hlstd{(}\hlkwd{c}\hlstd{(volume.gamma.trans, volume.gaussian.trans,}
+  \hlstd{volume.gamma.bin, volume.gaussian.bin, volume.LSLW, volume.LS, volume.HD),} \hlkwc{ncol} \hlstd{=} \hlnum{7}\hlstd{)}
+\hlkwd{colnames}\hlstd{(table.volume)} \hlkwb{<-} \hlkwd{c}\hlstd{(}\hlstr{"gamma trans"}\hlstd{,} \hlstr{"gaussian trans"}\hlstd{,} \hlstr{"gamma bin"}\hlstd{,}
+  \hlstr{"gaussian bin"}\hlstd{,} \hlstr{"LSLW"}\hlstd{,} \hlstr{"LS"}\hlstd{,} \hlstr{"HD"}\hlstd{)}
 \hlkwd{rownames}\hlstd{(table.volume)} \hlkwb{<-} \hlstr{"volume"}
+
 
 \hlstd{volume.factors} \hlkwb{<-} \hlkwa{function}\hlstd{(}\hlkwc{region}\hlstd{,} \hlkwc{bins} \hlstd{=} \hlnum{1}\hlstd{,} \hlkwc{data}\hlstd{,} \hlkwc{object}\hlstd{)\{}
   \hlkwa{if}\hlstd{(}\hlkwd{class}\hlstd{(region)} \hlopt{==} \hlstr{"list"}\hlstd{)\{}
@@ -1429,17 +1536,26 @@ We now compute the volume of each conformal prediction region.
   \hlkwd{sum}\hlstd{(volume.factor)}
 \hlstd{\}}
 
-\hlstd{volume.gamma} \hlkwb{<-} \hlkwd{volume.factors}\hlstd{(}\hlkwc{region} \hlstd{= conformal.gamma,}
+\hlstd{volume.gamma.trans} \hlkwb{<-} \hlkwd{volume.factors}\hlstd{(}\hlkwc{region} \hlstd{= gamma.transform,}
   \hlkwc{data} \hlstd{= dat,} \hlkwc{object} \hlstd{= m.gamma.log)}
-\hlstd{volume.gaussian} \hlkwb{<-} \hlkwd{volume.factors}\hlstd{(conformal.gaussian,}
+\hlstd{volume.gaussian.trans} \hlkwb{<-} \hlkwd{volume.factors}\hlstd{(gaussian.transform,}
+  \hlkwc{data} \hlstd{= dat,} \hlkwc{object} \hlstd{= m.gaussian)}
+\hlstd{volume.gamma.bin} \hlkwb{<-} \hlkwd{volume.factors}\hlstd{(}\hlkwc{region} \hlstd{= gamma.paraconfbin,}
+  \hlkwc{data} \hlstd{= dat,} \hlkwc{object} \hlstd{= m.gamma.log)}
+\hlstd{volume.gaussian.bin} \hlkwb{<-} \hlkwd{volume.factors}\hlstd{(gaussian.paraconfbin,}
   \hlkwc{data} \hlstd{= dat,} \hlkwc{object} \hlstd{= m.gaussian)}
 \hlstd{volume.LSLW} \hlkwb{<-} \hlkwd{volume.factors}\hlstd{(LSLW,}
   \hlkwc{data} \hlstd{= dat,} \hlkwc{object} \hlstd{= m.gaussian)}
 \hlstd{volume.LS} \hlkwb{<-} \hlkwd{volume.factors}\hlstd{(LS,}
   \hlkwc{data} \hlstd{= dat,} \hlkwc{object} \hlstd{= m.gaussian)}
-\hlstd{table.volume} \hlkwb{<-} \hlkwd{matrix}\hlstd{(}\hlkwd{c}\hlstd{(volume.gamma, volume.gaussian,}
-  \hlstd{volume.LSLW, volume.LS),} \hlkwc{ncol} \hlstd{=} \hlnum{4}\hlstd{)}
-\hlkwd{colnames}\hlstd{(table.volume)} \hlkwb{<-} \hlkwd{c}\hlstd{(}\hlstr{"gamma"}\hlstd{,} \hlstr{"gaussian"}\hlstd{,} \hlstr{"LSLW"}\hlstd{,} \hlstr{"LS"}\hlstd{)}
+\hlstd{volume.HD} \hlkwb{<-} \hlkwd{volume.factors}\hlstd{(HD,}
+  \hlkwc{data} \hlstd{= dat,} \hlkwc{object} \hlstd{= m.gamma.log)}
+
+\hlstd{table.volume} \hlkwb{<-} \hlkwd{matrix}\hlstd{(}\hlkwd{c}\hlstd{(volume.gamma.trans, volume.gaussian.trans,}
+  \hlstd{volume.gamma.bin, volume.gaussian.bin, volume.LSLW, volume.LS,}
+  \hlstd{volume.HD),} \hlkwc{ncol} \hlstd{=} \hlnum{7}\hlstd{)}
+\hlkwd{colnames}\hlstd{(table.volume)} \hlkwb{<-} \hlkwd{c}\hlstd{(}\hlstr{"gamma trans"}\hlstd{,} \hlstr{"gaussian trans"}\hlstd{,} \hlstr{"gamma bin"}\hlstd{,}
+  \hlstr{"gaussian bin"}\hlstd{,} \hlstr{"LSLW"}\hlstd{,} \hlstr{"LS"}\hlstd{,} \hlstr{"HD"}\hlstd{)}
 \hlkwd{rownames}\hlstd{(table.volume)} \hlkwb{<-} \hlstr{"volume"}
 \hlstd{table.volume} \hlkwb{<-} \hlstd{table.volume} \hlopt{/} \hlnum{1e4}
 \end{alltt}
@@ -1455,20 +1571,20 @@ Table 2 and Figure 4 in \citet{eck2019conformal} are shown below.
 \hlstd{diagnostics} \hlkwb{<-} \hlkwd{rbind}\hlstd{(table.marginal, table.volume,}
   \hlstd{table.pred.error, avg.cond.coverage)}
 \hlcom{#diagnostics <- t(diagnostics)}
-\hlkwd{xtable}\hlstd{(diagnostics,} \hlkwc{digits} \hlstd{=} \hlkwd{c}\hlstd{(}\hlnum{0}\hlstd{,} \hlnum{3}\hlstd{,} \hlnum{3}\hlstd{,} \hlnum{3}\hlstd{,} \hlnum{3}\hlstd{))}
+\hlkwd{xtable}\hlstd{(diagnostics,} \hlkwc{digits} \hlstd{=} \hlkwd{c}\hlstd{(}\hlnum{0}\hlstd{,} \hlnum{3}\hlstd{,} \hlnum{3}\hlstd{,} \hlnum{3}\hlstd{,} \hlnum{3}\hlstd{,} \hlnum{3}\hlstd{,} \hlnum{3}\hlstd{,} \hlnum{3}\hlstd{))}
 \end{alltt}
 \end{kframe}% latex table generated in R 3.4.4 by xtable 1.8-3 package
-% Sun Sep 15 14:49:08 2019
+% Sun Sep 15 18:25:40 2019
 \begin{table}[ht]
 \centering
-\begin{tabular}{rrrrr}
+\begin{tabular}{rrrrrrrr}
   \hline
- & gamma & gaussian & LSLW & LS \\ 
+ & gamma trans & gaussian trans & gamma bin & gaussian bin & LSLW & LS & HD \\ 
   \hline
-marginal coverage & 0.909 & 0.906 & 0.880 & 0.888 \\ 
-  volume & 7.349 & 7.730 & 8.574 & 7.103 \\ 
-  pred error & 0.931 & 0.849 & 0.803 & 1.012 \\ 
-  avg.cond.coverage & 0.874 & 0.849 & 0.863 & 0.827 \\ 
+marginal coverage & 0.901 & 0.924 & 0.909 & 0.906 & 0.880 & 0.888 & 0.906 \\ 
+  volume & 7.656 & 8.560 & 7.349 & 7.730 & 8.574 & 7.103 & 7.294 \\ 
+  pred error & 0.653 & 0.425 & 0.931 & 0.849 & 0.803 & 1.012 & 0.948 \\ 
+  avg.cond.coverage & 0.856 & 0.888 & 0.874 & 0.849 & 0.863 & 0.827 & 0.873 \\ 
    \hline
 \end{tabular}
 \end{table}
@@ -1492,6 +1608,7 @@ marginal coverage & 0.909 & 0.906 & 0.880 & 0.888 \\
 }
 \label{Fig:3d-conformal-regions}
 \end{figure}
+
 
 
 
@@ -1536,8 +1653,6 @@ when $n = 150$ and shape = $0.5$.
 \hlstd{bins} \hlkwb{<-} \hlnum{2}
 \hlstd{n} \hlkwb{<-} \hlnum{150}
 \hlstd{B} \hlkwb{<-} \hlnum{250}
-\hlstd{dat} \hlkwb{<-} \hlkwd{data.frame}\hlstd{(}\hlkwc{y} \hlstd{=} \hlkwd{rep}\hlstd{(}\hlnum{0}\hlstd{, n),}
-  \hlkwc{x1} \hlstd{=} \hlkwd{rep}\hlstd{(}\hlnum{0}\hlstd{, n))}
 \hlkwd{system.time}\hlstd{(out.gamma.150.2.0.5} \hlkwb{<-} \hlkwd{do.call}\hlstd{(cbind,}
   \hlkwd{lapply}\hlstd{(}\hlnum{1}\hlopt{:}\hlstd{B,} \hlkwc{FUN} \hlstd{=} \hlkwa{function}\hlstd{(}\hlkwc{j}\hlstd{)\{}
     \hlkwd{unlist}\hlstd{(}\hlkwd{gamma_simulator}\hlstd{(}\hlkwc{beta} \hlstd{= beta,} \hlkwc{n} \hlstd{= n,}
@@ -1546,9 +1661,9 @@ when $n = 150$ and shape = $0.5$.
 \end{alltt}
 
 
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(family\$initialize): non-positive values not allowed for the 'gamma' family}}
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(predvars, data, env): object 'x1' not found}}
 
-{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.109 0.016 0.124}}\end{kframe}
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.109 0 0.109}}\end{kframe}
 \end{knitrout}
 
 \begin{knitrout}
@@ -1582,9 +1697,9 @@ when $n = 150$ and shape = $0.75$.
 \end{alltt}
 
 
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(family\$initialize): non-positive values not allowed for the 'gamma' family}}
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(predvars, data, env): object 'x1' not found}}
 
-{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.52 0 0.521}}\end{kframe}
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.002 0 0.002}}\end{kframe}
 \end{knitrout}
 
 \begin{knitrout}
@@ -1618,9 +1733,9 @@ when $n = 150$ and shape = $1$.
 \end{alltt}
 
 
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(family\$initialize): non-positive values not allowed for the 'gamma' family}}
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(predvars, data, env): object 'x1' not found}}
 
-{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.007 0 0.007}}\end{kframe}
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.002 0 0.002}}\end{kframe}
 \end{knitrout}
 
 \begin{knitrout}
@@ -1654,9 +1769,9 @@ when $n = 150$ and shape = $1.5$.
 \end{alltt}
 
 
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(family\$initialize): non-positive values not allowed for the 'gamma' family}}
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(predvars, data, env): object 'x1' not found}}
 
-{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.002 0 0.003}}\end{kframe}
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.003 0 0.003}}\end{kframe}
 \end{knitrout}
 
 \begin{knitrout}
@@ -1690,9 +1805,9 @@ when $n = 150$ and shape = $2$.
 \end{alltt}
 
 
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(family\$initialize): non-positive values not allowed for the 'gamma' family}}
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(predvars, data, env): object 'x1' not found}}
 
-{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.003 0 0.003}}\end{kframe}
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.002 0 0.002}}\end{kframe}
 \end{knitrout}
 
 \begin{knitrout}
@@ -1726,9 +1841,9 @@ when $n = 150$ and shape = $5$.
 \end{alltt}
 
 
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(family\$initialize): non-positive values not allowed for the 'gamma' family}}
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(predvars, data, env): object 'x1' not found}}
 
-{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.003 0 0.003}}\end{kframe}
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.002 0 0.002}}\end{kframe}
 \end{knitrout}
 
 \begin{knitrout}
@@ -1762,9 +1877,9 @@ when $n = 150$ and shape = $7$.
 \end{alltt}
 
 
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(family\$initialize): non-positive values not allowed for the 'gamma' family}}
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(predvars, data, env): object 'x1' not found}}
 
-{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.004 0 0.003}}\end{kframe}
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.002 0 0.002}}\end{kframe}
 \end{knitrout}
 
 \begin{knitrout}
@@ -1798,9 +1913,9 @@ when $n = 150$ and shape = $10$.
 \end{alltt}
 
 
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(family\$initialize): non-positive values not allowed for the 'gamma' family}}
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(predvars, data, env): object 'x1' not found}}
 
-{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.005 0 0.006}}\end{kframe}
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.002 0 0.002}}\end{kframe}
 \end{knitrout}
 
 \begin{knitrout}
@@ -1834,9 +1949,9 @@ when $n = 150$ and shape = $12$.
 \end{alltt}
 
 
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(family\$initialize): non-positive values not allowed for the 'gamma' family}}
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(predvars, data, env): object 'x1' not found}}
 
-{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.003 0 0.003}}\end{kframe}
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.004 0 0.004}}\end{kframe}
 \end{knitrout}
 
 \begin{knitrout}
@@ -1870,9 +1985,9 @@ when $n = 150$ and shape = $15$.
 \end{alltt}
 
 
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(family\$initialize): non-positive values not allowed for the 'gamma' family}}
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(predvars, data, env): object 'x1' not found}}
 
-{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.002 0 0.003}}\end{kframe}
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.006 0 0.006}}\end{kframe}
 \end{knitrout}
 
 \begin{knitrout}
@@ -1906,9 +2021,9 @@ when $n = 150$ and shape = $20$.
 \end{alltt}
 
 
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(family\$initialize): non-positive values not allowed for the 'gamma' family}}
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(predvars, data, env): object 'x1' not found}}
 
-{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.002 0 0.002}}\end{kframe}
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.007 0 0.006}}\end{kframe}
 \end{knitrout}
 
 \begin{knitrout}
@@ -1942,9 +2057,9 @@ when $n = 150$ and shape = $25$.
 \end{alltt}
 
 
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(family\$initialize): non-positive values not allowed for the 'gamma' family}}
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(predvars, data, env): object 'x1' not found}}
 
-{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.003 0 0.002}}\end{kframe}
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.005 0 0.005}}\end{kframe}
 \end{knitrout}
 
 \begin{knitrout}
@@ -1978,7 +2093,7 @@ when $n = 150$ and shape = $30$.
 \end{alltt}
 
 
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(family\$initialize): non-positive values not allowed for the 'gamma' family}}
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(predvars, data, env): object 'x1' not found}}
 
 {\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.003 0 0.003}}\end{kframe}
 \end{knitrout}
@@ -2014,9 +2129,9 @@ when $n = 150$ and shape = $40$.
 \end{alltt}
 
 
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(family\$initialize): non-positive values not allowed for the 'gamma' family}}
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(predvars, data, env): object 'x1' not found}}
 
-{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.005 0 0.004}}\end{kframe}
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.002 0 0.002}}\end{kframe}
 \end{knitrout}
 
 \begin{knitrout}
@@ -2050,9 +2165,9 @@ when $n = 150$ and shape = $50$.
 \end{alltt}
 
 
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(family\$initialize): non-positive values not allowed for the 'gamma' family}}
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(predvars, data, env): object 'x1' not found}}
 
-{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.002 0 0.003}}\end{kframe}
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.004 0 0.004}}\end{kframe}
 \end{knitrout}
 
 \begin{knitrout}
@@ -2086,9 +2201,9 @@ when $n = 150$ and shape = $60$.
 \end{alltt}
 
 
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(family\$initialize): non-positive values not allowed for the 'gamma' family}}
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(predvars, data, env): object 'x1' not found}}
 
-{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.003 0 0.002}}\end{kframe}
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.004 0 0.004}}\end{kframe}
 \end{knitrout}
 
 \begin{knitrout}
@@ -2122,9 +2237,9 @@ when $n = 150$ and shape = $70$.
 \end{alltt}
 
 
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(family\$initialize): non-positive values not allowed for the 'gamma' family}}
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(predvars, data, env): object 'x1' not found}}
 
-{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.002 0 0.003}}\end{kframe}
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.004 0 0.004}}\end{kframe}
 \end{knitrout}
 
 \begin{knitrout}
@@ -2158,9 +2273,9 @@ when $n = 150$ and shape = $80$.
 \end{alltt}
 
 
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(family\$initialize): non-positive values not allowed for the 'gamma' family}}
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(predvars, data, env): object 'x1' not found}}
 
-{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.003 0 0.002}}\end{kframe}
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.004 0 0.003}}\end{kframe}
 \end{knitrout}
 
 \begin{knitrout}
@@ -2194,9 +2309,9 @@ when $n = 150$ and shape = $90$.
 \end{alltt}
 
 
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(family\$initialize): non-positive values not allowed for the 'gamma' family}}
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(predvars, data, env): object 'x1' not found}}
 
-{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.007 0 0.007}}\end{kframe}
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.003 0 0.003}}\end{kframe}
 \end{knitrout}
 
 \begin{knitrout}
@@ -2230,9 +2345,9 @@ when $n = 150$ and shape = $100$.
 \end{alltt}
 
 
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(family\$initialize): non-positive values not allowed for the 'gamma' family}}
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(predvars, data, env): object 'x1' not found}}
 
-{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.007 0 0.007}}\end{kframe}
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.008 0 0.008}}\end{kframe}
 \end{knitrout}
 
 \begin{knitrout}
