@@ -1638,6 +1638,125 @@ in Section~\ref{sec:Gamma-Results}.
 
 \subsection{Simulations}
 
+We perform Monte Carlo simulations to investigate the coverage properties, 
+size, and prediction error of the Gamma conformal prediction region under 
+transformation...
+
+<<>>=
+beta <- c(1.25, -1)
+gamma_simulator <- function(beta, n = 150, shape = 0.5, alpha = 0.10, B = 2){
+  models <- lapply(1:B, FUN = function(j){
+    p <- d <- length(beta) - 1
+    x <- matrix(runif(n*p), ncol = p)
+    rate <- (cbind(1, x) %*% beta) * shape
+    y <- rgamma(n = n, shape = shape, rate = rate)
+    y <- y / sd(y)
+    dat <- data.frame(y = y, x = x)
+    colnames(dat)[2:(p+1)] <- paste("x", 1:p, sep = "")
+
+    ## generate the data (has functionality for different 
+    ## families and link functions)
+    fit <- glm(y ~ x1, family = "Gamma", data = dat, 
+      x = TRUE, y = TRUE)  
+  })
+
+  funs <- lm.funs(intercept = TRUE)
+  train.fun <- funs$train.fun
+  predict.fun <- funs$predict.fun
+  conformal_regions <- lapply(models, FUN = function(obj){
+    x <- obj$x[, -1]
+    y <- obj$y
+    p1.tibs <- conformal.pred(x = cbind(x,x^2,x^3), y = y, 
+      x0 = cbind(x,x^2,x^3), 
+      train.fun = train.fun, predict.fun = predict.fun, 
+      alpha = alpha)
+    LSCI <- cbind(p1.tibs$lo, p1.tibs$up)
+
+    cubic.model <- lm(y ~ x + I(x^2) + I(x^3))
+    abs.resid <- abs(cubic.model$resid)
+    smooth.call <- smooth.spline(x, abs.resid, 
+      nknots = 10)
+    lambda <- smooth.call$lambda
+    df <- smooth.call$df
+    mad.train.fun <- function(x, y, out = NULL){
+      smooth.spline(x, y, lambda = lambda, 
+      df = df, nknots = 10)
+    }
+    mad.predict.fun <- function(out, newx){
+      predict(out, as.data.frame(newx))
+    }
+    p2.tibs <- conformal.pred(x = cbind(x,x^2,x^3), y = y, 
+      x0 = cbind(x,x^2,x^3), 
+      train.fun = train.fun, predict.fun = predict.fun, 
+      mad.train.fun = mad.train.fun,
+      mad.predict.fun = mad.predict.fun,
+      alpha = alpha)
+    LSLWCI <- cbind(p2.tibs$lo, p2.tibs$up)
+
+    betaMLE <- coefficients(obj)
+    shapeMLE <- as.numeric(gamma.shape(obj)[1])
+    rateMLE <- cbind(1, x) %*% betaMLE * shapeMLE
+    HDCI <- do.call(rbind, lapply(1:n, function(j){ 
+      hdi(qgamma, 1 - alpha, shape = shapeMLE, rate = rateMLE[j, 1])
+    }))
+
+    conf <- conformal.glm(obj, nonparametric = TRUE, method = "both", 
+      cores = 7)
+    parabinCI <- conf$paraconfbin
+    transformCI <- conf$transformconf
+    nonparabinCI <- conf$nonparaconfbin 
+ 
+    out = list(parabinCI = parabinCI, transformCI = transformCI, 
+      nonparabinCI = nonparabinCI, LSLWCI = LSLWCI, LSCI = LSCI, 
+      HDCI = HDCI)
+    out  
+  })
+
+  diagnostics_regions <- lapply(1:B, FUN = function(j){
+
+    obj <- conformal_regions[[j]]
+    dat <- models[[j]]$data
+    foo <- lapply(obj, FUN = function(region){
+
+      output <- NULL
+      if(class(region) == "matrix"){
+        marginal.coverage <- local.coverage(region = region, 
+          data = dat, d = p, bins = 1, at.data = "TRUE")
+        local.coverage <- local.coverage(region = region, 
+          data = dat, d = p, bins = bins, at.data = "TRUE")
+        local.inx.coverage <- local.coverage(region = region, 
+          data = dat, d = p, bins = 25, at.data = "TRUE")
+        output <- c(marginal.coverage, local.coverage, 
+          local.inx.coverage, mean(apply(region, 1, diff)), 
+          absolute.error(y = y, region = region))
+      }
+      else{
+        marginal.coverage <- local.coverage(region = region, 
+          nonparametric = "TRUE", data = dat, d = p, bins = 1, 
+          at.data = "TRUE")
+        local.coverage <- local.coverage(region = region, 
+          nonparametric = "TRUE", data = dat, d = p, bins = bins, 
+          at.data = "TRUE")
+        local.inx.coverage <- local.coverage(region = region, 
+          nonparametric = "TRUE", data = dat, d = p, bins = 25, 
+          at.data = "TRUE")
+        output <- c(marginal.coverage, local.coverage, 
+          local.inx.coverage, area.nonparametric(region),
+          absolute.error.nonparametric(data = dat, 
+            region = region))    
+      }
+      output
+    })
+    do.call(rbind, foo)
+
+  })
+
+  diagnostics_regions
+}
+@
+
+
+
 The following performs our Monte Carlo simulation of $B = 250$ iterations 
 when $n = 150$ and shape = $0.5$.
 
@@ -1650,20 +1769,10 @@ B <- 250
 system.time(out.gamma.150.2.0.5 <- do.call(cbind, 
   lapply(1:B, FUN = function(j){
     unlist(gamma_simulator(beta = beta, n = n, 
-      bins = bins, shape = 0.5))
+      shape = 0.5))
 })))
 @
 
-<<>>=
-gamma.150.2.0.5 <- cbind(
-  rowMeans(out.gamma.150.2.0.5, na.rm = TRUE),  
-  apply(out.gamma.150.2.0.5, 1, 
-  FUN = function(x){ 
-    sds <- sd(x, na.rm = TRUE)
-    lengths <- length(which(!is.na(x)))
-    sds / sqrt(lengths)
-  }))
-@
 
 The following performs our Monte Carlo simulation of $B = 250$ iterations 
 when $n = 150$ and shape = $0.75$.
@@ -1672,20 +1781,10 @@ when $n = 150$ and shape = $0.75$.
 system.time(out.gamma.150.2.0.75 <- do.call(cbind, 
   lapply(1:B, FUN = function(j){
     unlist(gamma_simulator(beta = beta, n = n, 
-      bins = bins, shape = 0.75))
+      shape = 0.75))
 })))
 @
 
-<<>>=
-gamma.150.2.0.75 <- cbind( 
-  rowMeans(out.gamma.150.2.0.75, na.rm = TRUE),  
-  apply(out.gamma.150.2.0.75, 1, 
-  FUN = function(x){ 
-    sds <- sd(x, na.rm = TRUE)
-    lengths <- length(which(!is.na(x)))
-    sds / sqrt(lengths)
-  }))
-@
 
 The following performs our Monte Carlo simulation of $B = 250$ iterations 
 when $n = 150$ and shape = $1$.
@@ -1694,20 +1793,10 @@ when $n = 150$ and shape = $1$.
 system.time(out.gamma.150.2.1 <- do.call(cbind, 
   lapply(1:B, FUN = function(j){
     unlist(gamma_simulator(beta = beta, n = n, 
-      bins = bins, shape = 1))
+      shape = 1))
 })))
 @
 
-<<>>=
-gamma.150.2.1 <- cbind( 
-  rowMeans(out.gamma.150.2.1, na.rm = TRUE),  
-  apply(out.gamma.150.2.1, 1, 
-  FUN = function(x){ 
-    sds <- sd(x, na.rm = TRUE)
-    lengths <- length(which(!is.na(x)))
-    sds / sqrt(lengths)
-  }))
-@
 
 The following performs our Monte Carlo simulation of $B = 250$ iterations 
 when $n = 150$ and shape = $1.5$.
@@ -1716,20 +1805,10 @@ when $n = 150$ and shape = $1.5$.
 system.time(out.gamma.150.2.1.5 <- do.call(cbind, 
   lapply(1:B, FUN = function(j){
     unlist(gamma_simulator(beta = beta, n = n, 
-      bins = bins, shape = 1.5))
+      shape = 1.5))
 })))
 @
 
-<<>>=
-gamma.150.2.1.5 <- cbind( 
-  rowMeans(out.gamma.150.2.1.5, na.rm = TRUE),  
-  apply(out.gamma.150.2.1.5, 1, 
-  FUN = function(x){ 
-    sds <- sd(x, na.rm = TRUE)
-    lengths <- length(which(!is.na(x)))
-    sds / sqrt(lengths)
-  }))
-@
 
 The following performs our Monte Carlo simulation of $B = 250$ iterations 
 when $n = 150$ and shape = $2$.
@@ -1738,20 +1817,10 @@ when $n = 150$ and shape = $2$.
 system.time(out.gamma.150.2.2 <- do.call(cbind, 
   lapply(1:B, FUN = function(j){
     unlist(gamma_simulator(beta = beta, n = n, 
-      bins = bins, shape = 2))
+      shape = 2))
 })))
 @
 
-<<>>=
-gamma.150.2.2 <- cbind( 
-  rowMeans(out.gamma.150.2.2, na.rm = TRUE),  
-  apply(out.gamma.150.2.2, 1, 
-  FUN = function(x){ 
-    sds <- sd(x, na.rm = TRUE)
-    lengths <- length(which(!is.na(x)))
-    sds / sqrt(lengths)
-  }))
-@
 
 The following performs our Monte Carlo simulation of $B = 250$ iterations 
 when $n = 150$ and shape = $5$.
@@ -1760,20 +1829,10 @@ when $n = 150$ and shape = $5$.
 system.time(out.gamma.150.2.5 <- do.call(cbind, 
   lapply(1:B, FUN = function(j){
     unlist(gamma_simulator(beta = beta, n = n, 
-      bins = bins, shape = 5))
+      shape = 5))
 })))
 @
 
-<<>>=
-gamma.150.2.5 <- cbind( 
-  rowMeans(out.gamma.150.2.5, na.rm = TRUE),  
-  apply(out.gamma.150.2.5, 1, 
-  FUN = function(x){ 
-    sds <- sd(x, na.rm = TRUE)
-    lengths <- length(which(!is.na(x)))
-    sds / sqrt(lengths)
-  }))
-@
 
 The following performs our Monte Carlo simulation of $B = 250$ iterations 
 when $n = 150$ and shape = $7$.
@@ -1782,20 +1841,10 @@ when $n = 150$ and shape = $7$.
 system.time(out.gamma.150.2.7 <- do.call(cbind, 
   lapply(1:B, FUN = function(j){
     unlist(gamma_simulator(beta = beta, n = n, 
-      bins = bins, shape = 7))
+      shape = 7))
 })))
 @
 
-<<>>=
-gamma.150.2.7 <- cbind( 
-  rowMeans(out.gamma.150.2.7, na.rm = TRUE),  
-  apply(out.gamma.150.2.7, 1, 
-  FUN = function(x){ 
-    sds <- sd(x, na.rm = TRUE)
-    lengths <- length(which(!is.na(x)))
-    sds / sqrt(lengths)
-  }))
-@
 
 The following performs our Monte Carlo simulation of $B = 250$ iterations 
 when $n = 150$ and shape = $10$.
@@ -1804,20 +1853,10 @@ when $n = 150$ and shape = $10$.
 system.time(out.gamma.150.2.10 <- do.call(cbind, 
   lapply(1:B, FUN = function(j){
     unlist(gamma_simulator(beta = beta, n = n, 
-      bins = bins, shape = 10))
+      shape = 10))
 })))
 @
 
-<<>>=
-gamma.150.2.10 <- cbind( 
-  rowMeans(out.gamma.150.2.10, na.rm = TRUE),  
-  apply(out.gamma.150.2.10, 1, 
-  FUN = function(x){ 
-    sds <- sd(x, na.rm = TRUE)
-    lengths <- length(which(!is.na(x)))
-    sds / sqrt(lengths)
-  }))
-@
 
 The following performs our Monte Carlo simulation of $B = 250$ iterations 
 when $n = 150$ and shape = $12$.
@@ -1826,20 +1865,10 @@ when $n = 150$ and shape = $12$.
 system.time(out.gamma.150.2.12 <- do.call(cbind, 
   lapply(1:B, FUN = function(j){
     unlist(gamma_simulator(beta = beta, n = n, 
-      bins = bins, shape = 12))
+      shape = 12))
 })))
 @
 
-<<>>=
-gamma.150.2.12 <- cbind( 
-  rowMeans(out.gamma.150.2.12, na.rm = TRUE),  
-  apply(out.gamma.150.2.12, 1, 
-  FUN = function(x){ 
-    sds <- sd(x, na.rm = TRUE)
-    lengths <- length(which(!is.na(x)))
-    sds / sqrt(lengths)
-  }))
-@
 
 The following performs our Monte Carlo simulation of $B = 250$ iterations 
 when $n = 150$ and shape = $15$.
@@ -1848,20 +1877,10 @@ when $n = 150$ and shape = $15$.
 system.time(out.gamma.150.2.15 <- do.call(cbind, 
   lapply(1:B, FUN = function(j){
     unlist(gamma_simulator(beta = beta, n = n, 
-      bins = bins, shape = 15))
+      shape = 15))
 })))
 @
 
-<<>>=
-gamma.150.2.15 <- cbind( 
-  rowMeans(out.gamma.150.2.15, na.rm = TRUE),  
-  apply(out.gamma.150.2.15, 1, 
-  FUN = function(x){ 
-    sds <- sd(x, na.rm = TRUE)
-    lengths <- length(which(!is.na(x)))
-    sds / sqrt(lengths)
-  }))
-@
 
 The following performs our Monte Carlo simulation of $B = 250$ iterations 
 when $n = 150$ and shape = $20$.
@@ -1870,20 +1889,10 @@ when $n = 150$ and shape = $20$.
 system.time(out.gamma.150.2.20 <- do.call(cbind, 
   lapply(1:B, FUN = function(j){
     unlist(gamma_simulator(beta = beta, n = n, 
-      bins = bins, shape = 20))
+      shape = 20))
 })))
 @
 
-<<>>=
-gamma.150.2.20 <- cbind( 
-  rowMeans(out.gamma.150.2.20, na.rm = TRUE),  
-  apply(out.gamma.150.2.20, 1, 
-  FUN = function(x){ 
-    sds <- sd(x, na.rm = TRUE)
-    lengths <- length(which(!is.na(x)))
-    sds / sqrt(lengths)
-  }))
-@
 
 The following performs our Monte Carlo simulation of $B = 250$ iterations 
 when $n = 150$ and shape = $25$.
@@ -1892,20 +1901,10 @@ when $n = 150$ and shape = $25$.
 system.time(out.gamma.150.2.25 <- do.call(cbind, 
   lapply(1:B, FUN = function(j){
     unlist(gamma_simulator(beta = beta, n = n, 
-      bins = bins, shape = 25))
+      shape = 25))
 })))
 @
 
-<<>>=
-gamma.150.2.25 <- cbind( 
-  rowMeans(out.gamma.150.2.25, na.rm = TRUE),  
-  apply(out.gamma.150.2.25, 1, 
-  FUN = function(x){ 
-    sds <- sd(x, na.rm = TRUE)
-    lengths <- length(which(!is.na(x)))
-    sds / sqrt(lengths)
-  }))
-@
 
 The following performs our Monte Carlo simulation of $B = 250$ iterations 
 when $n = 150$ and shape = $30$.
@@ -1914,20 +1913,10 @@ when $n = 150$ and shape = $30$.
 system.time(out.gamma.150.2.30 <- do.call(cbind, 
   lapply(1:B, FUN = function(j){
     unlist(gamma_simulator(beta = beta, n = n, 
-      bins = bins, shape = 30))
+      shape = 30))
 })))
 @
 
-<<>>=
-gamma.150.2.30 <- cbind( 
-  rowMeans(out.gamma.150.2.30, na.rm = TRUE),  
-  apply(out.gamma.150.2.30, 1, 
-  FUN = function(x){ 
-    sds <- sd(x, na.rm = TRUE)
-    lengths <- length(which(!is.na(x)))
-    sds / sqrt(lengths)
-  }))
-@
 
 The following performs our Monte Carlo simulation of $B = 250$ iterations 
 when $n = 150$ and shape = $40$.
@@ -1936,20 +1925,10 @@ when $n = 150$ and shape = $40$.
 system.time(out.gamma.150.2.40 <- do.call(cbind, 
   lapply(1:B, FUN = function(j){
     unlist(gamma_simulator(beta = beta, n = n, 
-      bins = bins, shape = 40))
+      shape = 40))
 })))
 @
 
-<<>>=
-gamma.150.2.40 <- cbind( 
-  rowMeans(out.gamma.150.2.40, na.rm = TRUE),  
-  apply(out.gamma.150.2.40, 1, 
-  FUN = function(x){ 
-    sds <- sd(x, na.rm = TRUE)
-    lengths <- length(which(!is.na(x)))
-    sds / sqrt(lengths)
-  }))
-@
 
 The following performs our Monte Carlo simulation of $B = 250$ iterations 
 when $n = 150$ and shape = $50$.
@@ -1958,20 +1937,10 @@ when $n = 150$ and shape = $50$.
 system.time(out.gamma.150.2.50 <- do.call(cbind, 
   lapply(1:B, FUN = function(j){
     unlist(gamma_simulator(beta = beta, n = n, 
-      bins = bins, shape = 50))
+      shape = 50))
 })))
 @
 
-<<>>=
-gamma.150.2.50 <- cbind( 
-  rowMeans(out.gamma.150.2.50, na.rm = TRUE),  
-  apply(out.gamma.150.2.50, 1, 
-  FUN = function(x){ 
-    sds <- sd(x, na.rm = TRUE)
-    lengths <- length(which(!is.na(x)))
-    sds / sqrt(lengths)
-  }))
-@
 
 The following performs our Monte Carlo simulation of $B = 250$ iterations 
 when $n = 150$ and shape = $60$.
@@ -1980,20 +1949,10 @@ when $n = 150$ and shape = $60$.
 system.time(out.gamma.150.2.60 <- do.call(cbind, 
   lapply(1:B, FUN = function(j){
     unlist(gamma_simulator(beta = beta, n = n, 
-      bins = bins, shape = 60))
+      shape = 60))
 })))
 @
 
-<<>>=
-gamma.150.2.60 <- cbind( 
-  rowMeans(out.gamma.150.2.60, na.rm = TRUE),  
-  apply(out.gamma.150.2.60, 1, 
-  FUN = function(x){ 
-    sds <- sd(x, na.rm = TRUE)
-    lengths <- length(which(!is.na(x)))
-    sds / sqrt(lengths)
-  }))
-@
 
 The following performs our Monte Carlo simulation of $B = 250$ iterations 
 when $n = 150$ and shape = $70$.
@@ -2002,20 +1961,10 @@ when $n = 150$ and shape = $70$.
 system.time(out.gamma.150.2.70 <- do.call(cbind, 
   lapply(1:B, FUN = function(j){
     unlist(gamma_simulator(beta = beta, n = n, 
-      bins = bins, shape = 70))
+      shape = 70))
 })))
 @
 
-<<>>=
-gamma.150.2.70 <- cbind( 
-  rowMeans(out.gamma.150.2.70, na.rm = TRUE),  
-  apply(out.gamma.150.2.70, 1, 
-  FUN = function(x){ 
-    sds <- sd(x, na.rm = TRUE)
-    lengths <- length(which(!is.na(x)))
-    sds / sqrt(lengths)
-  }))
-@
 
 The following performs our Monte Carlo simulation of $B = 250$ iterations 
 when $n = 150$ and shape = $80$.
@@ -2024,20 +1973,10 @@ when $n = 150$ and shape = $80$.
 system.time(out.gamma.150.2.80 <- do.call(cbind, 
   lapply(1:B, FUN = function(j){
     unlist(gamma_simulator(beta = beta, n = n, 
-      bins = bins, shape = 80))
+      shape = 80))
 })))
 @
 
-<<>>=
-gamma.150.2.80 <- cbind( 
-  rowMeans(out.gamma.150.2.80, na.rm = TRUE),  
-  apply(out.gamma.150.2.80, 1, 
-  FUN = function(x){ 
-    sds <- sd(x, na.rm = TRUE)
-    lengths <- length(which(!is.na(x)))
-    sds / sqrt(lengths)
-  }))
-@
 
 The following performs our Monte Carlo simulation of $B = 250$ iterations 
 when $n = 150$ and shape = $90$.
@@ -2046,20 +1985,10 @@ when $n = 150$ and shape = $90$.
 system.time(out.gamma.150.2.90 <- do.call(cbind, 
   lapply(1:B, FUN = function(j){
     unlist(gamma_simulator(beta = beta, n = n, 
-      bins = bins, shape = 90))
+      shape = 90))
 })))
 @
 
-<<>>=
-gamma.150.2.90 <- cbind( 
-  rowMeans(out.gamma.150.2.90, na.rm = TRUE),  
-  apply(out.gamma.150.2.90, 1, 
-  FUN = function(x){ 
-    sds <- sd(x, na.rm = TRUE)
-    lengths <- length(which(!is.na(x)))
-    sds / sqrt(lengths)
-  }))
-@
 
 The following performs our Monte Carlo simulation of $B = 250$ iterations 
 when $n = 150$ and shape = $100$.
@@ -2068,83 +1997,14 @@ when $n = 150$ and shape = $100$.
 system.time(out.gamma.150.2.100 <- do.call(cbind, 
   lapply(1:B, FUN = function(j){
     unlist(gamma_simulator(beta = beta, n = n, 
-      bins = bins, shape = 100))
+      shape = 100))
 })))
 @
 
-<<>>=
-gamma.150.2.100 <- cbind( 
-  rowMeans(out.gamma.150.2.100, na.rm = TRUE),  
-  apply(out.gamma.150.2.100, 1, 
-  FUN = function(x){ 
-    sds <- sd(x, na.rm = TRUE)
-    lengths <- length(which(!is.na(x)))
-    sds / sqrt(lengths)
-  }))
-@
 
 
-Reorganize the output.
 
-<<>>=
-para.area.gamma.150 <- nonpara.area.gamma.150 <- 
-  LS.area.gamma.150 <- LSLW.area.gamma.150 <- 
-  HD.area.gamma.150 <- NULL
-para.error.gamma.150 <- nonpara.error.gamma.150 <- 
-  LS.error.gamma.150 <- LSLW.error.gamma.150 <- 
-  HD.error.gamma.150 <- NULL
-para.marginal.gamma.150 <- nonpara.marginal.gamma.150 <- 
-  LS.marginal.gamma.150 <- LSLW.marginal.gamma.150 <- 
-  HD.marginal.gamma.150 <- NULL
-para.local.gamma.150 <- nonpara.local.gamma.150 <- 
-  LS.local.gamma.150 <- LSLW.local.gamma.150 <- 
-  HD.local.gamma.150 <- NULL
-para.inx.gamma.150 <- nonpara.inx.gamma.150 <- 
-  LS.inx.gamma.150 <- LSLW.inx.gamma.150 <- 
-  HD.inx.gamma.150 <- NULL  
-shapes <- c(0.5, 0.75, 1, 1.5, 2, 5, 7, 10, 12, 15, 20, 25, 
-  30, 40, 50, 60, 70, 80, 90, 100)
-for(j in shapes ){
-  internal.output <- 
-    eval(parse(text=paste("gamma.150.2", j, sep = ".")))
-  k <- which(shapes == j)
-  para.marginal.gamma.150[k] <- as.numeric(internal.output[1, 1])
-  para.local.gamma.150[c((bins*(k-1)+1):(bins*k))] <- 
-    as.numeric(internal.output[2:3, 1])
-  para.inx.gamma.150[c((25*(k-1)+1):(25*k))] <- 
-    as.numeric(internal.output[4:28, 1])
-  para.error.gamma.150[k] <- as.numeric(internal.output[29, 1]) 
-  para.area.gamma.150[k] <- as.numeric(internal.output[30, 1])
-  nonpara.marginal.gamma.150[k] <- as.numeric(internal.output[31, 1])
-  nonpara.local.gamma.150[c((bins*(k-1)+1):(bins*k))] <- 
-    as.numeric(internal.output[32:33, 1])
-  nonpara.inx.gamma.150[c((25*(k-1)+1):(25*k))] <- 
-    as.numeric(internal.output[34:58, 1])
-  nonpara.error.gamma.150[k] <- as.numeric(internal.output[59, 1]) 
-  nonpara.area.gamma.150[k] <- as.numeric(internal.output[60, 1])
-  LS.marginal.gamma.150[k] <- as.numeric(internal.output[61, 1])  
-  LS.local.gamma.150[c((bins*(k-1)+1):(bins*k))] <- 
-    as.numeric(internal.output[62:63, 1])
-  LS.inx.gamma.150[c((25*(k-1)+1):(25*k))] <- 
-    as.numeric(internal.output[64:88, 1])
-  LS.error.gamma.150[k] <- as.numeric(internal.output[89, 1]) 
-  LS.area.gamma.150[k] <- as.numeric(internal.output[90, 1])
-  LSLW.marginal.gamma.150[k] <- as.numeric(internal.output[91, 1])  
-  LSLW.local.gamma.150[c((bins*(k-1)+1):(bins*k))] <- 
-    as.numeric(internal.output[92:93, 1])
-  LSLW.inx.gamma.150[c((25*(k-1)+1):(25*k))] <- 
-    as.numeric(internal.output[94:118, 1])
-  LSLW.error.gamma.150[k] <- as.numeric(internal.output[119, 1]) 
-  LSLW.area.gamma.150[k] <- as.numeric(internal.output[120, 1])
-  HD.marginal.gamma.150[k] <- as.numeric(internal.output[121, 1])
-  HD.local.gamma.150[c((bins*(k-1)+1):(bins*k))] <- 
-    as.numeric(internal.output[122:123, 1])
-  HD.inx.gamma.150[c((25*(k-1)+1):(25*k))] <- 
-    as.numeric(internal.output[124:148, 1])
-  HD.error.gamma.150[k] <- as.numeric(internal.output[149, 1]) 
-  HD.area.gamma.150[k] <- as.numeric(internal.output[150, 1])      
-}
-@
+
 
 
 %% n = 250

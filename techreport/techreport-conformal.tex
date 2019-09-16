@@ -566,7 +566,7 @@ region.
 \hlkwd{xtable}\hlstd{(diagnostics,} \hlkwc{digits} \hlstd{=} \hlkwd{c}\hlstd{(}\hlnum{0}\hlstd{,} \hlnum{2}\hlstd{,} \hlnum{2}\hlstd{,} \hlnum{2}\hlstd{,} \hlnum{2}\hlstd{,} \hlnum{2}\hlstd{))}
 \end{alltt}
 \end{kframe}% latex table generated in R 3.4.4 by xtable 1.8-3 package
-% Sun Sep 15 18:25:38 2019
+% Mon Sep 16 08:42:16 2019
 \begin{table}[ht]
 \centering
 \begin{tabular}{rrrrrr}
@@ -1574,7 +1574,7 @@ Table 2 and Figure 4 in \citet{eck2019conformal} are shown below.
 \hlkwd{xtable}\hlstd{(diagnostics,} \hlkwc{digits} \hlstd{=} \hlkwd{c}\hlstd{(}\hlnum{0}\hlstd{,} \hlnum{3}\hlstd{,} \hlnum{3}\hlstd{,} \hlnum{3}\hlstd{,} \hlnum{3}\hlstd{,} \hlnum{3}\hlstd{,} \hlnum{3}\hlstd{,} \hlnum{3}\hlstd{))}
 \end{alltt}
 \end{kframe}% latex table generated in R 3.4.4 by xtable 1.8-3 package
-% Sun Sep 15 18:25:40 2019
+% Mon Sep 16 08:42:18 2019
 \begin{table}[ht]
 \centering
 \begin{tabular}{rrrrrrrr}
@@ -1642,6 +1642,126 @@ in Section~\ref{sec:Gamma-Results}.
 
 \subsection{Simulations}
 
+We perform Monte Carlo simulations to investigate the coverage properties, 
+size, and prediction error of the Gamma conformal prediction region under 
+transformation...
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlstd{beta} \hlkwb{<-} \hlkwd{c}\hlstd{(}\hlnum{1.25}\hlstd{,} \hlopt{-}\hlnum{1}\hlstd{)}
+\hlstd{gamma_simulator} \hlkwb{<-} \hlkwa{function}\hlstd{(}\hlkwc{beta}\hlstd{,} \hlkwc{n} \hlstd{=} \hlnum{150}\hlstd{,} \hlkwc{shape} \hlstd{=} \hlnum{0.5}\hlstd{,} \hlkwc{alpha} \hlstd{=} \hlnum{0.10}\hlstd{,} \hlkwc{B} \hlstd{=} \hlnum{2}\hlstd{)\{}
+  \hlstd{models} \hlkwb{<-} \hlkwd{lapply}\hlstd{(}\hlnum{1}\hlopt{:}\hlstd{B,} \hlkwc{FUN} \hlstd{=} \hlkwa{function}\hlstd{(}\hlkwc{j}\hlstd{)\{}
+    \hlstd{p} \hlkwb{<-} \hlstd{d} \hlkwb{<-} \hlkwd{length}\hlstd{(beta)} \hlopt{-} \hlnum{1}
+    \hlstd{x} \hlkwb{<-} \hlkwd{matrix}\hlstd{(}\hlkwd{runif}\hlstd{(n}\hlopt{*}\hlstd{p),} \hlkwc{ncol} \hlstd{= p)}
+    \hlstd{rate} \hlkwb{<-} \hlstd{(}\hlkwd{cbind}\hlstd{(}\hlnum{1}\hlstd{, x)} \hlopt{%*%} \hlstd{beta)} \hlopt{*} \hlstd{shape}
+    \hlstd{y} \hlkwb{<-} \hlkwd{rgamma}\hlstd{(}\hlkwc{n} \hlstd{= n,} \hlkwc{shape} \hlstd{= shape,} \hlkwc{rate} \hlstd{= rate)}
+    \hlstd{y} \hlkwb{<-} \hlstd{y} \hlopt{/} \hlkwd{sd}\hlstd{(y)}
+    \hlstd{dat} \hlkwb{<-} \hlkwd{data.frame}\hlstd{(}\hlkwc{y} \hlstd{= y,} \hlkwc{x} \hlstd{= x)}
+    \hlkwd{colnames}\hlstd{(dat)[}\hlnum{2}\hlopt{:}\hlstd{(p}\hlopt{+}\hlnum{1}\hlstd{)]} \hlkwb{<-} \hlkwd{paste}\hlstd{(}\hlstr{"x"}\hlstd{,} \hlnum{1}\hlopt{:}\hlstd{p,} \hlkwc{sep} \hlstd{=} \hlstr{""}\hlstd{)}
+
+    \hlcom{## generate the data (has functionality for different }
+    \hlcom{## families and link functions)}
+    \hlstd{fit} \hlkwb{<-} \hlkwd{glm}\hlstd{(y} \hlopt{~} \hlstd{x1,} \hlkwc{family} \hlstd{=} \hlstr{"Gamma"}\hlstd{,} \hlkwc{data} \hlstd{= dat,}
+      \hlkwc{x} \hlstd{=} \hlnum{TRUE}\hlstd{,} \hlkwc{y} \hlstd{=} \hlnum{TRUE}\hlstd{)}
+  \hlstd{\})}
+
+  \hlstd{funs} \hlkwb{<-} \hlkwd{lm.funs}\hlstd{(}\hlkwc{intercept} \hlstd{=} \hlnum{TRUE}\hlstd{)}
+  \hlstd{train.fun} \hlkwb{<-} \hlstd{funs}\hlopt{$}\hlstd{train.fun}
+  \hlstd{predict.fun} \hlkwb{<-} \hlstd{funs}\hlopt{$}\hlstd{predict.fun}
+  \hlstd{conformal_regions} \hlkwb{<-} \hlkwd{lapply}\hlstd{(models,} \hlkwc{FUN} \hlstd{=} \hlkwa{function}\hlstd{(}\hlkwc{obj}\hlstd{)\{}
+    \hlstd{x} \hlkwb{<-} \hlstd{obj}\hlopt{$}\hlstd{x[,} \hlopt{-}\hlnum{1}\hlstd{]}
+    \hlstd{y} \hlkwb{<-} \hlstd{obj}\hlopt{$}\hlstd{y}
+    \hlstd{p1.tibs} \hlkwb{<-} \hlkwd{conformal.pred}\hlstd{(}\hlkwc{x} \hlstd{=} \hlkwd{cbind}\hlstd{(x,x}\hlopt{^}\hlnum{2}\hlstd{,x}\hlopt{^}\hlnum{3}\hlstd{),} \hlkwc{y} \hlstd{= y,}
+      \hlkwc{x0} \hlstd{=} \hlkwd{cbind}\hlstd{(x,x}\hlopt{^}\hlnum{2}\hlstd{,x}\hlopt{^}\hlnum{3}\hlstd{),}
+      \hlkwc{train.fun} \hlstd{= train.fun,} \hlkwc{predict.fun} \hlstd{= predict.fun,}
+      \hlkwc{alpha} \hlstd{= alpha)}
+    \hlstd{LSCI} \hlkwb{<-} \hlkwd{cbind}\hlstd{(p1.tibs}\hlopt{$}\hlstd{lo, p1.tibs}\hlopt{$}\hlstd{up)}
+
+    \hlstd{cubic.model} \hlkwb{<-} \hlkwd{lm}\hlstd{(y} \hlopt{~} \hlstd{x} \hlopt{+} \hlkwd{I}\hlstd{(x}\hlopt{^}\hlnum{2}\hlstd{)} \hlopt{+} \hlkwd{I}\hlstd{(x}\hlopt{^}\hlnum{3}\hlstd{))}
+    \hlstd{abs.resid} \hlkwb{<-} \hlkwd{abs}\hlstd{(cubic.model}\hlopt{$}\hlstd{resid)}
+    \hlstd{smooth.call} \hlkwb{<-} \hlkwd{smooth.spline}\hlstd{(x, abs.resid,}
+      \hlkwc{nknots} \hlstd{=} \hlnum{10}\hlstd{)}
+    \hlstd{lambda} \hlkwb{<-} \hlstd{smooth.call}\hlopt{$}\hlstd{lambda}
+    \hlstd{df} \hlkwb{<-} \hlstd{smooth.call}\hlopt{$}\hlstd{df}
+    \hlstd{mad.train.fun} \hlkwb{<-} \hlkwa{function}\hlstd{(}\hlkwc{x}\hlstd{,} \hlkwc{y}\hlstd{,} \hlkwc{out} \hlstd{=} \hlkwa{NULL}\hlstd{)\{}
+      \hlkwd{smooth.spline}\hlstd{(x[,} \hlnum{1}\hlstd{], y,} \hlkwc{lambda} \hlstd{= lambda,}
+      \hlkwc{df} \hlstd{= df,} \hlkwc{nknots} \hlstd{=} \hlnum{10}\hlstd{)}
+    \hlstd{\}}
+    \hlstd{p2.tibs} \hlkwb{<-} \hlkwd{conformal.pred}\hlstd{(}\hlkwc{x} \hlstd{=} \hlkwd{cbind}\hlstd{(x,x}\hlopt{^}\hlnum{2}\hlstd{,x}\hlopt{^}\hlnum{3}\hlstd{),} \hlkwc{y} \hlstd{= y,}
+      \hlkwc{x0} \hlstd{=} \hlkwd{cbind}\hlstd{(x,x}\hlopt{^}\hlnum{2}\hlstd{,x}\hlopt{^}\hlnum{3}\hlstd{),}
+      \hlkwc{train.fun} \hlstd{= train.fun,} \hlkwc{predict.fun} \hlstd{= predict.fun,}
+      \hlkwc{mad.train.fun} \hlstd{= mad.train.fun,}
+      \hlkwc{mad.predict.fun} \hlstd{= mad.predict.fun,}
+      \hlkwc{alpha} \hlstd{= alpha)}
+    \hlstd{LSLWCI} \hlkwb{<-} \hlkwd{cbind}\hlstd{(p2.tibs}\hlopt{$}\hlstd{lo, p2.tibs}\hlopt{$}\hlstd{up)}
+
+    \hlstd{betaMLE} \hlkwb{<-} \hlkwd{coefficients}\hlstd{(obj)}
+    \hlstd{shapeMLE} \hlkwb{<-} \hlkwd{as.numeric}\hlstd{(}\hlkwd{gamma.shape}\hlstd{(obj)[}\hlnum{1}\hlstd{])}
+    \hlstd{rateMLE} \hlkwb{<-} \hlkwd{cbind}\hlstd{(}\hlnum{1}\hlstd{, x)} \hlopt{%*%} \hlstd{betaMLE} \hlopt{*} \hlstd{shapeMLE}
+    \hlstd{HDCI} \hlkwb{<-} \hlkwd{do.call}\hlstd{(rbind,} \hlkwd{lapply}\hlstd{(}\hlnum{1}\hlopt{:}\hlstd{n,} \hlkwa{function}\hlstd{(}\hlkwc{j}\hlstd{)\{}
+      \hlkwd{hdi}\hlstd{(qgamma,} \hlnum{1} \hlopt{-} \hlstd{alpha,} \hlkwc{shape} \hlstd{= shapeMLE,} \hlkwc{rate} \hlstd{= rateMLE[j,} \hlnum{1}\hlstd{])}
+    \hlstd{\}))}
+
+    \hlstd{conf} \hlkwb{<-} \hlkwd{conformal.glm}\hlstd{(obj,} \hlkwc{nonparametric} \hlstd{=} \hlnum{TRUE}\hlstd{,} \hlkwc{method} \hlstd{=} \hlstr{"both"}\hlstd{,}
+      \hlkwc{cores} \hlstd{=} \hlnum{7}\hlstd{)}
+    \hlstd{parabinCI} \hlkwb{<-} \hlstd{conf}\hlopt{$}\hlstd{paraconfbin}
+    \hlstd{transformCI} \hlkwb{<-} \hlstd{conf}\hlopt{$}\hlstd{transformconf}
+    \hlstd{nonparabinCI} \hlkwb{<-} \hlstd{conf}\hlopt{$}\hlstd{nonparaconfbin}
+
+    \hlstd{out} \hlkwb{=} \hlkwd{list}\hlstd{(}\hlkwc{parabinCI} \hlstd{= parabinCI,} \hlkwc{transformCI} \hlstd{= transformCI,}
+      \hlkwc{nonparabinCI} \hlstd{= nonparabinCI,} \hlkwc{LSLWCI} \hlstd{= LSLWCI,} \hlkwc{LSCI} \hlstd{= LSCI,}
+      \hlkwc{HDCI} \hlstd{= HDCI)}
+    \hlstd{out}
+  \hlstd{\})}
+
+  \hlstd{diagnostics_regions} \hlkwb{<-} \hlkwd{lapply}\hlstd{(}\hlnum{1}\hlopt{:}\hlstd{B,} \hlkwc{FUN} \hlstd{=} \hlkwa{function}\hlstd{(}\hlkwc{j}\hlstd{)\{}
+
+    \hlstd{obj} \hlkwb{<-} \hlstd{conformal_regions[[j]]}
+    \hlstd{dat} \hlkwb{<-} \hlstd{models[[j]]}\hlopt{$}\hlstd{data}
+    \hlstd{foo} \hlkwb{<-} \hlkwd{lapply}\hlstd{(obj,} \hlkwc{FUN} \hlstd{=} \hlkwa{function}\hlstd{(}\hlkwc{region}\hlstd{)\{}
+
+      \hlstd{output} \hlkwb{<-} \hlkwa{NULL}
+      \hlkwa{if}\hlstd{(}\hlkwd{class}\hlstd{(region)} \hlopt{==} \hlstr{"matrix"}\hlstd{)\{}
+        \hlstd{marginal.coverage} \hlkwb{<-} \hlkwd{local.coverage}\hlstd{(}\hlkwc{region} \hlstd{= region,}
+          \hlkwc{data} \hlstd{= dat,} \hlkwc{d} \hlstd{= p,} \hlkwc{bins} \hlstd{=} \hlnum{1}\hlstd{,} \hlkwc{at.data} \hlstd{=} \hlstr{"TRUE"}\hlstd{)}
+        \hlstd{local.coverage} \hlkwb{<-} \hlkwd{local.coverage}\hlstd{(}\hlkwc{region} \hlstd{= region,}
+          \hlkwc{data} \hlstd{= dat,} \hlkwc{d} \hlstd{= p,} \hlkwc{bins} \hlstd{= bins,} \hlkwc{at.data} \hlstd{=} \hlstr{"TRUE"}\hlstd{)}
+        \hlstd{local.inx.coverage} \hlkwb{<-} \hlkwd{local.coverage}\hlstd{(}\hlkwc{region} \hlstd{= region,}
+          \hlkwc{data} \hlstd{= dat,} \hlkwc{d} \hlstd{= p,} \hlkwc{bins} \hlstd{=} \hlnum{25}\hlstd{,} \hlkwc{at.data} \hlstd{=} \hlstr{"TRUE"}\hlstd{)}
+        \hlstd{output} \hlkwb{<-} \hlkwd{c}\hlstd{(marginal.coverage, local.coverage,}
+          \hlstd{local.inx.coverage,} \hlkwd{mean}\hlstd{(}\hlkwd{apply}\hlstd{(region,} \hlnum{1}\hlstd{, diff)),}
+          \hlkwd{absolute.error}\hlstd{(}\hlkwc{y} \hlstd{= y,} \hlkwc{region} \hlstd{= region))}
+      \hlstd{\}}
+      \hlkwa{else}\hlstd{\{}
+        \hlstd{marginal.coverage} \hlkwb{<-} \hlkwd{local.coverage}\hlstd{(}\hlkwc{region} \hlstd{= region,}
+          \hlkwc{nonparametric} \hlstd{=} \hlstr{"TRUE"}\hlstd{,} \hlkwc{data} \hlstd{= dat,} \hlkwc{d} \hlstd{= p,} \hlkwc{bins} \hlstd{=} \hlnum{1}\hlstd{,}
+          \hlkwc{at.data} \hlstd{=} \hlstr{"TRUE"}\hlstd{)}
+        \hlstd{local.coverage} \hlkwb{<-} \hlkwd{local.coverage}\hlstd{(}\hlkwc{region} \hlstd{= region,}
+          \hlkwc{nonparametric} \hlstd{=} \hlstr{"TRUE"}\hlstd{,} \hlkwc{data} \hlstd{= dat,} \hlkwc{d} \hlstd{= p,} \hlkwc{bins} \hlstd{= bins,}
+          \hlkwc{at.data} \hlstd{=} \hlstr{"TRUE"}\hlstd{)}
+        \hlstd{local.inx.coverage} \hlkwb{<-} \hlkwd{local.coverage}\hlstd{(}\hlkwc{region} \hlstd{= region,}
+          \hlkwc{nonparametric} \hlstd{=} \hlstr{"TRUE"}\hlstd{,} \hlkwc{data} \hlstd{= dat,} \hlkwc{d} \hlstd{= p,} \hlkwc{bins} \hlstd{=} \hlnum{25}\hlstd{,}
+          \hlkwc{at.data} \hlstd{=} \hlstr{"TRUE"}\hlstd{)}
+        \hlstd{output} \hlkwb{<-} \hlkwd{c}\hlstd{(marginal.coverage, local.coverage,}
+          \hlstd{local.inx.coverage,} \hlkwd{area.nonparametric}\hlstd{(region),}
+          \hlkwd{absolute.error.nonparametric}\hlstd{(}\hlkwc{data} \hlstd{= dat,}
+            \hlkwc{region} \hlstd{= region))}
+      \hlstd{\}}
+      \hlstd{output}
+    \hlstd{\})}
+    \hlkwd{do.call}\hlstd{(rbind, foo)}
+
+  \hlstd{\})}
+
+  \hlstd{diagnostics_regions}
+\hlstd{\}}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+
+
+
 The following performs our Monte Carlo simulation of $B = 250$ iterations 
 when $n = 150$ and shape = $0.5$.
 
@@ -1656,32 +1776,16 @@ when $n = 150$ and shape = $0.5$.
 \hlkwd{system.time}\hlstd{(out.gamma.150.2.0.5} \hlkwb{<-} \hlkwd{do.call}\hlstd{(cbind,}
   \hlkwd{lapply}\hlstd{(}\hlnum{1}\hlopt{:}\hlstd{B,} \hlkwc{FUN} \hlstd{=} \hlkwa{function}\hlstd{(}\hlkwc{j}\hlstd{)\{}
     \hlkwd{unlist}\hlstd{(}\hlkwd{gamma_simulator}\hlstd{(}\hlkwc{beta} \hlstd{= beta,} \hlkwc{n} \hlstd{= n,}
-      \hlkwc{bins} \hlstd{= bins,} \hlkwc{shape} \hlstd{=} \hlnum{0.5}\hlstd{))}
+      \hlkwc{shape} \hlstd{=} \hlnum{0.5}\hlstd{))}
 \hlstd{\})))}
 \end{alltt}
 
 
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(predvars, data, env): object 'x1' not found}}
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in r[, l]/mad.predict.fun(out.mad, xx): non-numeric argument to binary operator}}
 
-{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.109 0 0.109}}\end{kframe}
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 1.801 0 1.801}}\end{kframe}
 \end{knitrout}
 
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlstd{gamma.150.2.0.5} \hlkwb{<-} \hlkwd{cbind}\hlstd{(}
-  \hlkwd{rowMeans}\hlstd{(out.gamma.150.2.0.5,} \hlkwc{na.rm} \hlstd{=} \hlnum{TRUE}\hlstd{),}
-  \hlkwd{apply}\hlstd{(out.gamma.150.2.0.5,} \hlnum{1}\hlstd{,}
-  \hlkwc{FUN} \hlstd{=} \hlkwa{function}\hlstd{(}\hlkwc{x}\hlstd{)\{}
-    \hlstd{sds} \hlkwb{<-} \hlkwd{sd}\hlstd{(x,} \hlkwc{na.rm} \hlstd{=} \hlnum{TRUE}\hlstd{)}
-    \hlstd{lengths} \hlkwb{<-} \hlkwd{length}\hlstd{(}\hlkwd{which}\hlstd{(}\hlopt{!}\hlkwd{is.na}\hlstd{(x)))}
-    \hlstd{sds} \hlopt{/} \hlkwd{sqrt}\hlstd{(lengths)}
-  \hlstd{\}))}
-\end{alltt}
-
-
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in is.data.frame(x): object 'out.gamma.150.2.0.5' not found}}\end{kframe}
-\end{knitrout}
 
 The following performs our Monte Carlo simulation of $B = 250$ iterations 
 when $n = 150$ and shape = $0.75$.
@@ -1692,32 +1796,16 @@ when $n = 150$ and shape = $0.75$.
 \hlkwd{system.time}\hlstd{(out.gamma.150.2.0.75} \hlkwb{<-} \hlkwd{do.call}\hlstd{(cbind,}
   \hlkwd{lapply}\hlstd{(}\hlnum{1}\hlopt{:}\hlstd{B,} \hlkwc{FUN} \hlstd{=} \hlkwa{function}\hlstd{(}\hlkwc{j}\hlstd{)\{}
     \hlkwd{unlist}\hlstd{(}\hlkwd{gamma_simulator}\hlstd{(}\hlkwc{beta} \hlstd{= beta,} \hlkwc{n} \hlstd{= n,}
-      \hlkwc{bins} \hlstd{= bins,} \hlkwc{shape} \hlstd{=} \hlnum{0.75}\hlstd{))}
+      \hlkwc{shape} \hlstd{=} \hlnum{0.75}\hlstd{))}
 \hlstd{\})))}
 \end{alltt}
 
 
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(predvars, data, env): object 'x1' not found}}
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in r[, l]/mad.predict.fun(out.mad, xx): non-numeric argument to binary operator}}
 
-{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.002 0 0.002}}\end{kframe}
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 1.656 0 1.659}}\end{kframe}
 \end{knitrout}
 
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlstd{gamma.150.2.0.75} \hlkwb{<-} \hlkwd{cbind}\hlstd{(}
-  \hlkwd{rowMeans}\hlstd{(out.gamma.150.2.0.75,} \hlkwc{na.rm} \hlstd{=} \hlnum{TRUE}\hlstd{),}
-  \hlkwd{apply}\hlstd{(out.gamma.150.2.0.75,} \hlnum{1}\hlstd{,}
-  \hlkwc{FUN} \hlstd{=} \hlkwa{function}\hlstd{(}\hlkwc{x}\hlstd{)\{}
-    \hlstd{sds} \hlkwb{<-} \hlkwd{sd}\hlstd{(x,} \hlkwc{na.rm} \hlstd{=} \hlnum{TRUE}\hlstd{)}
-    \hlstd{lengths} \hlkwb{<-} \hlkwd{length}\hlstd{(}\hlkwd{which}\hlstd{(}\hlopt{!}\hlkwd{is.na}\hlstd{(x)))}
-    \hlstd{sds} \hlopt{/} \hlkwd{sqrt}\hlstd{(lengths)}
-  \hlstd{\}))}
-\end{alltt}
-
-
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in is.data.frame(x): object 'out.gamma.150.2.0.75' not found}}\end{kframe}
-\end{knitrout}
 
 The following performs our Monte Carlo simulation of $B = 250$ iterations 
 when $n = 150$ and shape = $1$.
@@ -1728,32 +1816,16 @@ when $n = 150$ and shape = $1$.
 \hlkwd{system.time}\hlstd{(out.gamma.150.2.1} \hlkwb{<-} \hlkwd{do.call}\hlstd{(cbind,}
   \hlkwd{lapply}\hlstd{(}\hlnum{1}\hlopt{:}\hlstd{B,} \hlkwc{FUN} \hlstd{=} \hlkwa{function}\hlstd{(}\hlkwc{j}\hlstd{)\{}
     \hlkwd{unlist}\hlstd{(}\hlkwd{gamma_simulator}\hlstd{(}\hlkwc{beta} \hlstd{= beta,} \hlkwc{n} \hlstd{= n,}
-      \hlkwc{bins} \hlstd{= bins,} \hlkwc{shape} \hlstd{=} \hlnum{1}\hlstd{))}
+      \hlkwc{shape} \hlstd{=} \hlnum{1}\hlstd{))}
 \hlstd{\})))}
 \end{alltt}
 
 
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(predvars, data, env): object 'x1' not found}}
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in r[, l]/mad.predict.fun(out.mad, xx): non-numeric argument to binary operator}}
 
-{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.002 0 0.002}}\end{kframe}
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 1.518 0 1.518}}\end{kframe}
 \end{knitrout}
 
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlstd{gamma.150.2.1} \hlkwb{<-} \hlkwd{cbind}\hlstd{(}
-  \hlkwd{rowMeans}\hlstd{(out.gamma.150.2.1,} \hlkwc{na.rm} \hlstd{=} \hlnum{TRUE}\hlstd{),}
-  \hlkwd{apply}\hlstd{(out.gamma.150.2.1,} \hlnum{1}\hlstd{,}
-  \hlkwc{FUN} \hlstd{=} \hlkwa{function}\hlstd{(}\hlkwc{x}\hlstd{)\{}
-    \hlstd{sds} \hlkwb{<-} \hlkwd{sd}\hlstd{(x,} \hlkwc{na.rm} \hlstd{=} \hlnum{TRUE}\hlstd{)}
-    \hlstd{lengths} \hlkwb{<-} \hlkwd{length}\hlstd{(}\hlkwd{which}\hlstd{(}\hlopt{!}\hlkwd{is.na}\hlstd{(x)))}
-    \hlstd{sds} \hlopt{/} \hlkwd{sqrt}\hlstd{(lengths)}
-  \hlstd{\}))}
-\end{alltt}
-
-
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in is.data.frame(x): object 'out.gamma.150.2.1' not found}}\end{kframe}
-\end{knitrout}
 
 The following performs our Monte Carlo simulation of $B = 250$ iterations 
 when $n = 150$ and shape = $1.5$.
@@ -1764,32 +1836,16 @@ when $n = 150$ and shape = $1.5$.
 \hlkwd{system.time}\hlstd{(out.gamma.150.2.1.5} \hlkwb{<-} \hlkwd{do.call}\hlstd{(cbind,}
   \hlkwd{lapply}\hlstd{(}\hlnum{1}\hlopt{:}\hlstd{B,} \hlkwc{FUN} \hlstd{=} \hlkwa{function}\hlstd{(}\hlkwc{j}\hlstd{)\{}
     \hlkwd{unlist}\hlstd{(}\hlkwd{gamma_simulator}\hlstd{(}\hlkwc{beta} \hlstd{= beta,} \hlkwc{n} \hlstd{= n,}
-      \hlkwc{bins} \hlstd{= bins,} \hlkwc{shape} \hlstd{=} \hlnum{1.5}\hlstd{))}
+      \hlkwc{shape} \hlstd{=} \hlnum{1.5}\hlstd{))}
 \hlstd{\})))}
 \end{alltt}
 
 
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(predvars, data, env): object 'x1' not found}}
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in r[, l]/mad.predict.fun(out.mad, xx): non-numeric argument to binary operator}}
 
-{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.003 0 0.003}}\end{kframe}
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 1.567 0 1.566}}\end{kframe}
 \end{knitrout}
 
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlstd{gamma.150.2.1.5} \hlkwb{<-} \hlkwd{cbind}\hlstd{(}
-  \hlkwd{rowMeans}\hlstd{(out.gamma.150.2.1.5,} \hlkwc{na.rm} \hlstd{=} \hlnum{TRUE}\hlstd{),}
-  \hlkwd{apply}\hlstd{(out.gamma.150.2.1.5,} \hlnum{1}\hlstd{,}
-  \hlkwc{FUN} \hlstd{=} \hlkwa{function}\hlstd{(}\hlkwc{x}\hlstd{)\{}
-    \hlstd{sds} \hlkwb{<-} \hlkwd{sd}\hlstd{(x,} \hlkwc{na.rm} \hlstd{=} \hlnum{TRUE}\hlstd{)}
-    \hlstd{lengths} \hlkwb{<-} \hlkwd{length}\hlstd{(}\hlkwd{which}\hlstd{(}\hlopt{!}\hlkwd{is.na}\hlstd{(x)))}
-    \hlstd{sds} \hlopt{/} \hlkwd{sqrt}\hlstd{(lengths)}
-  \hlstd{\}))}
-\end{alltt}
-
-
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in is.data.frame(x): object 'out.gamma.150.2.1.5' not found}}\end{kframe}
-\end{knitrout}
 
 The following performs our Monte Carlo simulation of $B = 250$ iterations 
 when $n = 150$ and shape = $2$.
@@ -1800,32 +1856,16 @@ when $n = 150$ and shape = $2$.
 \hlkwd{system.time}\hlstd{(out.gamma.150.2.2} \hlkwb{<-} \hlkwd{do.call}\hlstd{(cbind,}
   \hlkwd{lapply}\hlstd{(}\hlnum{1}\hlopt{:}\hlstd{B,} \hlkwc{FUN} \hlstd{=} \hlkwa{function}\hlstd{(}\hlkwc{j}\hlstd{)\{}
     \hlkwd{unlist}\hlstd{(}\hlkwd{gamma_simulator}\hlstd{(}\hlkwc{beta} \hlstd{= beta,} \hlkwc{n} \hlstd{= n,}
-      \hlkwc{bins} \hlstd{= bins,} \hlkwc{shape} \hlstd{=} \hlnum{2}\hlstd{))}
+      \hlkwc{shape} \hlstd{=} \hlnum{2}\hlstd{))}
 \hlstd{\})))}
 \end{alltt}
 
 
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(predvars, data, env): object 'x1' not found}}
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in r[, l]/mad.predict.fun(out.mad, xx): non-numeric argument to binary operator}}
 
-{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.002 0 0.002}}\end{kframe}
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 1.619 0 1.62}}\end{kframe}
 \end{knitrout}
 
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlstd{gamma.150.2.2} \hlkwb{<-} \hlkwd{cbind}\hlstd{(}
-  \hlkwd{rowMeans}\hlstd{(out.gamma.150.2.2,} \hlkwc{na.rm} \hlstd{=} \hlnum{TRUE}\hlstd{),}
-  \hlkwd{apply}\hlstd{(out.gamma.150.2.2,} \hlnum{1}\hlstd{,}
-  \hlkwc{FUN} \hlstd{=} \hlkwa{function}\hlstd{(}\hlkwc{x}\hlstd{)\{}
-    \hlstd{sds} \hlkwb{<-} \hlkwd{sd}\hlstd{(x,} \hlkwc{na.rm} \hlstd{=} \hlnum{TRUE}\hlstd{)}
-    \hlstd{lengths} \hlkwb{<-} \hlkwd{length}\hlstd{(}\hlkwd{which}\hlstd{(}\hlopt{!}\hlkwd{is.na}\hlstd{(x)))}
-    \hlstd{sds} \hlopt{/} \hlkwd{sqrt}\hlstd{(lengths)}
-  \hlstd{\}))}
-\end{alltt}
-
-
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in is.data.frame(x): object 'out.gamma.150.2.2' not found}}\end{kframe}
-\end{knitrout}
 
 The following performs our Monte Carlo simulation of $B = 250$ iterations 
 when $n = 150$ and shape = $5$.
@@ -1836,32 +1876,16 @@ when $n = 150$ and shape = $5$.
 \hlkwd{system.time}\hlstd{(out.gamma.150.2.5} \hlkwb{<-} \hlkwd{do.call}\hlstd{(cbind,}
   \hlkwd{lapply}\hlstd{(}\hlnum{1}\hlopt{:}\hlstd{B,} \hlkwc{FUN} \hlstd{=} \hlkwa{function}\hlstd{(}\hlkwc{j}\hlstd{)\{}
     \hlkwd{unlist}\hlstd{(}\hlkwd{gamma_simulator}\hlstd{(}\hlkwc{beta} \hlstd{= beta,} \hlkwc{n} \hlstd{= n,}
-      \hlkwc{bins} \hlstd{= bins,} \hlkwc{shape} \hlstd{=} \hlnum{5}\hlstd{))}
+      \hlkwc{shape} \hlstd{=} \hlnum{5}\hlstd{))}
 \hlstd{\})))}
 \end{alltt}
 
 
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(predvars, data, env): object 'x1' not found}}
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in r[, l]/mad.predict.fun(out.mad, xx): non-numeric argument to binary operator}}
 
-{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.002 0 0.002}}\end{kframe}
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 1.55 0.001 1.55}}\end{kframe}
 \end{knitrout}
 
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlstd{gamma.150.2.5} \hlkwb{<-} \hlkwd{cbind}\hlstd{(}
-  \hlkwd{rowMeans}\hlstd{(out.gamma.150.2.5,} \hlkwc{na.rm} \hlstd{=} \hlnum{TRUE}\hlstd{),}
-  \hlkwd{apply}\hlstd{(out.gamma.150.2.5,} \hlnum{1}\hlstd{,}
-  \hlkwc{FUN} \hlstd{=} \hlkwa{function}\hlstd{(}\hlkwc{x}\hlstd{)\{}
-    \hlstd{sds} \hlkwb{<-} \hlkwd{sd}\hlstd{(x,} \hlkwc{na.rm} \hlstd{=} \hlnum{TRUE}\hlstd{)}
-    \hlstd{lengths} \hlkwb{<-} \hlkwd{length}\hlstd{(}\hlkwd{which}\hlstd{(}\hlopt{!}\hlkwd{is.na}\hlstd{(x)))}
-    \hlstd{sds} \hlopt{/} \hlkwd{sqrt}\hlstd{(lengths)}
-  \hlstd{\}))}
-\end{alltt}
-
-
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in is.data.frame(x): object 'out.gamma.150.2.5' not found}}\end{kframe}
-\end{knitrout}
 
 The following performs our Monte Carlo simulation of $B = 250$ iterations 
 when $n = 150$ and shape = $7$.
@@ -1872,32 +1896,16 @@ when $n = 150$ and shape = $7$.
 \hlkwd{system.time}\hlstd{(out.gamma.150.2.7} \hlkwb{<-} \hlkwd{do.call}\hlstd{(cbind,}
   \hlkwd{lapply}\hlstd{(}\hlnum{1}\hlopt{:}\hlstd{B,} \hlkwc{FUN} \hlstd{=} \hlkwa{function}\hlstd{(}\hlkwc{j}\hlstd{)\{}
     \hlkwd{unlist}\hlstd{(}\hlkwd{gamma_simulator}\hlstd{(}\hlkwc{beta} \hlstd{= beta,} \hlkwc{n} \hlstd{= n,}
-      \hlkwc{bins} \hlstd{= bins,} \hlkwc{shape} \hlstd{=} \hlnum{7}\hlstd{))}
+      \hlkwc{shape} \hlstd{=} \hlnum{7}\hlstd{))}
 \hlstd{\})))}
 \end{alltt}
 
 
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(predvars, data, env): object 'x1' not found}}
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in r[, l]/mad.predict.fun(out.mad, xx): non-numeric argument to binary operator}}
 
-{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.002 0 0.002}}\end{kframe}
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 1.49 0 1.49}}\end{kframe}
 \end{knitrout}
 
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlstd{gamma.150.2.7} \hlkwb{<-} \hlkwd{cbind}\hlstd{(}
-  \hlkwd{rowMeans}\hlstd{(out.gamma.150.2.7,} \hlkwc{na.rm} \hlstd{=} \hlnum{TRUE}\hlstd{),}
-  \hlkwd{apply}\hlstd{(out.gamma.150.2.7,} \hlnum{1}\hlstd{,}
-  \hlkwc{FUN} \hlstd{=} \hlkwa{function}\hlstd{(}\hlkwc{x}\hlstd{)\{}
-    \hlstd{sds} \hlkwb{<-} \hlkwd{sd}\hlstd{(x,} \hlkwc{na.rm} \hlstd{=} \hlnum{TRUE}\hlstd{)}
-    \hlstd{lengths} \hlkwb{<-} \hlkwd{length}\hlstd{(}\hlkwd{which}\hlstd{(}\hlopt{!}\hlkwd{is.na}\hlstd{(x)))}
-    \hlstd{sds} \hlopt{/} \hlkwd{sqrt}\hlstd{(lengths)}
-  \hlstd{\}))}
-\end{alltt}
-
-
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in is.data.frame(x): object 'out.gamma.150.2.7' not found}}\end{kframe}
-\end{knitrout}
 
 The following performs our Monte Carlo simulation of $B = 250$ iterations 
 when $n = 150$ and shape = $10$.
@@ -1908,32 +1916,16 @@ when $n = 150$ and shape = $10$.
 \hlkwd{system.time}\hlstd{(out.gamma.150.2.10} \hlkwb{<-} \hlkwd{do.call}\hlstd{(cbind,}
   \hlkwd{lapply}\hlstd{(}\hlnum{1}\hlopt{:}\hlstd{B,} \hlkwc{FUN} \hlstd{=} \hlkwa{function}\hlstd{(}\hlkwc{j}\hlstd{)\{}
     \hlkwd{unlist}\hlstd{(}\hlkwd{gamma_simulator}\hlstd{(}\hlkwc{beta} \hlstd{= beta,} \hlkwc{n} \hlstd{= n,}
-      \hlkwc{bins} \hlstd{= bins,} \hlkwc{shape} \hlstd{=} \hlnum{10}\hlstd{))}
+      \hlkwc{shape} \hlstd{=} \hlnum{10}\hlstd{))}
 \hlstd{\})))}
 \end{alltt}
 
 
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(predvars, data, env): object 'x1' not found}}
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in r[, l]/mad.predict.fun(out.mad, xx): non-numeric argument to binary operator}}
 
-{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.002 0 0.002}}\end{kframe}
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 1.494 0 1.495}}\end{kframe}
 \end{knitrout}
 
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlstd{gamma.150.2.10} \hlkwb{<-} \hlkwd{cbind}\hlstd{(}
-  \hlkwd{rowMeans}\hlstd{(out.gamma.150.2.10,} \hlkwc{na.rm} \hlstd{=} \hlnum{TRUE}\hlstd{),}
-  \hlkwd{apply}\hlstd{(out.gamma.150.2.10,} \hlnum{1}\hlstd{,}
-  \hlkwc{FUN} \hlstd{=} \hlkwa{function}\hlstd{(}\hlkwc{x}\hlstd{)\{}
-    \hlstd{sds} \hlkwb{<-} \hlkwd{sd}\hlstd{(x,} \hlkwc{na.rm} \hlstd{=} \hlnum{TRUE}\hlstd{)}
-    \hlstd{lengths} \hlkwb{<-} \hlkwd{length}\hlstd{(}\hlkwd{which}\hlstd{(}\hlopt{!}\hlkwd{is.na}\hlstd{(x)))}
-    \hlstd{sds} \hlopt{/} \hlkwd{sqrt}\hlstd{(lengths)}
-  \hlstd{\}))}
-\end{alltt}
-
-
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in is.data.frame(x): object 'out.gamma.150.2.10' not found}}\end{kframe}
-\end{knitrout}
 
 The following performs our Monte Carlo simulation of $B = 250$ iterations 
 when $n = 150$ and shape = $12$.
@@ -1944,32 +1936,16 @@ when $n = 150$ and shape = $12$.
 \hlkwd{system.time}\hlstd{(out.gamma.150.2.12} \hlkwb{<-} \hlkwd{do.call}\hlstd{(cbind,}
   \hlkwd{lapply}\hlstd{(}\hlnum{1}\hlopt{:}\hlstd{B,} \hlkwc{FUN} \hlstd{=} \hlkwa{function}\hlstd{(}\hlkwc{j}\hlstd{)\{}
     \hlkwd{unlist}\hlstd{(}\hlkwd{gamma_simulator}\hlstd{(}\hlkwc{beta} \hlstd{= beta,} \hlkwc{n} \hlstd{= n,}
-      \hlkwc{bins} \hlstd{= bins,} \hlkwc{shape} \hlstd{=} \hlnum{12}\hlstd{))}
+      \hlkwc{shape} \hlstd{=} \hlnum{12}\hlstd{))}
 \hlstd{\})))}
 \end{alltt}
 
 
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(predvars, data, env): object 'x1' not found}}
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in r[, l]/mad.predict.fun(out.mad, xx): non-numeric argument to binary operator}}
 
-{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.004 0 0.004}}\end{kframe}
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 1.766 0 1.767}}\end{kframe}
 \end{knitrout}
 
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlstd{gamma.150.2.12} \hlkwb{<-} \hlkwd{cbind}\hlstd{(}
-  \hlkwd{rowMeans}\hlstd{(out.gamma.150.2.12,} \hlkwc{na.rm} \hlstd{=} \hlnum{TRUE}\hlstd{),}
-  \hlkwd{apply}\hlstd{(out.gamma.150.2.12,} \hlnum{1}\hlstd{,}
-  \hlkwc{FUN} \hlstd{=} \hlkwa{function}\hlstd{(}\hlkwc{x}\hlstd{)\{}
-    \hlstd{sds} \hlkwb{<-} \hlkwd{sd}\hlstd{(x,} \hlkwc{na.rm} \hlstd{=} \hlnum{TRUE}\hlstd{)}
-    \hlstd{lengths} \hlkwb{<-} \hlkwd{length}\hlstd{(}\hlkwd{which}\hlstd{(}\hlopt{!}\hlkwd{is.na}\hlstd{(x)))}
-    \hlstd{sds} \hlopt{/} \hlkwd{sqrt}\hlstd{(lengths)}
-  \hlstd{\}))}
-\end{alltt}
-
-
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in is.data.frame(x): object 'out.gamma.150.2.12' not found}}\end{kframe}
-\end{knitrout}
 
 The following performs our Monte Carlo simulation of $B = 250$ iterations 
 when $n = 150$ and shape = $15$.
@@ -1980,32 +1956,16 @@ when $n = 150$ and shape = $15$.
 \hlkwd{system.time}\hlstd{(out.gamma.150.2.15} \hlkwb{<-} \hlkwd{do.call}\hlstd{(cbind,}
   \hlkwd{lapply}\hlstd{(}\hlnum{1}\hlopt{:}\hlstd{B,} \hlkwc{FUN} \hlstd{=} \hlkwa{function}\hlstd{(}\hlkwc{j}\hlstd{)\{}
     \hlkwd{unlist}\hlstd{(}\hlkwd{gamma_simulator}\hlstd{(}\hlkwc{beta} \hlstd{= beta,} \hlkwc{n} \hlstd{= n,}
-      \hlkwc{bins} \hlstd{= bins,} \hlkwc{shape} \hlstd{=} \hlnum{15}\hlstd{))}
+      \hlkwc{shape} \hlstd{=} \hlnum{15}\hlstd{))}
 \hlstd{\})))}
 \end{alltt}
 
 
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(predvars, data, env): object 'x1' not found}}
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in r[, l]/mad.predict.fun(out.mad, xx): non-numeric argument to binary operator}}
 
-{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.006 0 0.006}}\end{kframe}
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 1.728 0 1.728}}\end{kframe}
 \end{knitrout}
 
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlstd{gamma.150.2.15} \hlkwb{<-} \hlkwd{cbind}\hlstd{(}
-  \hlkwd{rowMeans}\hlstd{(out.gamma.150.2.15,} \hlkwc{na.rm} \hlstd{=} \hlnum{TRUE}\hlstd{),}
-  \hlkwd{apply}\hlstd{(out.gamma.150.2.15,} \hlnum{1}\hlstd{,}
-  \hlkwc{FUN} \hlstd{=} \hlkwa{function}\hlstd{(}\hlkwc{x}\hlstd{)\{}
-    \hlstd{sds} \hlkwb{<-} \hlkwd{sd}\hlstd{(x,} \hlkwc{na.rm} \hlstd{=} \hlnum{TRUE}\hlstd{)}
-    \hlstd{lengths} \hlkwb{<-} \hlkwd{length}\hlstd{(}\hlkwd{which}\hlstd{(}\hlopt{!}\hlkwd{is.na}\hlstd{(x)))}
-    \hlstd{sds} \hlopt{/} \hlkwd{sqrt}\hlstd{(lengths)}
-  \hlstd{\}))}
-\end{alltt}
-
-
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in is.data.frame(x): object 'out.gamma.150.2.15' not found}}\end{kframe}
-\end{knitrout}
 
 The following performs our Monte Carlo simulation of $B = 250$ iterations 
 when $n = 150$ and shape = $20$.
@@ -2016,32 +1976,16 @@ when $n = 150$ and shape = $20$.
 \hlkwd{system.time}\hlstd{(out.gamma.150.2.20} \hlkwb{<-} \hlkwd{do.call}\hlstd{(cbind,}
   \hlkwd{lapply}\hlstd{(}\hlnum{1}\hlopt{:}\hlstd{B,} \hlkwc{FUN} \hlstd{=} \hlkwa{function}\hlstd{(}\hlkwc{j}\hlstd{)\{}
     \hlkwd{unlist}\hlstd{(}\hlkwd{gamma_simulator}\hlstd{(}\hlkwc{beta} \hlstd{= beta,} \hlkwc{n} \hlstd{= n,}
-      \hlkwc{bins} \hlstd{= bins,} \hlkwc{shape} \hlstd{=} \hlnum{20}\hlstd{))}
+      \hlkwc{shape} \hlstd{=} \hlnum{20}\hlstd{))}
 \hlstd{\})))}
 \end{alltt}
 
 
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(predvars, data, env): object 'x1' not found}}
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in r[, l]/mad.predict.fun(out.mad, xx): non-numeric argument to binary operator}}
 
-{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.007 0 0.006}}\end{kframe}
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 1.717 0 1.717}}\end{kframe}
 \end{knitrout}
 
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlstd{gamma.150.2.20} \hlkwb{<-} \hlkwd{cbind}\hlstd{(}
-  \hlkwd{rowMeans}\hlstd{(out.gamma.150.2.20,} \hlkwc{na.rm} \hlstd{=} \hlnum{TRUE}\hlstd{),}
-  \hlkwd{apply}\hlstd{(out.gamma.150.2.20,} \hlnum{1}\hlstd{,}
-  \hlkwc{FUN} \hlstd{=} \hlkwa{function}\hlstd{(}\hlkwc{x}\hlstd{)\{}
-    \hlstd{sds} \hlkwb{<-} \hlkwd{sd}\hlstd{(x,} \hlkwc{na.rm} \hlstd{=} \hlnum{TRUE}\hlstd{)}
-    \hlstd{lengths} \hlkwb{<-} \hlkwd{length}\hlstd{(}\hlkwd{which}\hlstd{(}\hlopt{!}\hlkwd{is.na}\hlstd{(x)))}
-    \hlstd{sds} \hlopt{/} \hlkwd{sqrt}\hlstd{(lengths)}
-  \hlstd{\}))}
-\end{alltt}
-
-
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in is.data.frame(x): object 'out.gamma.150.2.20' not found}}\end{kframe}
-\end{knitrout}
 
 The following performs our Monte Carlo simulation of $B = 250$ iterations 
 when $n = 150$ and shape = $25$.
@@ -2052,32 +1996,16 @@ when $n = 150$ and shape = $25$.
 \hlkwd{system.time}\hlstd{(out.gamma.150.2.25} \hlkwb{<-} \hlkwd{do.call}\hlstd{(cbind,}
   \hlkwd{lapply}\hlstd{(}\hlnum{1}\hlopt{:}\hlstd{B,} \hlkwc{FUN} \hlstd{=} \hlkwa{function}\hlstd{(}\hlkwc{j}\hlstd{)\{}
     \hlkwd{unlist}\hlstd{(}\hlkwd{gamma_simulator}\hlstd{(}\hlkwc{beta} \hlstd{= beta,} \hlkwc{n} \hlstd{= n,}
-      \hlkwc{bins} \hlstd{= bins,} \hlkwc{shape} \hlstd{=} \hlnum{25}\hlstd{))}
+      \hlkwc{shape} \hlstd{=} \hlnum{25}\hlstd{))}
 \hlstd{\})))}
 \end{alltt}
 
 
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(predvars, data, env): object 'x1' not found}}
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in r[, l]/mad.predict.fun(out.mad, xx): non-numeric argument to binary operator}}
 
-{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.005 0 0.005}}\end{kframe}
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 1.815 0.001 1.816}}\end{kframe}
 \end{knitrout}
 
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlstd{gamma.150.2.25} \hlkwb{<-} \hlkwd{cbind}\hlstd{(}
-  \hlkwd{rowMeans}\hlstd{(out.gamma.150.2.25,} \hlkwc{na.rm} \hlstd{=} \hlnum{TRUE}\hlstd{),}
-  \hlkwd{apply}\hlstd{(out.gamma.150.2.25,} \hlnum{1}\hlstd{,}
-  \hlkwc{FUN} \hlstd{=} \hlkwa{function}\hlstd{(}\hlkwc{x}\hlstd{)\{}
-    \hlstd{sds} \hlkwb{<-} \hlkwd{sd}\hlstd{(x,} \hlkwc{na.rm} \hlstd{=} \hlnum{TRUE}\hlstd{)}
-    \hlstd{lengths} \hlkwb{<-} \hlkwd{length}\hlstd{(}\hlkwd{which}\hlstd{(}\hlopt{!}\hlkwd{is.na}\hlstd{(x)))}
-    \hlstd{sds} \hlopt{/} \hlkwd{sqrt}\hlstd{(lengths)}
-  \hlstd{\}))}
-\end{alltt}
-
-
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in is.data.frame(x): object 'out.gamma.150.2.25' not found}}\end{kframe}
-\end{knitrout}
 
 The following performs our Monte Carlo simulation of $B = 250$ iterations 
 when $n = 150$ and shape = $30$.
@@ -2088,32 +2016,16 @@ when $n = 150$ and shape = $30$.
 \hlkwd{system.time}\hlstd{(out.gamma.150.2.30} \hlkwb{<-} \hlkwd{do.call}\hlstd{(cbind,}
   \hlkwd{lapply}\hlstd{(}\hlnum{1}\hlopt{:}\hlstd{B,} \hlkwc{FUN} \hlstd{=} \hlkwa{function}\hlstd{(}\hlkwc{j}\hlstd{)\{}
     \hlkwd{unlist}\hlstd{(}\hlkwd{gamma_simulator}\hlstd{(}\hlkwc{beta} \hlstd{= beta,} \hlkwc{n} \hlstd{= n,}
-      \hlkwc{bins} \hlstd{= bins,} \hlkwc{shape} \hlstd{=} \hlnum{30}\hlstd{))}
+      \hlkwc{shape} \hlstd{=} \hlnum{30}\hlstd{))}
 \hlstd{\})))}
 \end{alltt}
 
 
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(predvars, data, env): object 'x1' not found}}
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in r[, l]/mad.predict.fun(out.mad, xx): non-numeric argument to binary operator}}
 
-{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.003 0 0.003}}\end{kframe}
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 1.884 0 1.884}}\end{kframe}
 \end{knitrout}
 
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlstd{gamma.150.2.30} \hlkwb{<-} \hlkwd{cbind}\hlstd{(}
-  \hlkwd{rowMeans}\hlstd{(out.gamma.150.2.30,} \hlkwc{na.rm} \hlstd{=} \hlnum{TRUE}\hlstd{),}
-  \hlkwd{apply}\hlstd{(out.gamma.150.2.30,} \hlnum{1}\hlstd{,}
-  \hlkwc{FUN} \hlstd{=} \hlkwa{function}\hlstd{(}\hlkwc{x}\hlstd{)\{}
-    \hlstd{sds} \hlkwb{<-} \hlkwd{sd}\hlstd{(x,} \hlkwc{na.rm} \hlstd{=} \hlnum{TRUE}\hlstd{)}
-    \hlstd{lengths} \hlkwb{<-} \hlkwd{length}\hlstd{(}\hlkwd{which}\hlstd{(}\hlopt{!}\hlkwd{is.na}\hlstd{(x)))}
-    \hlstd{sds} \hlopt{/} \hlkwd{sqrt}\hlstd{(lengths)}
-  \hlstd{\}))}
-\end{alltt}
-
-
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in is.data.frame(x): object 'out.gamma.150.2.30' not found}}\end{kframe}
-\end{knitrout}
 
 The following performs our Monte Carlo simulation of $B = 250$ iterations 
 when $n = 150$ and shape = $40$.
@@ -2124,32 +2036,16 @@ when $n = 150$ and shape = $40$.
 \hlkwd{system.time}\hlstd{(out.gamma.150.2.40} \hlkwb{<-} \hlkwd{do.call}\hlstd{(cbind,}
   \hlkwd{lapply}\hlstd{(}\hlnum{1}\hlopt{:}\hlstd{B,} \hlkwc{FUN} \hlstd{=} \hlkwa{function}\hlstd{(}\hlkwc{j}\hlstd{)\{}
     \hlkwd{unlist}\hlstd{(}\hlkwd{gamma_simulator}\hlstd{(}\hlkwc{beta} \hlstd{= beta,} \hlkwc{n} \hlstd{= n,}
-      \hlkwc{bins} \hlstd{= bins,} \hlkwc{shape} \hlstd{=} \hlnum{40}\hlstd{))}
+      \hlkwc{shape} \hlstd{=} \hlnum{40}\hlstd{))}
 \hlstd{\})))}
 \end{alltt}
 
 
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(predvars, data, env): object 'x1' not found}}
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in r[, l]/mad.predict.fun(out.mad, xx): non-numeric argument to binary operator}}
 
-{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.002 0 0.002}}\end{kframe}
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 1.658 0.001 1.665}}\end{kframe}
 \end{knitrout}
 
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlstd{gamma.150.2.40} \hlkwb{<-} \hlkwd{cbind}\hlstd{(}
-  \hlkwd{rowMeans}\hlstd{(out.gamma.150.2.40,} \hlkwc{na.rm} \hlstd{=} \hlnum{TRUE}\hlstd{),}
-  \hlkwd{apply}\hlstd{(out.gamma.150.2.40,} \hlnum{1}\hlstd{,}
-  \hlkwc{FUN} \hlstd{=} \hlkwa{function}\hlstd{(}\hlkwc{x}\hlstd{)\{}
-    \hlstd{sds} \hlkwb{<-} \hlkwd{sd}\hlstd{(x,} \hlkwc{na.rm} \hlstd{=} \hlnum{TRUE}\hlstd{)}
-    \hlstd{lengths} \hlkwb{<-} \hlkwd{length}\hlstd{(}\hlkwd{which}\hlstd{(}\hlopt{!}\hlkwd{is.na}\hlstd{(x)))}
-    \hlstd{sds} \hlopt{/} \hlkwd{sqrt}\hlstd{(lengths)}
-  \hlstd{\}))}
-\end{alltt}
-
-
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in is.data.frame(x): object 'out.gamma.150.2.40' not found}}\end{kframe}
-\end{knitrout}
 
 The following performs our Monte Carlo simulation of $B = 250$ iterations 
 when $n = 150$ and shape = $50$.
@@ -2160,32 +2056,16 @@ when $n = 150$ and shape = $50$.
 \hlkwd{system.time}\hlstd{(out.gamma.150.2.50} \hlkwb{<-} \hlkwd{do.call}\hlstd{(cbind,}
   \hlkwd{lapply}\hlstd{(}\hlnum{1}\hlopt{:}\hlstd{B,} \hlkwc{FUN} \hlstd{=} \hlkwa{function}\hlstd{(}\hlkwc{j}\hlstd{)\{}
     \hlkwd{unlist}\hlstd{(}\hlkwd{gamma_simulator}\hlstd{(}\hlkwc{beta} \hlstd{= beta,} \hlkwc{n} \hlstd{= n,}
-      \hlkwc{bins} \hlstd{= bins,} \hlkwc{shape} \hlstd{=} \hlnum{50}\hlstd{))}
+      \hlkwc{shape} \hlstd{=} \hlnum{50}\hlstd{))}
 \hlstd{\})))}
 \end{alltt}
 
 
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(predvars, data, env): object 'x1' not found}}
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in r[, l]/mad.predict.fun(out.mad, xx): non-numeric argument to binary operator}}
 
-{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.004 0 0.004}}\end{kframe}
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 1.809 0 1.812}}\end{kframe}
 \end{knitrout}
 
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlstd{gamma.150.2.50} \hlkwb{<-} \hlkwd{cbind}\hlstd{(}
-  \hlkwd{rowMeans}\hlstd{(out.gamma.150.2.50,} \hlkwc{na.rm} \hlstd{=} \hlnum{TRUE}\hlstd{),}
-  \hlkwd{apply}\hlstd{(out.gamma.150.2.50,} \hlnum{1}\hlstd{,}
-  \hlkwc{FUN} \hlstd{=} \hlkwa{function}\hlstd{(}\hlkwc{x}\hlstd{)\{}
-    \hlstd{sds} \hlkwb{<-} \hlkwd{sd}\hlstd{(x,} \hlkwc{na.rm} \hlstd{=} \hlnum{TRUE}\hlstd{)}
-    \hlstd{lengths} \hlkwb{<-} \hlkwd{length}\hlstd{(}\hlkwd{which}\hlstd{(}\hlopt{!}\hlkwd{is.na}\hlstd{(x)))}
-    \hlstd{sds} \hlopt{/} \hlkwd{sqrt}\hlstd{(lengths)}
-  \hlstd{\}))}
-\end{alltt}
-
-
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in is.data.frame(x): object 'out.gamma.150.2.50' not found}}\end{kframe}
-\end{knitrout}
 
 The following performs our Monte Carlo simulation of $B = 250$ iterations 
 when $n = 150$ and shape = $60$.
@@ -2196,32 +2076,16 @@ when $n = 150$ and shape = $60$.
 \hlkwd{system.time}\hlstd{(out.gamma.150.2.60} \hlkwb{<-} \hlkwd{do.call}\hlstd{(cbind,}
   \hlkwd{lapply}\hlstd{(}\hlnum{1}\hlopt{:}\hlstd{B,} \hlkwc{FUN} \hlstd{=} \hlkwa{function}\hlstd{(}\hlkwc{j}\hlstd{)\{}
     \hlkwd{unlist}\hlstd{(}\hlkwd{gamma_simulator}\hlstd{(}\hlkwc{beta} \hlstd{= beta,} \hlkwc{n} \hlstd{= n,}
-      \hlkwc{bins} \hlstd{= bins,} \hlkwc{shape} \hlstd{=} \hlnum{60}\hlstd{))}
+      \hlkwc{shape} \hlstd{=} \hlnum{60}\hlstd{))}
 \hlstd{\})))}
 \end{alltt}
 
 
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(predvars, data, env): object 'x1' not found}}
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in r[, l]/mad.predict.fun(out.mad, xx): non-numeric argument to binary operator}}
 
-{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.004 0 0.004}}\end{kframe}
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 1.759 0.004 1.768}}\end{kframe}
 \end{knitrout}
 
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlstd{gamma.150.2.60} \hlkwb{<-} \hlkwd{cbind}\hlstd{(}
-  \hlkwd{rowMeans}\hlstd{(out.gamma.150.2.60,} \hlkwc{na.rm} \hlstd{=} \hlnum{TRUE}\hlstd{),}
-  \hlkwd{apply}\hlstd{(out.gamma.150.2.60,} \hlnum{1}\hlstd{,}
-  \hlkwc{FUN} \hlstd{=} \hlkwa{function}\hlstd{(}\hlkwc{x}\hlstd{)\{}
-    \hlstd{sds} \hlkwb{<-} \hlkwd{sd}\hlstd{(x,} \hlkwc{na.rm} \hlstd{=} \hlnum{TRUE}\hlstd{)}
-    \hlstd{lengths} \hlkwb{<-} \hlkwd{length}\hlstd{(}\hlkwd{which}\hlstd{(}\hlopt{!}\hlkwd{is.na}\hlstd{(x)))}
-    \hlstd{sds} \hlopt{/} \hlkwd{sqrt}\hlstd{(lengths)}
-  \hlstd{\}))}
-\end{alltt}
-
-
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in is.data.frame(x): object 'out.gamma.150.2.60' not found}}\end{kframe}
-\end{knitrout}
 
 The following performs our Monte Carlo simulation of $B = 250$ iterations 
 when $n = 150$ and shape = $70$.
@@ -2232,32 +2096,16 @@ when $n = 150$ and shape = $70$.
 \hlkwd{system.time}\hlstd{(out.gamma.150.2.70} \hlkwb{<-} \hlkwd{do.call}\hlstd{(cbind,}
   \hlkwd{lapply}\hlstd{(}\hlnum{1}\hlopt{:}\hlstd{B,} \hlkwc{FUN} \hlstd{=} \hlkwa{function}\hlstd{(}\hlkwc{j}\hlstd{)\{}
     \hlkwd{unlist}\hlstd{(}\hlkwd{gamma_simulator}\hlstd{(}\hlkwc{beta} \hlstd{= beta,} \hlkwc{n} \hlstd{= n,}
-      \hlkwc{bins} \hlstd{= bins,} \hlkwc{shape} \hlstd{=} \hlnum{70}\hlstd{))}
+      \hlkwc{shape} \hlstd{=} \hlnum{70}\hlstd{))}
 \hlstd{\})))}
 \end{alltt}
 
 
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(predvars, data, env): object 'x1' not found}}
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in r[, l]/mad.predict.fun(out.mad, xx): non-numeric argument to binary operator}}
 
-{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.004 0 0.004}}\end{kframe}
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 1.729 0 1.732}}\end{kframe}
 \end{knitrout}
 
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlstd{gamma.150.2.70} \hlkwb{<-} \hlkwd{cbind}\hlstd{(}
-  \hlkwd{rowMeans}\hlstd{(out.gamma.150.2.70,} \hlkwc{na.rm} \hlstd{=} \hlnum{TRUE}\hlstd{),}
-  \hlkwd{apply}\hlstd{(out.gamma.150.2.70,} \hlnum{1}\hlstd{,}
-  \hlkwc{FUN} \hlstd{=} \hlkwa{function}\hlstd{(}\hlkwc{x}\hlstd{)\{}
-    \hlstd{sds} \hlkwb{<-} \hlkwd{sd}\hlstd{(x,} \hlkwc{na.rm} \hlstd{=} \hlnum{TRUE}\hlstd{)}
-    \hlstd{lengths} \hlkwb{<-} \hlkwd{length}\hlstd{(}\hlkwd{which}\hlstd{(}\hlopt{!}\hlkwd{is.na}\hlstd{(x)))}
-    \hlstd{sds} \hlopt{/} \hlkwd{sqrt}\hlstd{(lengths)}
-  \hlstd{\}))}
-\end{alltt}
-
-
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in is.data.frame(x): object 'out.gamma.150.2.70' not found}}\end{kframe}
-\end{knitrout}
 
 The following performs our Monte Carlo simulation of $B = 250$ iterations 
 when $n = 150$ and shape = $80$.
@@ -2268,32 +2116,16 @@ when $n = 150$ and shape = $80$.
 \hlkwd{system.time}\hlstd{(out.gamma.150.2.80} \hlkwb{<-} \hlkwd{do.call}\hlstd{(cbind,}
   \hlkwd{lapply}\hlstd{(}\hlnum{1}\hlopt{:}\hlstd{B,} \hlkwc{FUN} \hlstd{=} \hlkwa{function}\hlstd{(}\hlkwc{j}\hlstd{)\{}
     \hlkwd{unlist}\hlstd{(}\hlkwd{gamma_simulator}\hlstd{(}\hlkwc{beta} \hlstd{= beta,} \hlkwc{n} \hlstd{= n,}
-      \hlkwc{bins} \hlstd{= bins,} \hlkwc{shape} \hlstd{=} \hlnum{80}\hlstd{))}
+      \hlkwc{shape} \hlstd{=} \hlnum{80}\hlstd{))}
 \hlstd{\})))}
 \end{alltt}
 
 
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(predvars, data, env): object 'x1' not found}}
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in r[, l]/mad.predict.fun(out.mad, xx): non-numeric argument to binary operator}}
 
-{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.004 0 0.003}}\end{kframe}
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 1.724 0 1.726}}\end{kframe}
 \end{knitrout}
 
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlstd{gamma.150.2.80} \hlkwb{<-} \hlkwd{cbind}\hlstd{(}
-  \hlkwd{rowMeans}\hlstd{(out.gamma.150.2.80,} \hlkwc{na.rm} \hlstd{=} \hlnum{TRUE}\hlstd{),}
-  \hlkwd{apply}\hlstd{(out.gamma.150.2.80,} \hlnum{1}\hlstd{,}
-  \hlkwc{FUN} \hlstd{=} \hlkwa{function}\hlstd{(}\hlkwc{x}\hlstd{)\{}
-    \hlstd{sds} \hlkwb{<-} \hlkwd{sd}\hlstd{(x,} \hlkwc{na.rm} \hlstd{=} \hlnum{TRUE}\hlstd{)}
-    \hlstd{lengths} \hlkwb{<-} \hlkwd{length}\hlstd{(}\hlkwd{which}\hlstd{(}\hlopt{!}\hlkwd{is.na}\hlstd{(x)))}
-    \hlstd{sds} \hlopt{/} \hlkwd{sqrt}\hlstd{(lengths)}
-  \hlstd{\}))}
-\end{alltt}
-
-
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in is.data.frame(x): object 'out.gamma.150.2.80' not found}}\end{kframe}
-\end{knitrout}
 
 The following performs our Monte Carlo simulation of $B = 250$ iterations 
 when $n = 150$ and shape = $90$.
@@ -2304,32 +2136,16 @@ when $n = 150$ and shape = $90$.
 \hlkwd{system.time}\hlstd{(out.gamma.150.2.90} \hlkwb{<-} \hlkwd{do.call}\hlstd{(cbind,}
   \hlkwd{lapply}\hlstd{(}\hlnum{1}\hlopt{:}\hlstd{B,} \hlkwc{FUN} \hlstd{=} \hlkwa{function}\hlstd{(}\hlkwc{j}\hlstd{)\{}
     \hlkwd{unlist}\hlstd{(}\hlkwd{gamma_simulator}\hlstd{(}\hlkwc{beta} \hlstd{= beta,} \hlkwc{n} \hlstd{= n,}
-      \hlkwc{bins} \hlstd{= bins,} \hlkwc{shape} \hlstd{=} \hlnum{90}\hlstd{))}
+      \hlkwc{shape} \hlstd{=} \hlnum{90}\hlstd{))}
 \hlstd{\})))}
 \end{alltt}
 
 
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(predvars, data, env): object 'x1' not found}}
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in r[, l]/mad.predict.fun(out.mad, xx): non-numeric argument to binary operator}}
 
-{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.003 0 0.003}}\end{kframe}
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 1.667 0 1.669}}\end{kframe}
 \end{knitrout}
 
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlstd{gamma.150.2.90} \hlkwb{<-} \hlkwd{cbind}\hlstd{(}
-  \hlkwd{rowMeans}\hlstd{(out.gamma.150.2.90,} \hlkwc{na.rm} \hlstd{=} \hlnum{TRUE}\hlstd{),}
-  \hlkwd{apply}\hlstd{(out.gamma.150.2.90,} \hlnum{1}\hlstd{,}
-  \hlkwc{FUN} \hlstd{=} \hlkwa{function}\hlstd{(}\hlkwc{x}\hlstd{)\{}
-    \hlstd{sds} \hlkwb{<-} \hlkwd{sd}\hlstd{(x,} \hlkwc{na.rm} \hlstd{=} \hlnum{TRUE}\hlstd{)}
-    \hlstd{lengths} \hlkwb{<-} \hlkwd{length}\hlstd{(}\hlkwd{which}\hlstd{(}\hlopt{!}\hlkwd{is.na}\hlstd{(x)))}
-    \hlstd{sds} \hlopt{/} \hlkwd{sqrt}\hlstd{(lengths)}
-  \hlstd{\}))}
-\end{alltt}
-
-
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in is.data.frame(x): object 'out.gamma.150.2.90' not found}}\end{kframe}
-\end{knitrout}
 
 The following performs our Monte Carlo simulation of $B = 250$ iterations 
 when $n = 150$ and shape = $100$.
@@ -2340,101 +2156,20 @@ when $n = 150$ and shape = $100$.
 \hlkwd{system.time}\hlstd{(out.gamma.150.2.100} \hlkwb{<-} \hlkwd{do.call}\hlstd{(cbind,}
   \hlkwd{lapply}\hlstd{(}\hlnum{1}\hlopt{:}\hlstd{B,} \hlkwc{FUN} \hlstd{=} \hlkwa{function}\hlstd{(}\hlkwc{j}\hlstd{)\{}
     \hlkwd{unlist}\hlstd{(}\hlkwd{gamma_simulator}\hlstd{(}\hlkwc{beta} \hlstd{= beta,} \hlkwc{n} \hlstd{= n,}
-      \hlkwc{bins} \hlstd{= bins,} \hlkwc{shape} \hlstd{=} \hlnum{100}\hlstd{))}
+      \hlkwc{shape} \hlstd{=} \hlnum{100}\hlstd{))}
 \hlstd{\})))}
 \end{alltt}
 
 
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(predvars, data, env): object 'x1' not found}}
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in r[, l]/mad.predict.fun(out.mad, xx): non-numeric argument to binary operator}}
 
-{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.008 0 0.008}}\end{kframe}
-\end{knitrout}
-
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlstd{gamma.150.2.100} \hlkwb{<-} \hlkwd{cbind}\hlstd{(}
-  \hlkwd{rowMeans}\hlstd{(out.gamma.150.2.100,} \hlkwc{na.rm} \hlstd{=} \hlnum{TRUE}\hlstd{),}
-  \hlkwd{apply}\hlstd{(out.gamma.150.2.100,} \hlnum{1}\hlstd{,}
-  \hlkwc{FUN} \hlstd{=} \hlkwa{function}\hlstd{(}\hlkwc{x}\hlstd{)\{}
-    \hlstd{sds} \hlkwb{<-} \hlkwd{sd}\hlstd{(x,} \hlkwc{na.rm} \hlstd{=} \hlnum{TRUE}\hlstd{)}
-    \hlstd{lengths} \hlkwb{<-} \hlkwd{length}\hlstd{(}\hlkwd{which}\hlstd{(}\hlopt{!}\hlkwd{is.na}\hlstd{(x)))}
-    \hlstd{sds} \hlopt{/} \hlkwd{sqrt}\hlstd{(lengths)}
-  \hlstd{\}))}
-\end{alltt}
-
-
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in is.data.frame(x): object 'out.gamma.150.2.100' not found}}\end{kframe}
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 1.62 0 1.623}}\end{kframe}
 \end{knitrout}
 
 
-Reorganize the output.
-
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlstd{para.area.gamma.150} \hlkwb{<-} \hlstd{nonpara.area.gamma.150} \hlkwb{<-}
-  \hlstd{LS.area.gamma.150} \hlkwb{<-} \hlstd{LSLW.area.gamma.150} \hlkwb{<-}
-  \hlstd{HD.area.gamma.150} \hlkwb{<-} \hlkwa{NULL}
-\hlstd{para.error.gamma.150} \hlkwb{<-} \hlstd{nonpara.error.gamma.150} \hlkwb{<-}
-  \hlstd{LS.error.gamma.150} \hlkwb{<-} \hlstd{LSLW.error.gamma.150} \hlkwb{<-}
-  \hlstd{HD.error.gamma.150} \hlkwb{<-} \hlkwa{NULL}
-\hlstd{para.marginal.gamma.150} \hlkwb{<-} \hlstd{nonpara.marginal.gamma.150} \hlkwb{<-}
-  \hlstd{LS.marginal.gamma.150} \hlkwb{<-} \hlstd{LSLW.marginal.gamma.150} \hlkwb{<-}
-  \hlstd{HD.marginal.gamma.150} \hlkwb{<-} \hlkwa{NULL}
-\hlstd{para.local.gamma.150} \hlkwb{<-} \hlstd{nonpara.local.gamma.150} \hlkwb{<-}
-  \hlstd{LS.local.gamma.150} \hlkwb{<-} \hlstd{LSLW.local.gamma.150} \hlkwb{<-}
-  \hlstd{HD.local.gamma.150} \hlkwb{<-} \hlkwa{NULL}
-\hlstd{para.inx.gamma.150} \hlkwb{<-} \hlstd{nonpara.inx.gamma.150} \hlkwb{<-}
-  \hlstd{LS.inx.gamma.150} \hlkwb{<-} \hlstd{LSLW.inx.gamma.150} \hlkwb{<-}
-  \hlstd{HD.inx.gamma.150} \hlkwb{<-} \hlkwa{NULL}
-\hlstd{shapes} \hlkwb{<-} \hlkwd{c}\hlstd{(}\hlnum{0.5}\hlstd{,} \hlnum{0.75}\hlstd{,} \hlnum{1}\hlstd{,} \hlnum{1.5}\hlstd{,} \hlnum{2}\hlstd{,} \hlnum{5}\hlstd{,} \hlnum{7}\hlstd{,} \hlnum{10}\hlstd{,} \hlnum{12}\hlstd{,} \hlnum{15}\hlstd{,} \hlnum{20}\hlstd{,} \hlnum{25}\hlstd{,}
-  \hlnum{30}\hlstd{,} \hlnum{40}\hlstd{,} \hlnum{50}\hlstd{,} \hlnum{60}\hlstd{,} \hlnum{70}\hlstd{,} \hlnum{80}\hlstd{,} \hlnum{90}\hlstd{,} \hlnum{100}\hlstd{)}
-\hlkwa{for}\hlstd{(j} \hlkwa{in} \hlstd{shapes )\{}
-  \hlstd{internal.output} \hlkwb{<-}
-    \hlkwd{eval}\hlstd{(}\hlkwd{parse}\hlstd{(}\hlkwc{text}\hlstd{=}\hlkwd{paste}\hlstd{(}\hlstr{"gamma.150.2"}\hlstd{, j,} \hlkwc{sep} \hlstd{=} \hlstr{"."}\hlstd{)))}
-  \hlstd{k} \hlkwb{<-} \hlkwd{which}\hlstd{(shapes} \hlopt{==} \hlstd{j)}
-  \hlstd{para.marginal.gamma.150[k]} \hlkwb{<-} \hlkwd{as.numeric}\hlstd{(internal.output[}\hlnum{1}\hlstd{,} \hlnum{1}\hlstd{])}
-  \hlstd{para.local.gamma.150[}\hlkwd{c}\hlstd{((bins}\hlopt{*}\hlstd{(k}\hlopt{-}\hlnum{1}\hlstd{)}\hlopt{+}\hlnum{1}\hlstd{)}\hlopt{:}\hlstd{(bins}\hlopt{*}\hlstd{k))]} \hlkwb{<-}
-    \hlkwd{as.numeric}\hlstd{(internal.output[}\hlnum{2}\hlopt{:}\hlnum{3}\hlstd{,} \hlnum{1}\hlstd{])}
-  \hlstd{para.inx.gamma.150[}\hlkwd{c}\hlstd{((}\hlnum{25}\hlopt{*}\hlstd{(k}\hlopt{-}\hlnum{1}\hlstd{)}\hlopt{+}\hlnum{1}\hlstd{)}\hlopt{:}\hlstd{(}\hlnum{25}\hlopt{*}\hlstd{k))]} \hlkwb{<-}
-    \hlkwd{as.numeric}\hlstd{(internal.output[}\hlnum{4}\hlopt{:}\hlnum{28}\hlstd{,} \hlnum{1}\hlstd{])}
-  \hlstd{para.error.gamma.150[k]} \hlkwb{<-} \hlkwd{as.numeric}\hlstd{(internal.output[}\hlnum{29}\hlstd{,} \hlnum{1}\hlstd{])}
-  \hlstd{para.area.gamma.150[k]} \hlkwb{<-} \hlkwd{as.numeric}\hlstd{(internal.output[}\hlnum{30}\hlstd{,} \hlnum{1}\hlstd{])}
-  \hlstd{nonpara.marginal.gamma.150[k]} \hlkwb{<-} \hlkwd{as.numeric}\hlstd{(internal.output[}\hlnum{31}\hlstd{,} \hlnum{1}\hlstd{])}
-  \hlstd{nonpara.local.gamma.150[}\hlkwd{c}\hlstd{((bins}\hlopt{*}\hlstd{(k}\hlopt{-}\hlnum{1}\hlstd{)}\hlopt{+}\hlnum{1}\hlstd{)}\hlopt{:}\hlstd{(bins}\hlopt{*}\hlstd{k))]} \hlkwb{<-}
-    \hlkwd{as.numeric}\hlstd{(internal.output[}\hlnum{32}\hlopt{:}\hlnum{33}\hlstd{,} \hlnum{1}\hlstd{])}
-  \hlstd{nonpara.inx.gamma.150[}\hlkwd{c}\hlstd{((}\hlnum{25}\hlopt{*}\hlstd{(k}\hlopt{-}\hlnum{1}\hlstd{)}\hlopt{+}\hlnum{1}\hlstd{)}\hlopt{:}\hlstd{(}\hlnum{25}\hlopt{*}\hlstd{k))]} \hlkwb{<-}
-    \hlkwd{as.numeric}\hlstd{(internal.output[}\hlnum{34}\hlopt{:}\hlnum{58}\hlstd{,} \hlnum{1}\hlstd{])}
-  \hlstd{nonpara.error.gamma.150[k]} \hlkwb{<-} \hlkwd{as.numeric}\hlstd{(internal.output[}\hlnum{59}\hlstd{,} \hlnum{1}\hlstd{])}
-  \hlstd{nonpara.area.gamma.150[k]} \hlkwb{<-} \hlkwd{as.numeric}\hlstd{(internal.output[}\hlnum{60}\hlstd{,} \hlnum{1}\hlstd{])}
-  \hlstd{LS.marginal.gamma.150[k]} \hlkwb{<-} \hlkwd{as.numeric}\hlstd{(internal.output[}\hlnum{61}\hlstd{,} \hlnum{1}\hlstd{])}
-  \hlstd{LS.local.gamma.150[}\hlkwd{c}\hlstd{((bins}\hlopt{*}\hlstd{(k}\hlopt{-}\hlnum{1}\hlstd{)}\hlopt{+}\hlnum{1}\hlstd{)}\hlopt{:}\hlstd{(bins}\hlopt{*}\hlstd{k))]} \hlkwb{<-}
-    \hlkwd{as.numeric}\hlstd{(internal.output[}\hlnum{62}\hlopt{:}\hlnum{63}\hlstd{,} \hlnum{1}\hlstd{])}
-  \hlstd{LS.inx.gamma.150[}\hlkwd{c}\hlstd{((}\hlnum{25}\hlopt{*}\hlstd{(k}\hlopt{-}\hlnum{1}\hlstd{)}\hlopt{+}\hlnum{1}\hlstd{)}\hlopt{:}\hlstd{(}\hlnum{25}\hlopt{*}\hlstd{k))]} \hlkwb{<-}
-    \hlkwd{as.numeric}\hlstd{(internal.output[}\hlnum{64}\hlopt{:}\hlnum{88}\hlstd{,} \hlnum{1}\hlstd{])}
-  \hlstd{LS.error.gamma.150[k]} \hlkwb{<-} \hlkwd{as.numeric}\hlstd{(internal.output[}\hlnum{89}\hlstd{,} \hlnum{1}\hlstd{])}
-  \hlstd{LS.area.gamma.150[k]} \hlkwb{<-} \hlkwd{as.numeric}\hlstd{(internal.output[}\hlnum{90}\hlstd{,} \hlnum{1}\hlstd{])}
-  \hlstd{LSLW.marginal.gamma.150[k]} \hlkwb{<-} \hlkwd{as.numeric}\hlstd{(internal.output[}\hlnum{91}\hlstd{,} \hlnum{1}\hlstd{])}
-  \hlstd{LSLW.local.gamma.150[}\hlkwd{c}\hlstd{((bins}\hlopt{*}\hlstd{(k}\hlopt{-}\hlnum{1}\hlstd{)}\hlopt{+}\hlnum{1}\hlstd{)}\hlopt{:}\hlstd{(bins}\hlopt{*}\hlstd{k))]} \hlkwb{<-}
-    \hlkwd{as.numeric}\hlstd{(internal.output[}\hlnum{92}\hlopt{:}\hlnum{93}\hlstd{,} \hlnum{1}\hlstd{])}
-  \hlstd{LSLW.inx.gamma.150[}\hlkwd{c}\hlstd{((}\hlnum{25}\hlopt{*}\hlstd{(k}\hlopt{-}\hlnum{1}\hlstd{)}\hlopt{+}\hlnum{1}\hlstd{)}\hlopt{:}\hlstd{(}\hlnum{25}\hlopt{*}\hlstd{k))]} \hlkwb{<-}
-    \hlkwd{as.numeric}\hlstd{(internal.output[}\hlnum{94}\hlopt{:}\hlnum{118}\hlstd{,} \hlnum{1}\hlstd{])}
-  \hlstd{LSLW.error.gamma.150[k]} \hlkwb{<-} \hlkwd{as.numeric}\hlstd{(internal.output[}\hlnum{119}\hlstd{,} \hlnum{1}\hlstd{])}
-  \hlstd{LSLW.area.gamma.150[k]} \hlkwb{<-} \hlkwd{as.numeric}\hlstd{(internal.output[}\hlnum{120}\hlstd{,} \hlnum{1}\hlstd{])}
-  \hlstd{HD.marginal.gamma.150[k]} \hlkwb{<-} \hlkwd{as.numeric}\hlstd{(internal.output[}\hlnum{121}\hlstd{,} \hlnum{1}\hlstd{])}
-  \hlstd{HD.local.gamma.150[}\hlkwd{c}\hlstd{((bins}\hlopt{*}\hlstd{(k}\hlopt{-}\hlnum{1}\hlstd{)}\hlopt{+}\hlnum{1}\hlstd{)}\hlopt{:}\hlstd{(bins}\hlopt{*}\hlstd{k))]} \hlkwb{<-}
-    \hlkwd{as.numeric}\hlstd{(internal.output[}\hlnum{122}\hlopt{:}\hlnum{123}\hlstd{,} \hlnum{1}\hlstd{])}
-  \hlstd{HD.inx.gamma.150[}\hlkwd{c}\hlstd{((}\hlnum{25}\hlopt{*}\hlstd{(k}\hlopt{-}\hlnum{1}\hlstd{)}\hlopt{+}\hlnum{1}\hlstd{)}\hlopt{:}\hlstd{(}\hlnum{25}\hlopt{*}\hlstd{k))]} \hlkwb{<-}
-    \hlkwd{as.numeric}\hlstd{(internal.output[}\hlnum{124}\hlopt{:}\hlnum{148}\hlstd{,} \hlnum{1}\hlstd{])}
-  \hlstd{HD.error.gamma.150[k]} \hlkwb{<-} \hlkwd{as.numeric}\hlstd{(internal.output[}\hlnum{149}\hlstd{,} \hlnum{1}\hlstd{])}
-  \hlstd{HD.area.gamma.150[k]} \hlkwb{<-} \hlkwd{as.numeric}\hlstd{(internal.output[}\hlnum{150}\hlstd{,} \hlnum{1}\hlstd{])}
-\hlstd{\}}
-\end{alltt}
 
 
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(parse(text = paste("{}gamma.150.2"{}, j, sep = "{}."{}))): object 'gamma.150.2.0.5' not found}}\end{kframe}
-\end{knitrout}
+
 
 
 %% n = 250
@@ -3442,7 +3177,48 @@ prediction regions and HD prediction region.
 \begin{figure}[h!]
 \begin{center}
 \begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in xy.coords(x, y): object 'para.area.gamma.150' not found}}
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in xy.coords(x, y): object 'nonpara.area.gamma.150' not found}}
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in xy.coords(x, y): object 'LSLW.area.gamma.150' not found}}
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in xy.coords(x, y): object 'LS.area.gamma.150' not found}}
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in xy.coords(x, y): object 'HD.area.gamma.150' not found}}
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in xy.coords(x, y): object 'para.error.gamma.150' not found}}
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in xy.coords(x, y): object 'nonpara.error.gamma.150' not found}}
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in xy.coords(x, y): object 'LSLW.error.gamma.150' not found}}
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in xy.coords(x, y): object 'LS.error.gamma.150' not found}}
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in xy.coords(x, y): object 'HD.error.gamma.150' not found}}
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in xy.coords(x, y): object 'para.local.gamma.150' not found}}
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in xy.coords(x, y): object 'nonpara.local.gamma.150' not found}}
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in xy.coords(x, y): object 'LSLW.local.gamma.150' not found}}
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in xy.coords(x, y): object 'LS.local.gamma.150' not found}}
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in xy.coords(x, y): object 'HD.local.gamma.150' not found}}
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in xy.coords(x, y): object 'para.local.gamma.150' not found}}
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in xy.coords(x, y): object 'nonpara.local.gamma.150' not found}}
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in xy.coords(x, y): object 'LSLW.local.gamma.150' not found}}
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in xy.coords(x, y): object 'LS.local.gamma.150' not found}}
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in xy.coords(x, y): object 'HD.local.gamma.150' not found}}\end{kframe}
 \includegraphics[width=\maxwidth]{figure/Fig-gamma-150-1} 
 
 \end{knitrout}
@@ -3470,7 +3246,158 @@ prediction regions and HD prediction region.
 \begin{figure}[h!]
 \begin{center}
 \begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in xy.coords(x, y): object 'para.inx.gamma.150' not found}}
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in xy.coords(x, y): object 'nonpara.inx.gamma.150' not found}}
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in xy.coords(x, y): object 'LSLW.inx.gamma.150' not found}}
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in xy.coords(x, y): object 'LS.inx.gamma.150' not found}}
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in xy.coords(x, y): object 'HD.inx.gamma.150' not found}}
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in xy.coords(x, y): object 'para.inx.gamma.150' not found}}
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in xy.coords(x, y): object 'nonpara.inx.gamma.150' not found}}
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in xy.coords(x, y): object 'LSLW.inx.gamma.150' not found}}
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in xy.coords(x, y): object 'LS.inx.gamma.150' not found}}
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in xy.coords(x, y): object 'HD.inx.gamma.150' not found}}
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in xy.coords(x, y): object 'para.inx.gamma.150' not found}}
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in xy.coords(x, y): object 'nonpara.inx.gamma.150' not found}}
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in xy.coords(x, y): object 'LSLW.inx.gamma.150' not found}}
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in xy.coords(x, y): object 'LS.inx.gamma.150' not found}}
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in xy.coords(x, y): object 'HD.inx.gamma.150' not found}}
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in xy.coords(x, y): object 'para.inx.gamma.150' not found}}
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in xy.coords(x, y): object 'nonpara.inx.gamma.150' not found}}
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in xy.coords(x, y): object 'LSLW.inx.gamma.150' not found}}
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in xy.coords(x, y): object 'LS.inx.gamma.150' not found}}
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in xy.coords(x, y): object 'HD.inx.gamma.150' not found}}
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in xy.coords(x, y): object 'para.inx.gamma.150' not found}}
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in xy.coords(x, y): object 'nonpara.inx.gamma.150' not found}}
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in xy.coords(x, y): object 'LSLW.inx.gamma.150' not found}}
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in xy.coords(x, y): object 'LS.inx.gamma.150' not found}}
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in xy.coords(x, y): object 'HD.inx.gamma.150' not found}}
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in xy.coords(x, y): object 'para.inx.gamma.150' not found}}
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in xy.coords(x, y): object 'nonpara.inx.gamma.150' not found}}
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in xy.coords(x, y): object 'LSLW.inx.gamma.150' not found}}
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in xy.coords(x, y): object 'LS.inx.gamma.150' not found}}
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in xy.coords(x, y): object 'HD.inx.gamma.150' not found}}
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in xy.coords(x, y): object 'para.inx.gamma.150' not found}}
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in xy.coords(x, y): object 'nonpara.inx.gamma.150' not found}}
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in xy.coords(x, y): object 'LSLW.inx.gamma.150' not found}}
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in xy.coords(x, y): object 'LS.inx.gamma.150' not found}}
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in xy.coords(x, y): object 'HD.inx.gamma.150' not found}}
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in xy.coords(x, y): object 'para.inx.gamma.150' not found}}
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in xy.coords(x, y): object 'nonpara.inx.gamma.150' not found}}
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in xy.coords(x, y): object 'LSLW.inx.gamma.150' not found}}
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in xy.coords(x, y): object 'LS.inx.gamma.150' not found}}
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in xy.coords(x, y): object 'HD.inx.gamma.150' not found}}
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in xy.coords(x, y): object 'para.inx.gamma.150' not found}}
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in xy.coords(x, y): object 'nonpara.inx.gamma.150' not found}}
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in xy.coords(x, y): object 'LSLW.inx.gamma.150' not found}}
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in xy.coords(x, y): object 'LS.inx.gamma.150' not found}}
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in xy.coords(x, y): object 'HD.inx.gamma.150' not found}}
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in xy.coords(x, y): object 'para.inx.gamma.150' not found}}
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in xy.coords(x, y): object 'nonpara.inx.gamma.150' not found}}
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in xy.coords(x, y): object 'LSLW.inx.gamma.150' not found}}
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in xy.coords(x, y): object 'LS.inx.gamma.150' not found}}
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in xy.coords(x, y): object 'HD.inx.gamma.150' not found}}
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in xy.coords(x, y): object 'para.inx.gamma.150' not found}}
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in xy.coords(x, y): object 'nonpara.inx.gamma.150' not found}}
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in xy.coords(x, y): object 'LSLW.inx.gamma.150' not found}}
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in xy.coords(x, y): object 'LS.inx.gamma.150' not found}}
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in xy.coords(x, y): object 'HD.inx.gamma.150' not found}}
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in xy.coords(x, y): object 'para.inx.gamma.150' not found}}
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in xy.coords(x, y): object 'nonpara.inx.gamma.150' not found}}
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in xy.coords(x, y): object 'LSLW.inx.gamma.150' not found}}
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in xy.coords(x, y): object 'LS.inx.gamma.150' not found}}
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in xy.coords(x, y): object 'HD.inx.gamma.150' not found}}
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in xy.coords(x, y): object 'para.inx.gamma.150' not found}}
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in xy.coords(x, y): object 'nonpara.inx.gamma.150' not found}}
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in xy.coords(x, y): object 'LSLW.inx.gamma.150' not found}}
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in xy.coords(x, y): object 'LS.inx.gamma.150' not found}}
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in xy.coords(x, y): object 'HD.inx.gamma.150' not found}}
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in xy.coords(x, y): object 'para.inx.gamma.150' not found}}
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in xy.coords(x, y): object 'nonpara.inx.gamma.150' not found}}
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in xy.coords(x, y): object 'LSLW.inx.gamma.150' not found}}
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in xy.coords(x, y): object 'LS.inx.gamma.150' not found}}
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in xy.coords(x, y): object 'HD.inx.gamma.150' not found}}
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in xy.coords(x, y): object 'para.inx.gamma.150' not found}}
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in xy.coords(x, y): object 'nonpara.inx.gamma.150' not found}}
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in xy.coords(x, y): object 'LSLW.inx.gamma.150' not found}}
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in xy.coords(x, y): object 'LS.inx.gamma.150' not found}}
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in xy.coords(x, y): object 'HD.inx.gamma.150' not found}}\end{kframe}
 \includegraphics[width=\maxwidth]{figure/Fig-gamma-inx-150-1} 
 
 \end{knitrout}
