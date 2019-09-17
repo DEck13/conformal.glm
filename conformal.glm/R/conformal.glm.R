@@ -12,7 +12,8 @@ conformal.glm <- function(object, ..., newdata = NULL, alpha = 0.10,
   nonparaconfbin <- NULL
 
   ## some important quantities
-  object <- update(object, x = TRUE, y = TRUE)
+  data <- object$data  
+  object <- update(object, x = TRUE, y = TRUE, data = data)
   call <- object$call
   formula <- call$formula
   fam <- object$family
@@ -20,7 +21,6 @@ conformal.glm <- function(object, ..., newdata = NULL, alpha = 0.10,
   stopifnot("glm" %in% class(object))
   stopifnot(family %in% c("Gamma", "gaussian", "inverse.gaussian"))
   link <- fam$link
-  data <- object$data
   X <- as.matrix(object$x[, -1])
   colnames(X) <- colnames(object$x)[-1]
 

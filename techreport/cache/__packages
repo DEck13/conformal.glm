@@ -5,7 +5,7 @@ statmod
 HDInterval
 conformal.glm
 conformalInference
-xtable
 faraway
 geometry
+xtable
 rgl
