@@ -6,15 +6,10 @@
 \contentsline {subsection}{\numberline {4.1}Results in \citet {eck2019conformal}}{21}
 \contentsline {section}{\numberline {5}Additional Gamma simulations}{27}
 \contentsline {subsection}{\numberline {5.1}Simulations}{27}
-\contentsline {subsection}{\numberline {5.2}Results}{49}
+\contentsline {subsection}{\numberline {5.2}Results}{43}
 \contentsline {section}{\numberline {6}Gamma-Gaussian model misspecification}{50}
 \contentsline {subsection}{\numberline {6.1}Simulations}{50}
-\contentsline {subsection}{\numberline {6.2}Results}{73}
-\contentsline {section}{\numberline {7}Linear Regression Simulations}{74}
-\contentsline {subsection}{\numberline {7.1}Simulations}{74}
-\contentsline {subsection}{\numberline {7.2}Results}{79}
-\contentsline {section}{\numberline {8}Example plots of prediction regions}{80}
-\contentsline {subsection}{\numberline {8.1}Plots corresponding to Section\nobreakspace {}5\hbox {}}{81}
-\contentsline {subsection}{\numberline {8.2}Plots corresponding to Section\nobreakspace {}6\hbox {}}{82}
-\contentsline {subsection}{\numberline {8.3}Plots corresponding to Section\nobreakspace {}7\hbox {}}{83}
-\contentsline {section}{\numberline {9}Creating this Document}{83}
+\contentsline {subsection}{\numberline {6.2}Results}{65}
+\contentsline {section}{\numberline {7}Linear Regression Simulations}{72}
+\contentsline {subsection}{\numberline {7.1}Simulations}{72}
+\contentsline {section}{\numberline {8}Creating this Document}{75}
