@@ -566,7 +566,7 @@ region.
 \hlkwd{xtable}\hlstd{(diagnostics,} \hlkwc{digits} \hlstd{=} \hlkwd{c}\hlstd{(}\hlnum{0}\hlstd{,} \hlnum{2}\hlstd{,} \hlnum{2}\hlstd{,} \hlnum{2}\hlstd{,} \hlnum{2}\hlstd{,} \hlnum{2}\hlstd{))}
 \end{alltt}
 \end{kframe}% latex table generated in R 3.4.4 by xtable 1.8-3 package
-% Fri Sep 20 18:39:36 2019
+% Mon Sep 23 15:47:45 2019
 \begin{table}[ht]
 \centering
 \begin{tabular}{rrrrrr}
@@ -710,11 +710,6 @@ prediction region.
 Our Monte Carlo simulator follows. This function computes all of the 
 dignostics and local coverage probabilities for each prediction region 
 for every generated dataset.
-
-
-\begin{center}
-{\Huge Revised up to here}
-\end{center}
 
 
 \begin{knitrout}
@@ -1574,7 +1569,7 @@ Table 2 and Figure 4 in \citet{eck2019conformal} are shown below.
 \hlkwd{xtable}\hlstd{(diagnostics,} \hlkwc{digits} \hlstd{=} \hlkwd{c}\hlstd{(}\hlnum{0}\hlstd{,} \hlnum{3}\hlstd{,} \hlnum{3}\hlstd{,} \hlnum{3}\hlstd{,} \hlnum{3}\hlstd{,} \hlnum{3}\hlstd{,} \hlnum{3}\hlstd{,} \hlnum{3}\hlstd{))}
 \end{alltt}
 \end{kframe}% latex table generated in R 3.4.4 by xtable 1.8-3 package
-% Fri Sep 20 18:39:37 2019
+% Mon Sep 23 15:47:47 2019
 \begin{table}[ht]
 \centering
 \begin{tabular}{rrrrrrrr}
@@ -1622,7 +1617,7 @@ regression model with one variable.  We specify the inverse link function
 (the defualt in the \texttt{glm} function) and we set 
 $\beta = (1.25, -1)^T$.  This value of $\beta$ is chosen so that the generated 
 Gamma data is increasing, on average, in $x$ and exhibits increasing 
-variability in $x$.  We investigate the performance of the five prediction 
+variability in $x$.  We investigate the performance of the prediction 
 regions across different sample size and shape parameter combinations.  We 
 consider sample sizes of $n \in \{150, 250, 500\}$ and shape parameter values 
 of $\{0.5, 0.75, 1, 1.5, 2, 5, 7, 10, 12, 15, 20, 25, 30, 40, 50, 60, 70, 80, 90, 100\}$.  
@@ -1643,8 +1638,9 @@ in Section~\ref{sec:Gamma-Results}.
 \subsection{Simulations}
 
 We perform Monte Carlo simulations to investigate the coverage properties, 
-size, and prediction error of the Gamma conformal prediction region under 
-transformation...
+size, and prediction error of the binned parametric and nonparametric 
+conformal, transform under the true data generating Gamma model conformal, 
+LSLW conformal, LS conformal, and HD prediction regions.  
 
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
@@ -2881,31 +2877,31 @@ when $n = 500$ and shape = $25$.
 \subsection{Results}
 \label{sec:Gamma-Results}
 
-Results form our simulations are depicted in 
+Results from our simulations are depicted in 
 Figures~\ref{Fig:gamma.150}-\ref{Fig:gamma.inx.500}.  
-For all five prediction regions we depict the estimatated area, prediction 
-error, and local coverage probabilities with respect to binning in 
+We depict the estimatated area, prediction error, marginal coverage, and 
+local coverage probabilities with respect to binning in 
 Figures~\ref{Fig:gamma.150}, \ref{Fig:gamma.250}, and \ref{Fig:gamma.500} 
-for $n = 150$, $250$, and $500$ respectively.  For all five prediction 
+for $n = 150$, $250$, and $500$ respectively.  For all prediction 
 regions we depict the local coverage probabilities across $x$ in
 Figures~\ref{Fig:gamma.inx.150}, \ref{Fig:gamma.inx.250}, and 
 \ref{Fig:gamma.inx.500} for $n = 150$, $250$, and $500$ respectively.
 
-From these simulations we see that the parametric conformal prediction region 
-is similar to the HD prediciton region in area, prediction error, and 
-appearance (as seen in Section~\ref{sec:gammaplots}).  Moreover, the 
-parametric conformal prediction region possess finite-sample, albeit slightly 
-conservative, local validity with respect to binning and possess nominal 
-finite-sample conditional coverage over most of the support. 
-The LSLW conformal prediction region is smaller than than both the parametric 
-conformal prediction region and the HD prediction region.  However, it has a 
-higher prediciton error than these regions and it is more conservative than 
-the parametric conformal prediction region in most of our simulation 
-settings.  It also does not fit the data well when the deviations about the 
+From these simulations we see that both parametric conformal prediction 
+regions are similar to the HD prediciton region in area, prediction error, and 
+appearance (as seen in Section~\ref{sec:gammaplots}), where the transformation 
+based conformal prediction region is slightly preferrable to its binned counterpart.  
+Moreover, the parametric conformal prediction regions possess finite-sample, 
+albeit slightly conservative, local validity with respect to binning and 
+possess nominal finite-sample conditional coverage over most of the support. 
+The LSLW conformal prediction region provides lower prediciton error than the 
+parametric conformal prediciton regions.  However, the LSLW conformal 
+prediction possesses some erratic coverage properties.  
+{\bf Revisit} It also does not fit the data well when the deviations about the 
 estimated mean function are clearly not symmetric as evidenced by 
 in Section~\ref{sec:gammaplots}.  These figures correspond to data generated 
 from a Gamma distribution with small shape parameter values.  
-The nonparametric conformal prediction region gives closer to nominal 
+The binned nonparametric conformal prediction region gives closer to nominal 
 coverage and it possesses finite-sample local validity with respect to 
 binning.  However, this prediction region is larger and gives higher 
 prediciton error than the parametric and LSLW conformal prediction 
@@ -2934,10 +2930,11 @@ prediction regions and HD prediction region.
   least squares locally weighted conformal prediciton region and the 
   highest density predcition region when $n = 150$ and the number of bins 
   equals 2.  
-  The specific diagnostics used to compare these prediciton regions is the 
+  The specific diagnostics used to compare these prediciton regions are the 
     area,
-    prediction error, and
-    the coverage probability with respect to binning  
+    prediction error, 
+    marginal coverage probability,
+    and the coverage probability with respect to binning  
     across shape parameter values.
   The average of 200 Monte Carlo samples at each shape parameter value in 
   these simulation settings form the lines that are depicted in this figure.}
@@ -2981,9 +2978,10 @@ prediction regions and HD prediction region.
   highest density prediction region when $n = 250$ and the number of bins 
   equals 3.  
   The specific diagnostics used to compare these prediciton regions is the 
-    area (top-left panel),
-    prediction error (top-right panel), and
-    the coverage probability with respect to binning (bottom row) 
+    area,
+    prediction error, 
+    marginal coverage probability,
+    and the coverage probability with respect to binning 
     across shape parameter values.
   The average of 50 Monte Carlo samples at each shape parameter value in 
   these simulation settings form the lines that are depicted in this figure.}
@@ -3020,8 +3018,22 @@ prediction regions and HD prediction region.
 
 \end{knitrout}
 \end{center}
-\caption{Diagnostic plots for prediction regions when the model is correctly 
-  specified, $n = 500$, and the number of bins is equal to $3$.}
+\caption{This figure compares the performance of the 
+  binned parametric,
+  transformation,
+  binned nonparametric,
+  least squares, and 
+  least squares locally weighted conformal prediciton region and the 
+  highest density prediction region when $n = 500$ and the number of bins 
+  equals 3.  
+  The specific diagnostics used to compare these prediciton regions is the 
+    area,
+    prediction error, 
+    marginal coverage probability,
+    and the coverage probability with respect to binning 
+    across shape parameter values.
+  The average of 50 Monte Carlo samples at each shape parameter value in 
+  these simulation settings form the lines that are depicted in this figure.}
 \label{Fig:gamma.500}
 \end{figure}
 
@@ -3037,21 +3049,9 @@ prediction regions and HD prediction region.
 
 \end{knitrout}
 \end{center}
-\caption{This figure compares the performance of the 
-  binned parametric,
-  transformation, 
-  binned nonparametric,
-  least squares, and 
-  least squares locally weighted conformal prediciton region and the 
-  highest density prediction region when $n = 500$ and the number of bins 
-  equals 3.  
-  The specific diagnostics used to compare these prediciton regions is the 
-    area (top-left panel),
-    prediction error (top-right panel), and
-    the coverage probability with respect to binning (bottom row) 
-    across shape parameter values.
-  The average of 50 Monte Carlo samples at each shape parameter value in 
-  these simulation settings form the lines that are depicted in this figure.}
+\caption{Plot of the estimated coverage probabilities of prediction regions 
+  across $x$ and shape parameter values when the model is correctly 
+  specified, $n = 500$, and the number of bins is equal to $3$.}
 \label{Fig:gamma.inx.500}
 \end{figure}
 
@@ -3065,29 +3065,32 @@ prediction regions and HD prediction region.
 \section{Gamma-Gaussian model misspecification}
 \label{sec:misspec}
 
-In this Section, we compare the parametric conformal prediction 
-region, the nonparametric conformal prediction region, the LSLW conformal 
-prediction region, the LS conformal prediction region, and the HD prediction 
-region under model misspecification.  The data generating process is Gamma 
-with an inverse link function and we set $\beta = (0.5, 1)^T$.
-We consider sample sizes of $n \in \{150, 250, 500\}$ and shape parameter 
-values of $\{5, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100\}$ when $n = 150$ and 
-shape parameter values of $\{5, 20, 40, 60, 80, 100\}$ when $n = 250, 500$.  
-This value of $\beta$ and these shape parameter values are chosen so that 
-errors about a cubic regression model appear to be almost symmetric.  In this 
-analysis the parametric, LSLW, and LS conformal prediction regions and the HD 
-prediction region are fit assuming this misspecified cubic regression model 
-with homoscedastic normal errors.  When $n = 150$ we build the parametric and 
-nonparametric conformal prediction regions using 2 bins.  When $n = 250, 500$ 
-we build the parametric and nonparametric conformal prediction regions using 
-3 bins.  These number of bin choices correspond to the bin width asymptotics 
-of \citet{lei2014distribution}. 
+In this Section, we compare the binned parametric and nonparametric conformal 
+prediction regions, the transformation based conformal prediction region, 
+the LSLW conformal prediction region, the LS conformal prediction region, 
+and the HD prediction region under model misspecification.  The data 
+generating process is Gamma with an inverse link function and we set 
+$\beta = (0.5, 1)^T$.   We consider sample sizes of $n \in \{150, 250, 500\}$ 
+and shape parameter values of $\{5, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100\}$ 
+when $n = 150$ and shape parameter values of $\{5, 20, 40, 60, 80, 100\}$ 
+when $n = 250, 500$.  This value of $\beta$ and these shape parameter values 
+are chosen so that errors about a cubic regression model appear to be almost 
+symmetric.  In this analysis the binned and transformation based parametric, 
+LSLW, and LS conformal prediction regions are fit assuming this misspecified 
+cubic regression model with homoscedastic normal errors, and the HD prediction 
+region is fit to the true data generating Gamma model.  When $n = 150$ we 
+build the binned parametric and nonparametric conformal prediction regions 
+using 2 bins.  When $n = 250, 500$ we build the parametric and nonparametric 
+conformal prediction regions using 3 bins.  These number of bin choices 
+correspond to the bin width asymptotics of \citet{lei2014distribution}. 
 
+We also compare the HD prediction region fit to the misspecified cubic 
+regression model with homoscedastic normal errors when $n = 150$.  
 
 
 \subsection{Simulations}
 
-The following function computes our diagnostic measures for the five 
+The following function computes our diagnostic measures for the six 
 prediction regions under investigation in the univariate case where data 
 is assumed to be Gamma with inverse link function and the fitted model is 
 Gaussian with a cubic fit.  
@@ -3110,7 +3113,7 @@ Gaussian with a cubic fit.
     \hlkwd{colnames}\hlstd{(dat)[}\hlnum{2}\hlopt{:}\hlstd{(p}\hlopt{+}\hlnum{1}\hlstd{)]} \hlkwb{<-} \hlkwd{paste}\hlstd{(}\hlstr{"x"}\hlstd{,} \hlnum{1}\hlopt{:}\hlstd{p,} \hlkwc{sep} \hlstd{=} \hlstr{""}\hlstd{)}
     \hlstd{fit} \hlkwb{<-} \hlkwd{glm}\hlstd{(y} \hlopt{~} \hlstd{x1} \hlopt{+} \hlkwd{I}\hlstd{(x1}\hlopt{^}\hlnum{2}\hlstd{)} \hlopt{+} \hlkwd{I}\hlstd{(x1}\hlopt{^}\hlnum{3}\hlstd{),} \hlkwc{family} \hlstd{=} \hlstr{"gaussian"}\hlstd{,}
       \hlkwc{data} \hlstd{= dat,} \hlkwc{x} \hlstd{=} \hlnum{TRUE}\hlstd{,} \hlkwc{y} \hlstd{=} \hlnum{TRUE}\hlstd{)}
-    \hlstd{fit.true} \hlkwb{<-} \hlkwd{glm}\hlstd{(y} \hlopt{~} \hlstd{x,} \hlkwc{family} \hlstd{=} \hlstr{"Gamma"}\hlstd{,}
+    \hlstd{fit.true} \hlkwb{<-} \hlkwd{glm}\hlstd{(y} \hlopt{~} \hlstd{x1,} \hlkwc{family} \hlstd{=} \hlstr{"Gamma"}\hlstd{,}
       \hlkwc{data} \hlstd{= dat,} \hlkwc{x} \hlstd{=} \hlnum{TRUE}\hlstd{,} \hlkwc{y} \hlstd{=} \hlnum{TRUE}\hlstd{)}
     \hlstd{output} \hlkwb{=} \hlkwd{list}\hlstd{(}\hlkwc{model} \hlstd{= fit,} \hlkwc{model.true} \hlstd{= fit.true,} \hlkwc{dat} \hlstd{= dat)}
     \hlstd{output}
@@ -3124,7 +3127,7 @@ Gaussian with a cubic fit.
     \hlstd{model} \hlkwb{<-} \hlstd{obj}\hlopt{$}\hlstd{model}
     \hlstd{dat} \hlkwb{<-} \hlstd{obj}\hlopt{$}\hlstd{dat}
     \hlstd{model}\hlopt{$}\hlstd{data} \hlkwb{<-} \hlstd{dat}
-    \hlstd{x} \hlkwb{<-} \hlstd{model}\hlopt{$}\hlstd{x[,} \hlopt{-}\hlnum{1}\hlstd{]}
+    \hlstd{x} \hlkwb{<-} \hlstd{model}\hlopt{$}\hlstd{x[,} \hlnum{2}\hlstd{]}
     \hlstd{y} \hlkwb{<-} \hlstd{model}\hlopt{$}\hlstd{y}
     \hlstd{p1.tibs} \hlkwb{<-} \hlkwd{conformal.pred}\hlstd{(}\hlkwc{x} \hlstd{=} \hlkwd{cbind}\hlstd{(x,x}\hlopt{^}\hlnum{2}\hlstd{,x}\hlopt{^}\hlnum{3}\hlstd{),} \hlkwc{y} \hlstd{= y,}
       \hlkwc{x0} \hlstd{=} \hlkwd{cbind}\hlstd{(x,x}\hlopt{^}\hlnum{2}\hlstd{,x}\hlopt{^}\hlnum{3}\hlstd{),}
@@ -3158,9 +3161,10 @@ Gaussian with a cubic fit.
     \hlstd{sdMLE} \hlkwb{<-} \hlkwd{summary}\hlstd{(fit.int)}\hlopt{$}\hlstd{sigma}
     \hlstd{meanMLE} \hlkwb{<-} \hlkwd{as.numeric}\hlstd{(}\hlkwd{cbind}\hlstd{(}\hlnum{1}\hlstd{, x, x}\hlopt{^}\hlnum{2}\hlstd{, x}\hlopt{^}\hlnum{3}\hlstd{)} \hlopt{%*%} \hlstd{betaMLE)}
     \hlstd{HDCI} \hlkwb{<-} \hlkwd{do.call}\hlstd{(rbind,} \hlkwd{lapply}\hlstd{(}\hlnum{1}\hlopt{:}\hlstd{n,} \hlkwa{function}\hlstd{(}\hlkwc{j}\hlstd{)\{}
-      \hlkwd{hdi}\hlstd{(qnorm,} \hlnum{1} \hlopt{-} \hlstd{alpha,} \hlkwc{mean} \hlstd{= meanMLE,} \hlkwc{sd} \hlstd{= sdMLE)}
+      \hlkwd{hdi}\hlstd{(qnorm,} \hlnum{1} \hlopt{-} \hlstd{alpha,} \hlkwc{mean} \hlstd{= meanMLE[j],} \hlkwc{sd} \hlstd{= sdMLE)}
     \hlstd{\}))}
 
+    \hlstd{model.true} \hlkwb{<-} \hlstd{obj}\hlopt{$}\hlstd{model.true}
     \hlstd{betaMLE.true} \hlkwb{<-} \hlkwd{coefficients}\hlstd{(model.true)}
     \hlstd{shapeMLE.true} \hlkwb{<-} \hlkwd{as.numeric}\hlstd{(}\hlkwd{gamma.shape}\hlstd{(model.true)[}\hlnum{1}\hlstd{])}
     \hlstd{rateMLE.true} \hlkwb{<-} \hlkwd{cbind}\hlstd{(}\hlnum{1}\hlstd{, x)} \hlopt{%*%} \hlstd{betaMLE.true} \hlopt{*} \hlstd{shapeMLE.true}
@@ -3242,18 +3246,16 @@ when $n = 150$ and shape = $0.75$.
 \hlkwd{system.time}\hlstd{(out.misspec.150.2.0.75} \hlkwb{<-} \hlkwd{do.call}\hlstd{(rbind,}
   \hlkwd{misspec_simulator}\hlstd{(}\hlkwc{beta} \hlstd{= beta,} \hlkwc{n} \hlstd{= n,} \hlkwc{shape} \hlstd{=} \hlnum{0.75}\hlstd{,} \hlkwc{bins} \hlstd{= bins,} \hlkwc{B} \hlstd{= B)))}
 \end{alltt}
-
-
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in chol.default(crossprod(x) + lambda[j] * diag(v)): the leading minor of order 5 is not positive definite}}
-
-{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.887 0.004 0.892}}\begin{alltt}
+\begin{verbatim}
+##      user    system   elapsed 
+## 18259.601   226.217  7293.052
+\end{verbatim}
+\begin{alltt}
 \hlstd{diagnostics.misspec.150.2.0.75} \hlkwb{<-} \hlkwd{do.call}\hlstd{(rbind,} \hlkwd{lapply}\hlstd{(}\hlkwd{split}\hlstd{(out.misspec.150.2.0.75,}
   \hlkwc{f} \hlstd{=} \hlkwd{as.factor}\hlstd{(}\hlkwd{rownames}\hlstd{(out.misspec.150.2.0.75))),}
   \hlkwc{FUN} \hlstd{=} \hlkwa{function}\hlstd{(}\hlkwc{xx}\hlstd{)} \hlkwd{colMeans}\hlstd{(}\hlkwd{matrix}\hlstd{(xx,} \hlkwc{nrow} \hlstd{= B),} \hlkwc{na.rm} \hlstd{=} \hlnum{TRUE}\hlstd{)))}
 \end{alltt}
-
-
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in split(out.misspec.150.2.0.75, f = as.factor(rownames(out.misspec.150.2.0.75))): object 'out.misspec.150.2.0.75' not found}}\end{kframe}
+\end{kframe}
 \end{knitrout}
 
 
@@ -3267,18 +3269,16 @@ when $n = 150$ and shape = $1$.
 \hlkwd{system.time}\hlstd{(out.misspec.150.2.1} \hlkwb{<-} \hlkwd{do.call}\hlstd{(rbind,}
   \hlkwd{misspec_simulator}\hlstd{(}\hlkwc{beta} \hlstd{= beta,} \hlkwc{n} \hlstd{= n,} \hlkwc{shape} \hlstd{=} \hlnum{1}\hlstd{,} \hlkwc{bins} \hlstd{= bins,} \hlkwc{B} \hlstd{= B)))}
 \end{alltt}
-
-
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in chol.default(crossprod(x) + lambda[j] * diag(v)): the leading minor of order 5 is not positive definite}}
-
-{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.798 0 0.798}}\begin{alltt}
+\begin{verbatim}
+##      user    system   elapsed 
+## 17689.076   216.942  7207.307
+\end{verbatim}
+\begin{alltt}
 \hlstd{diagnostics.misspec.150.2.1} \hlkwb{<-} \hlkwd{do.call}\hlstd{(rbind,} \hlkwd{lapply}\hlstd{(}\hlkwd{split}\hlstd{(out.misspec.150.2.1,}
   \hlkwc{f} \hlstd{=} \hlkwd{as.factor}\hlstd{(}\hlkwd{rownames}\hlstd{(out.misspec.150.2.1))),}
   \hlkwc{FUN} \hlstd{=} \hlkwa{function}\hlstd{(}\hlkwc{xx}\hlstd{)} \hlkwd{colMeans}\hlstd{(}\hlkwd{matrix}\hlstd{(xx,} \hlkwc{nrow} \hlstd{= B),} \hlkwc{na.rm} \hlstd{=} \hlnum{TRUE}\hlstd{)))}
 \end{alltt}
-
-
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in split(out.misspec.150.2.1, f = as.factor(rownames(out.misspec.150.2.1))): object 'out.misspec.150.2.1' not found}}\end{kframe}
+\end{kframe}
 \end{knitrout}
 
 
@@ -3292,18 +3292,16 @@ when $n = 150$ and shape = $2$.
 \hlkwd{system.time}\hlstd{(out.misspec.150.2.2} \hlkwb{<-} \hlkwd{do.call}\hlstd{(rbind,}
   \hlkwd{misspec_simulator}\hlstd{(}\hlkwc{beta} \hlstd{= beta,} \hlkwc{n} \hlstd{= n,} \hlkwc{shape} \hlstd{=} \hlnum{2}\hlstd{,} \hlkwc{bins} \hlstd{= bins,} \hlkwc{B} \hlstd{= B)))}
 \end{alltt}
-
-
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in chol.default(crossprod(x) + lambda[j] * diag(v)): the leading minor of order 5 is not positive definite}}
-
-{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.698 0 0.698}}\begin{alltt}
+\begin{verbatim}
+##      user    system   elapsed 
+## 17933.057   248.811  7260.141
+\end{verbatim}
+\begin{alltt}
 \hlstd{diagnostics.misspec.150.2.2} \hlkwb{<-} \hlkwd{do.call}\hlstd{(rbind,} \hlkwd{lapply}\hlstd{(}\hlkwd{split}\hlstd{(out.misspec.150.2.2,}
   \hlkwc{f} \hlstd{=} \hlkwd{as.factor}\hlstd{(}\hlkwd{rownames}\hlstd{(out.misspec.150.2.2))),}
   \hlkwc{FUN} \hlstd{=} \hlkwa{function}\hlstd{(}\hlkwc{xx}\hlstd{)} \hlkwd{colMeans}\hlstd{(}\hlkwd{matrix}\hlstd{(xx,} \hlkwc{nrow} \hlstd{= B),} \hlkwc{na.rm} \hlstd{=} \hlnum{TRUE}\hlstd{)))}
 \end{alltt}
-
-
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in split(out.misspec.150.2.2, f = as.factor(rownames(out.misspec.150.2.2))): object 'out.misspec.150.2.2' not found}}\end{kframe}
+\end{kframe}
 \end{knitrout}
 
 
@@ -3317,18 +3315,16 @@ when $n = 150$ and shape = $5$.
 \hlkwd{system.time}\hlstd{(out.misspec.150.2.5} \hlkwb{<-} \hlkwd{do.call}\hlstd{(rbind,}
   \hlkwd{misspec_simulator}\hlstd{(}\hlkwc{beta} \hlstd{= beta,} \hlkwc{n} \hlstd{= n,} \hlkwc{shape} \hlstd{=} \hlnum{5}\hlstd{,} \hlkwc{bins} \hlstd{= bins,} \hlkwc{B} \hlstd{= B)))}
 \end{alltt}
-
-
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in chol.default(crossprod(x) + lambda[j] * diag(v)): the leading minor of order 5 is not positive definite}}
-
-{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.667 0 0.667}}\begin{alltt}
+\begin{verbatim}
+##      user    system   elapsed 
+## 17262.546   226.816  7170.114
+\end{verbatim}
+\begin{alltt}
 \hlstd{diagnostics.misspec.150.2.5} \hlkwb{<-} \hlkwd{do.call}\hlstd{(rbind,} \hlkwd{lapply}\hlstd{(}\hlkwd{split}\hlstd{(out.misspec.150.2.5,}
   \hlkwc{f} \hlstd{=} \hlkwd{as.factor}\hlstd{(}\hlkwd{rownames}\hlstd{(out.misspec.150.2.5))),}
   \hlkwc{FUN} \hlstd{=} \hlkwa{function}\hlstd{(}\hlkwc{xx}\hlstd{)} \hlkwd{colMeans}\hlstd{(}\hlkwd{matrix}\hlstd{(xx,} \hlkwc{nrow} \hlstd{= B),} \hlkwc{na.rm} \hlstd{=} \hlnum{TRUE}\hlstd{)))}
 \end{alltt}
-
-
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in split(out.misspec.150.2.5, f = as.factor(rownames(out.misspec.150.2.5))): object 'out.misspec.150.2.5' not found}}\end{kframe}
+\end{kframe}
 \end{knitrout}
 
 
@@ -3342,18 +3338,16 @@ when $n = 150$ and shape = $7$.
 \hlkwd{system.time}\hlstd{(out.misspec.150.2.7} \hlkwb{<-} \hlkwd{do.call}\hlstd{(rbind,}
   \hlkwd{misspec_simulator}\hlstd{(}\hlkwc{beta} \hlstd{= beta,} \hlkwc{n} \hlstd{= n,} \hlkwc{shape} \hlstd{=} \hlnum{7}\hlstd{,} \hlkwc{bins} \hlstd{= bins,} \hlkwc{B} \hlstd{= B)))}
 \end{alltt}
-
-
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in chol.default(crossprod(x) + lambda[j] * diag(v)): the leading minor of order 5 is not positive definite}}
-
-{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.764 0 0.763}}\begin{alltt}
+\begin{verbatim}
+##      user    system   elapsed 
+## 16908.723   228.178  7103.159
+\end{verbatim}
+\begin{alltt}
 \hlstd{diagnostics.misspec.150.2.7} \hlkwb{<-} \hlkwd{do.call}\hlstd{(rbind,} \hlkwd{lapply}\hlstd{(}\hlkwd{split}\hlstd{(out.misspec.150.2.7,}
   \hlkwc{f} \hlstd{=} \hlkwd{as.factor}\hlstd{(}\hlkwd{rownames}\hlstd{(out.misspec.150.2.7))),}
   \hlkwc{FUN} \hlstd{=} \hlkwa{function}\hlstd{(}\hlkwc{xx}\hlstd{)} \hlkwd{colMeans}\hlstd{(}\hlkwd{matrix}\hlstd{(xx,} \hlkwc{nrow} \hlstd{= B),} \hlkwc{na.rm} \hlstd{=} \hlnum{TRUE}\hlstd{)))}
 \end{alltt}
-
-
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in split(out.misspec.150.2.7, f = as.factor(rownames(out.misspec.150.2.7))): object 'out.misspec.150.2.7' not found}}\end{kframe}
+\end{kframe}
 \end{knitrout}
 
 
@@ -3367,18 +3361,16 @@ when $n = 150$ and shape = $10$.
 \hlkwd{system.time}\hlstd{(out.misspec.150.2.10} \hlkwb{<-} \hlkwd{do.call}\hlstd{(rbind,}
   \hlkwd{misspec_simulator}\hlstd{(}\hlkwc{beta} \hlstd{= beta,} \hlkwc{n} \hlstd{= n,} \hlkwc{shape} \hlstd{=} \hlnum{10}\hlstd{,} \hlkwc{bins} \hlstd{= bins,} \hlkwc{B} \hlstd{= B)))}
 \end{alltt}
-
-
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in chol.default(crossprod(x) + lambda[j] * diag(v)): the leading minor of order 5 is not positive definite}}
-
-{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.692 0 0.692}}\begin{alltt}
+\begin{verbatim}
+##      user    system   elapsed 
+## 16080.013   234.080  6976.448
+\end{verbatim}
+\begin{alltt}
 \hlstd{diagnostics.misspec.150.2.10} \hlkwb{<-} \hlkwd{do.call}\hlstd{(rbind,} \hlkwd{lapply}\hlstd{(}\hlkwd{split}\hlstd{(out.misspec.150.2.10,}
   \hlkwc{f} \hlstd{=} \hlkwd{as.factor}\hlstd{(}\hlkwd{rownames}\hlstd{(out.misspec.150.2.10))),}
   \hlkwc{FUN} \hlstd{=} \hlkwa{function}\hlstd{(}\hlkwc{xx}\hlstd{)} \hlkwd{colMeans}\hlstd{(}\hlkwd{matrix}\hlstd{(xx,} \hlkwc{nrow} \hlstd{= B),} \hlkwc{na.rm} \hlstd{=} \hlnum{TRUE}\hlstd{)))}
 \end{alltt}
-
-
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in split(out.misspec.150.2.10, f = as.factor(rownames(out.misspec.150.2.10))): object 'out.misspec.150.2.10' not found}}\end{kframe}
+\end{kframe}
 \end{knitrout}
 
 
@@ -3392,18 +3384,16 @@ when $n = 150$ and shape = $12$.
 \hlkwd{system.time}\hlstd{(out.misspec.150.2.12} \hlkwb{<-} \hlkwd{do.call}\hlstd{(rbind,}
   \hlkwd{misspec_simulator}\hlstd{(}\hlkwc{beta} \hlstd{= beta,} \hlkwc{n} \hlstd{= n,} \hlkwc{shape} \hlstd{=} \hlnum{12}\hlstd{,} \hlkwc{bins} \hlstd{= bins,} \hlkwc{B} \hlstd{= B)))}
 \end{alltt}
-
-
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in chol.default(crossprod(x) + lambda[j] * diag(v)): the leading minor of order 5 is not positive definite}}
-
-{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.671 0 0.671}}\begin{alltt}
+\begin{verbatim}
+##      user    system   elapsed 
+## 15762.621   228.348  6916.090
+\end{verbatim}
+\begin{alltt}
 \hlstd{diagnostics.misspec.150.2.12} \hlkwb{<-} \hlkwd{do.call}\hlstd{(rbind,} \hlkwd{lapply}\hlstd{(}\hlkwd{split}\hlstd{(out.misspec.150.2.12,}
   \hlkwc{f} \hlstd{=} \hlkwd{as.factor}\hlstd{(}\hlkwd{rownames}\hlstd{(out.misspec.150.2.12))),}
   \hlkwc{FUN} \hlstd{=} \hlkwa{function}\hlstd{(}\hlkwc{xx}\hlstd{)} \hlkwd{colMeans}\hlstd{(}\hlkwd{matrix}\hlstd{(xx,} \hlkwc{nrow} \hlstd{= B),} \hlkwc{na.rm} \hlstd{=} \hlnum{TRUE}\hlstd{)))}
 \end{alltt}
-
-
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in split(out.misspec.150.2.12, f = as.factor(rownames(out.misspec.150.2.12))): object 'out.misspec.150.2.12' not found}}\end{kframe}
+\end{kframe}
 \end{knitrout}
 
 
@@ -3417,18 +3407,16 @@ when $n = 150$ and shape = $15$.
 \hlkwd{system.time}\hlstd{(out.misspec.150.2.15} \hlkwb{<-} \hlkwd{do.call}\hlstd{(rbind,}
   \hlkwd{misspec_simulator}\hlstd{(}\hlkwc{beta} \hlstd{= beta,} \hlkwc{n} \hlstd{= n,} \hlkwc{shape} \hlstd{=} \hlnum{15}\hlstd{,} \hlkwc{bins} \hlstd{= bins,} \hlkwc{B} \hlstd{= B)))}
 \end{alltt}
-
-
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in chol.default(crossprod(x) + lambda[j] * diag(v)): the leading minor of order 5 is not positive definite}}
-
-{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.65 0 0.65}}\begin{alltt}
+\begin{verbatim}
+##      user    system   elapsed 
+## 15217.193   228.904  6822.536
+\end{verbatim}
+\begin{alltt}
 \hlstd{diagnostics.misspec.150.2.15} \hlkwb{<-} \hlkwd{do.call}\hlstd{(rbind,} \hlkwd{lapply}\hlstd{(}\hlkwd{split}\hlstd{(out.misspec.150.2.15,}
   \hlkwc{f} \hlstd{=} \hlkwd{as.factor}\hlstd{(}\hlkwd{rownames}\hlstd{(out.misspec.150.2.15))),}
   \hlkwc{FUN} \hlstd{=} \hlkwa{function}\hlstd{(}\hlkwc{xx}\hlstd{)} \hlkwd{colMeans}\hlstd{(}\hlkwd{matrix}\hlstd{(xx,} \hlkwc{nrow} \hlstd{= B),} \hlkwc{na.rm} \hlstd{=} \hlnum{TRUE}\hlstd{)))}
 \end{alltt}
-
-
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in split(out.misspec.150.2.15, f = as.factor(rownames(out.misspec.150.2.15))): object 'out.misspec.150.2.15' not found}}\end{kframe}
+\end{kframe}
 \end{knitrout}
 
 
@@ -3442,18 +3430,16 @@ when $n = 150$ and shape = $20$.
 \hlkwd{system.time}\hlstd{(out.misspec.150.2.20} \hlkwb{<-} \hlkwd{do.call}\hlstd{(rbind,}
   \hlkwd{misspec_simulator}\hlstd{(}\hlkwc{beta} \hlstd{= beta,} \hlkwc{n} \hlstd{= n,} \hlkwc{shape} \hlstd{=} \hlnum{20}\hlstd{,} \hlkwc{bins} \hlstd{= bins,} \hlkwc{B} \hlstd{= B)))}
 \end{alltt}
-
-
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in chol.default(crossprod(x) + lambda[j] * diag(v)): the leading minor of order 5 is not positive definite}}
-
-{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.665 0 0.665}}\begin{alltt}
+\begin{verbatim}
+##      user    system   elapsed 
+## 14663.431   237.032  6714.321
+\end{verbatim}
+\begin{alltt}
 \hlstd{diagnostics.misspec.150.2.20} \hlkwb{<-} \hlkwd{do.call}\hlstd{(rbind,} \hlkwd{lapply}\hlstd{(}\hlkwd{split}\hlstd{(out.misspec.150.2.20,}
   \hlkwc{f} \hlstd{=} \hlkwd{as.factor}\hlstd{(}\hlkwd{rownames}\hlstd{(out.misspec.150.2.20))),}
   \hlkwc{FUN} \hlstd{=} \hlkwa{function}\hlstd{(}\hlkwc{xx}\hlstd{)} \hlkwd{colMeans}\hlstd{(}\hlkwd{matrix}\hlstd{(xx,} \hlkwc{nrow} \hlstd{= B),} \hlkwc{na.rm} \hlstd{=} \hlnum{TRUE}\hlstd{)))}
 \end{alltt}
-
-
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in split(out.misspec.150.2.20, f = as.factor(rownames(out.misspec.150.2.20))): object 'out.misspec.150.2.20' not found}}\end{kframe}
+\end{kframe}
 \end{knitrout}
 
 
@@ -3467,18 +3453,16 @@ when $n = 150$ and shape = $25$.
 \hlkwd{system.time}\hlstd{(out.misspec.150.2.25} \hlkwb{<-} \hlkwd{do.call}\hlstd{(rbind,}
   \hlkwd{misspec_simulator}\hlstd{(}\hlkwc{beta} \hlstd{= beta,} \hlkwc{n} \hlstd{= n,} \hlkwc{shape} \hlstd{=} \hlnum{25}\hlstd{,} \hlkwc{bins} \hlstd{= bins,} \hlkwc{B} \hlstd{= B)))}
 \end{alltt}
-
-
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in chol.default(crossprod(x) + lambda[j] * diag(v)): the leading minor of order 5 is not positive definite}}
-
-{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.654 0 0.654}}\begin{alltt}
+\begin{verbatim}
+##      user    system   elapsed 
+## 14312.506   235.725  6677.914
+\end{verbatim}
+\begin{alltt}
 \hlstd{diagnostics.misspec.150.2.25} \hlkwb{<-} \hlkwd{do.call}\hlstd{(rbind,} \hlkwd{lapply}\hlstd{(}\hlkwd{split}\hlstd{(out.misspec.150.2.25,}
   \hlkwc{f} \hlstd{=} \hlkwd{as.factor}\hlstd{(}\hlkwd{rownames}\hlstd{(out.misspec.150.2.25))),}
   \hlkwc{FUN} \hlstd{=} \hlkwa{function}\hlstd{(}\hlkwc{xx}\hlstd{)} \hlkwd{colMeans}\hlstd{(}\hlkwd{matrix}\hlstd{(xx,} \hlkwc{nrow} \hlstd{= B),} \hlkwc{na.rm} \hlstd{=} \hlnum{TRUE}\hlstd{)))}
 \end{alltt}
-
-
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in split(out.misspec.150.2.25, f = as.factor(rownames(out.misspec.150.2.25))): object 'out.misspec.150.2.25' not found}}\end{kframe}
+\end{kframe}
 \end{knitrout}
 
 
@@ -3492,18 +3476,16 @@ when $n = 150$ and shape = $30$.
 \hlkwd{system.time}\hlstd{(out.misspec.150.2.30} \hlkwb{<-} \hlkwd{do.call}\hlstd{(rbind,}
   \hlkwd{misspec_simulator}\hlstd{(}\hlkwc{beta} \hlstd{= beta,} \hlkwc{n} \hlstd{= n,} \hlkwc{shape} \hlstd{=} \hlnum{30}\hlstd{,} \hlkwc{bins} \hlstd{= bins,} \hlkwc{B} \hlstd{= B)))}
 \end{alltt}
-
-
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in chol.default(crossprod(x) + lambda[j] * diag(v)): the leading minor of order 5 is not positive definite}}
-
-{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.656 0 0.656}}\begin{alltt}
+\begin{verbatim}
+##      user    system   elapsed 
+## 13891.022   235.349  6594.836
+\end{verbatim}
+\begin{alltt}
 \hlstd{diagnostics.misspec.150.2.30} \hlkwb{<-} \hlkwd{do.call}\hlstd{(rbind,} \hlkwd{lapply}\hlstd{(}\hlkwd{split}\hlstd{(out.misspec.150.2.30,}
   \hlkwc{f} \hlstd{=} \hlkwd{as.factor}\hlstd{(}\hlkwd{rownames}\hlstd{(out.misspec.150.2.30))),}
   \hlkwc{FUN} \hlstd{=} \hlkwa{function}\hlstd{(}\hlkwc{xx}\hlstd{)} \hlkwd{colMeans}\hlstd{(}\hlkwd{matrix}\hlstd{(xx,} \hlkwc{nrow} \hlstd{= B),} \hlkwc{na.rm} \hlstd{=} \hlnum{TRUE}\hlstd{)))}
 \end{alltt}
-
-
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in split(out.misspec.150.2.30, f = as.factor(rownames(out.misspec.150.2.30))): object 'out.misspec.150.2.30' not found}}\end{kframe}
+\end{kframe}
 \end{knitrout}
 
 
@@ -3517,18 +3499,16 @@ when $n = 150$ and shape = $40$.
 \hlkwd{system.time}\hlstd{(out.misspec.150.2.40} \hlkwb{<-} \hlkwd{do.call}\hlstd{(rbind,}
   \hlkwd{misspec_simulator}\hlstd{(}\hlkwc{beta} \hlstd{= beta,} \hlkwc{n} \hlstd{= n,} \hlkwc{shape} \hlstd{=} \hlnum{40}\hlstd{,} \hlkwc{bins} \hlstd{= bins,} \hlkwc{B} \hlstd{= B)))}
 \end{alltt}
-
-
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in chol.default(crossprod(x) + lambda[j] * diag(v)): the leading minor of order 5 is not positive definite}}
-
-{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.67 0 0.67}}\begin{alltt}
+\begin{verbatim}
+##      user    system   elapsed 
+## 13715.377   236.239  6588.388
+\end{verbatim}
+\begin{alltt}
 \hlstd{diagnostics.misspec.150.2.40} \hlkwb{<-} \hlkwd{do.call}\hlstd{(rbind,} \hlkwd{lapply}\hlstd{(}\hlkwd{split}\hlstd{(out.misspec.150.2.40,}
   \hlkwc{f} \hlstd{=} \hlkwd{as.factor}\hlstd{(}\hlkwd{rownames}\hlstd{(out.misspec.150.2.40))),}
   \hlkwc{FUN} \hlstd{=} \hlkwa{function}\hlstd{(}\hlkwc{xx}\hlstd{)} \hlkwd{colMeans}\hlstd{(}\hlkwd{matrix}\hlstd{(xx,} \hlkwc{nrow} \hlstd{= B),} \hlkwc{na.rm} \hlstd{=} \hlnum{TRUE}\hlstd{)))}
 \end{alltt}
-
-
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in split(out.misspec.150.2.40, f = as.factor(rownames(out.misspec.150.2.40))): object 'out.misspec.150.2.40' not found}}\end{kframe}
+\end{kframe}
 \end{knitrout}
 
 
@@ -3542,18 +3522,16 @@ when $n = 150$ and shape = $50$.
 \hlkwd{system.time}\hlstd{(out.misspec.150.2.50} \hlkwb{<-} \hlkwd{do.call}\hlstd{(rbind,}
   \hlkwd{misspec_simulator}\hlstd{(}\hlkwc{beta} \hlstd{= beta,} \hlkwc{n} \hlstd{= n,} \hlkwc{shape} \hlstd{=} \hlnum{50}\hlstd{,} \hlkwc{bins} \hlstd{= bins,} \hlkwc{B} \hlstd{= B)))}
 \end{alltt}
-
-
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in chol.default(crossprod(x) + lambda[j] * diag(v)): the leading minor of order 5 is not positive definite}}
-
-{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.716 0 0.716}}\begin{alltt}
+\begin{verbatim}
+##      user    system   elapsed 
+## 13154.245   235.327  6484.792
+\end{verbatim}
+\begin{alltt}
 \hlstd{diagnostics.misspec.150.2.50} \hlkwb{<-} \hlkwd{do.call}\hlstd{(rbind,} \hlkwd{lapply}\hlstd{(}\hlkwd{split}\hlstd{(out.misspec.150.2.50,}
   \hlkwc{f} \hlstd{=} \hlkwd{as.factor}\hlstd{(}\hlkwd{rownames}\hlstd{(out.misspec.150.2.50))),}
   \hlkwc{FUN} \hlstd{=} \hlkwa{function}\hlstd{(}\hlkwc{xx}\hlstd{)} \hlkwd{colMeans}\hlstd{(}\hlkwd{matrix}\hlstd{(xx,} \hlkwc{nrow} \hlstd{= B),} \hlkwc{na.rm} \hlstd{=} \hlnum{TRUE}\hlstd{)))}
 \end{alltt}
-
-
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in split(out.misspec.150.2.50, f = as.factor(rownames(out.misspec.150.2.50))): object 'out.misspec.150.2.50' not found}}\end{kframe}
+\end{kframe}
 \end{knitrout}
 
 
@@ -3567,18 +3545,16 @@ when $n = 150$ and shape = $60$.
 \hlkwd{system.time}\hlstd{(out.misspec.150.2.60} \hlkwb{<-} \hlkwd{do.call}\hlstd{(rbind,}
   \hlkwd{misspec_simulator}\hlstd{(}\hlkwc{beta} \hlstd{= beta,} \hlkwc{n} \hlstd{= n,} \hlkwc{shape} \hlstd{=} \hlnum{60}\hlstd{,} \hlkwc{bins} \hlstd{= bins,} \hlkwc{B} \hlstd{= B)))}
 \end{alltt}
-
-
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in chol.default(crossprod(x) + lambda[j] * diag(v)): the leading minor of order 5 is not positive definite}}
-
-{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.717 0 0.717}}\begin{alltt}
+\begin{verbatim}
+##      user    system   elapsed 
+## 13018.596   233.423  6467.037
+\end{verbatim}
+\begin{alltt}
 \hlstd{diagnostics.misspec.150.2.60} \hlkwb{<-} \hlkwd{do.call}\hlstd{(rbind,} \hlkwd{lapply}\hlstd{(}\hlkwd{split}\hlstd{(out.misspec.150.2.60,}
   \hlkwc{f} \hlstd{=} \hlkwd{as.factor}\hlstd{(}\hlkwd{rownames}\hlstd{(out.misspec.150.2.60))),}
   \hlkwc{FUN} \hlstd{=} \hlkwa{function}\hlstd{(}\hlkwc{xx}\hlstd{)} \hlkwd{colMeans}\hlstd{(}\hlkwd{matrix}\hlstd{(xx,} \hlkwc{nrow} \hlstd{= B),} \hlkwc{na.rm} \hlstd{=} \hlnum{TRUE}\hlstd{)))}
 \end{alltt}
-
-
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in split(out.misspec.150.2.60, f = as.factor(rownames(out.misspec.150.2.60))): object 'out.misspec.150.2.60' not found}}\end{kframe}
+\end{kframe}
 \end{knitrout}
 
 
@@ -3592,18 +3568,16 @@ when $n = 150$ and shape = $70$.
 \hlkwd{system.time}\hlstd{(out.misspec.150.2.70} \hlkwb{<-} \hlkwd{do.call}\hlstd{(rbind,}
   \hlkwd{misspec_simulator}\hlstd{(}\hlkwc{beta} \hlstd{= beta,} \hlkwc{n} \hlstd{= n,} \hlkwc{shape} \hlstd{=} \hlnum{70}\hlstd{,} \hlkwc{bins} \hlstd{= bins,} \hlkwc{B} \hlstd{= B)))}
 \end{alltt}
-
-
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in chol.default(crossprod(x) + lambda[j] * diag(v)): the leading minor of order 5 is not positive definite}}
-
-{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.702 0 0.702}}\begin{alltt}
+\begin{verbatim}
+##      user    system   elapsed 
+## 12909.234   236.603  6450.357
+\end{verbatim}
+\begin{alltt}
 \hlstd{diagnostics.misspec.150.2.70} \hlkwb{<-} \hlkwd{do.call}\hlstd{(rbind,} \hlkwd{lapply}\hlstd{(}\hlkwd{split}\hlstd{(out.misspec.150.2.70,}
   \hlkwc{f} \hlstd{=} \hlkwd{as.factor}\hlstd{(}\hlkwd{rownames}\hlstd{(out.misspec.150.2.70))),}
   \hlkwc{FUN} \hlstd{=} \hlkwa{function}\hlstd{(}\hlkwc{xx}\hlstd{)} \hlkwd{colMeans}\hlstd{(}\hlkwd{matrix}\hlstd{(xx,} \hlkwc{nrow} \hlstd{= B),} \hlkwc{na.rm} \hlstd{=} \hlnum{TRUE}\hlstd{)))}
 \end{alltt}
-
-
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in split(out.misspec.150.2.70, f = as.factor(rownames(out.misspec.150.2.70))): object 'out.misspec.150.2.70' not found}}\end{kframe}
+\end{kframe}
 \end{knitrout}
 
 
@@ -3617,18 +3591,16 @@ when $n = 150$ and shape = $80$.
 \hlkwd{system.time}\hlstd{(out.misspec.150.2.80} \hlkwb{<-} \hlkwd{do.call}\hlstd{(rbind,}
   \hlkwd{misspec_simulator}\hlstd{(}\hlkwc{beta} \hlstd{= beta,} \hlkwc{n} \hlstd{= n,} \hlkwc{shape} \hlstd{=} \hlnum{80}\hlstd{,} \hlkwc{bins} \hlstd{= bins,} \hlkwc{B} \hlstd{= B)))}
 \end{alltt}
-
-
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in chol.default(crossprod(x) + lambda[j] * diag(v)): the leading minor of order 5 is not positive definite}}
-
-{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.712 0 0.712}}\begin{alltt}
+\begin{verbatim}
+##      user    system   elapsed 
+## 12670.099   236.189  6424.075
+\end{verbatim}
+\begin{alltt}
 \hlstd{diagnostics.misspec.150.2.80} \hlkwb{<-} \hlkwd{do.call}\hlstd{(rbind,} \hlkwd{lapply}\hlstd{(}\hlkwd{split}\hlstd{(out.misspec.150.2.80,}
   \hlkwc{f} \hlstd{=} \hlkwd{as.factor}\hlstd{(}\hlkwd{rownames}\hlstd{(out.misspec.150.2.80))),}
   \hlkwc{FUN} \hlstd{=} \hlkwa{function}\hlstd{(}\hlkwc{xx}\hlstd{)} \hlkwd{colMeans}\hlstd{(}\hlkwd{matrix}\hlstd{(xx,} \hlkwc{nrow} \hlstd{= B),} \hlkwc{na.rm} \hlstd{=} \hlnum{TRUE}\hlstd{)))}
 \end{alltt}
-
-
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in split(out.misspec.150.2.80, f = as.factor(rownames(out.misspec.150.2.80))): object 'out.misspec.150.2.80' not found}}\end{kframe}
+\end{kframe}
 \end{knitrout}
 
 
@@ -3642,18 +3614,16 @@ when $n = 150$ and shape = $90$.
 \hlkwd{system.time}\hlstd{(out.misspec.150.2.90} \hlkwb{<-} \hlkwd{do.call}\hlstd{(rbind,}
   \hlkwd{misspec_simulator}\hlstd{(}\hlkwc{beta} \hlstd{= beta,} \hlkwc{n} \hlstd{= n,} \hlkwc{shape} \hlstd{=} \hlnum{40}\hlstd{,} \hlkwc{bins} \hlstd{= bins,} \hlkwc{B} \hlstd{= B)))}
 \end{alltt}
-
-
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in chol.default(crossprod(x) + lambda[j] * diag(v)): the leading minor of order 5 is not positive definite}}
-
-{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.72 0 0.719}}\begin{alltt}
+\begin{verbatim}
+##      user    system   elapsed 
+## 13714.205   237.114  6587.412
+\end{verbatim}
+\begin{alltt}
 \hlstd{diagnostics.misspec.150.2.90} \hlkwb{<-} \hlkwd{do.call}\hlstd{(rbind,} \hlkwd{lapply}\hlstd{(}\hlkwd{split}\hlstd{(out.misspec.150.2.90,}
   \hlkwc{f} \hlstd{=} \hlkwd{as.factor}\hlstd{(}\hlkwd{rownames}\hlstd{(out.misspec.150.2.90))),}
   \hlkwc{FUN} \hlstd{=} \hlkwa{function}\hlstd{(}\hlkwc{xx}\hlstd{)} \hlkwd{colMeans}\hlstd{(}\hlkwd{matrix}\hlstd{(xx,} \hlkwc{nrow} \hlstd{= B),} \hlkwc{na.rm} \hlstd{=} \hlnum{TRUE}\hlstd{)))}
 \end{alltt}
-
-
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in split(out.misspec.150.2.90, f = as.factor(rownames(out.misspec.150.2.90))): object 'out.misspec.150.2.90' not found}}\end{kframe}
+\end{kframe}
 \end{knitrout}
 
 
@@ -3667,29 +3637,22 @@ when $n = 150$ and shape = $100$.
 \hlkwd{system.time}\hlstd{(out.misspec.150.2.100} \hlkwb{<-} \hlkwd{do.call}\hlstd{(rbind,}
   \hlkwd{misspec_simulator}\hlstd{(}\hlkwc{beta} \hlstd{= beta,} \hlkwc{n} \hlstd{= n,} \hlkwc{shape} \hlstd{=} \hlnum{100}\hlstd{,} \hlkwc{bins} \hlstd{= bins,} \hlkwc{B} \hlstd{= B)))}
 \end{alltt}
-
-
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in chol.default(crossprod(x) + lambda[j] * diag(v)): the leading minor of order 5 is not positive definite}}
-
-{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.673 0 0.672}}\begin{alltt}
+\begin{verbatim}
+##      user    system   elapsed 
+## 12357.275   236.284  6369.125
+\end{verbatim}
+\begin{alltt}
 \hlstd{diagnostics.misspec.150.2.100} \hlkwb{<-} \hlkwd{do.call}\hlstd{(rbind,} \hlkwd{lapply}\hlstd{(}\hlkwd{split}\hlstd{(out.misspec.150.2.100,}
   \hlkwc{f} \hlstd{=} \hlkwd{as.factor}\hlstd{(}\hlkwd{rownames}\hlstd{(out.misspec.150.2.100))),}
   \hlkwc{FUN} \hlstd{=} \hlkwa{function}\hlstd{(}\hlkwc{xx}\hlstd{)} \hlkwd{colMeans}\hlstd{(}\hlkwd{matrix}\hlstd{(xx,} \hlkwc{nrow} \hlstd{= B),} \hlkwc{na.rm} \hlstd{=} \hlnum{TRUE}\hlstd{)))}
 \end{alltt}
-
-
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in split(out.misspec.150.2.100, f = as.factor(rownames(out.misspec.150.2.100))): object 'out.misspec.150.2.100' not found}}\end{kframe}
+\end{kframe}
 \end{knitrout}
 
 
 %Reorganize the output.
 
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 
-
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(parse(text = paste("{}diagnostics.misspec.150.2"{}, j, sep = "{}."{}))): object 'diagnostics.misspec.150.2.0.75' not found}}\end{kframe}
-\end{knitrout}
 
 
 %% n = 250
@@ -3706,18 +3669,16 @@ when $n = 250$ and shape = $5$.
 \hlkwd{system.time}\hlstd{(out.misspec.250.3.5} \hlkwb{<-} \hlkwd{do.call}\hlstd{(rbind,}
   \hlkwd{misspec_simulator}\hlstd{(}\hlkwc{beta} \hlstd{= beta,} \hlkwc{n} \hlstd{= n,} \hlkwc{shape} \hlstd{=} \hlnum{5}\hlstd{,} \hlkwc{bins} \hlstd{= bins,} \hlkwc{B} \hlstd{= B)))}
 \end{alltt}
-
-
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in chol.default(crossprod(x) + lambda[j] * diag(v)): the leading minor of order 5 is not positive definite}}
-
-{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.199 0 0.2}}\begin{alltt}
+\begin{verbatim}
+##     user   system  elapsed 
+## 7517.093   65.385 3219.572
+\end{verbatim}
+\begin{alltt}
 \hlstd{diagnostics.misspec.250.3.5} \hlkwb{<-} \hlkwd{do.call}\hlstd{(rbind,} \hlkwd{lapply}\hlstd{(}\hlkwd{split}\hlstd{(out.misspec.250.3.5,}
   \hlkwc{f} \hlstd{=} \hlkwd{as.factor}\hlstd{(}\hlkwd{rownames}\hlstd{(out.misspec.250.3.5))),}
   \hlkwc{FUN} \hlstd{=} \hlkwa{function}\hlstd{(}\hlkwc{xx}\hlstd{)} \hlkwd{colMeans}\hlstd{(}\hlkwd{matrix}\hlstd{(xx,} \hlkwc{nrow} \hlstd{= B),} \hlkwc{na.rm} \hlstd{=} \hlnum{TRUE}\hlstd{)))}
 \end{alltt}
-
-
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in split(out.misspec.250.3.5, f = as.factor(rownames(out.misspec.250.3.5))): object 'out.misspec.250.3.5' not found}}\end{kframe}
+\end{kframe}
 \end{knitrout}
 
 
@@ -3731,18 +3692,16 @@ when $n = 250$ and shape = $20$.
 \hlkwd{system.time}\hlstd{(out.misspec.250.3.20} \hlkwb{<-} \hlkwd{do.call}\hlstd{(rbind,}
   \hlkwd{misspec_simulator}\hlstd{(}\hlkwc{beta} \hlstd{= beta,} \hlkwc{n} \hlstd{= n,} \hlkwc{shape} \hlstd{=} \hlnum{20}\hlstd{,} \hlkwc{bins} \hlstd{= bins,} \hlkwc{B} \hlstd{= B)))}
 \end{alltt}
-
-
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in chol.default(crossprod(x) + lambda[j] * diag(v)): the leading minor of order 5 is not positive definite}}
-
-{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.178 0 0.179}}\begin{alltt}
+\begin{verbatim}
+##     user   system  elapsed 
+## 6559.878   65.129 3072.853
+\end{verbatim}
+\begin{alltt}
 \hlstd{diagnostics.misspec.250.3.20} \hlkwb{<-} \hlkwd{do.call}\hlstd{(rbind,} \hlkwd{lapply}\hlstd{(}\hlkwd{split}\hlstd{(out.misspec.250.3.20,}
   \hlkwc{f} \hlstd{=} \hlkwd{as.factor}\hlstd{(}\hlkwd{rownames}\hlstd{(out.misspec.250.3.20))),}
   \hlkwc{FUN} \hlstd{=} \hlkwa{function}\hlstd{(}\hlkwc{xx}\hlstd{)} \hlkwd{colMeans}\hlstd{(}\hlkwd{matrix}\hlstd{(xx,} \hlkwc{nrow} \hlstd{= B),} \hlkwc{na.rm} \hlstd{=} \hlnum{TRUE}\hlstd{)))}
 \end{alltt}
-
-
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in split(out.misspec.250.3.20, f = as.factor(rownames(out.misspec.250.3.20))): object 'out.misspec.250.3.20' not found}}\end{kframe}
+\end{kframe}
 \end{knitrout}
 
 
@@ -3756,18 +3715,16 @@ when $n = 250$ and shape = $40$.
 \hlkwd{system.time}\hlstd{(out.misspec.250.3.40} \hlkwb{<-} \hlkwd{do.call}\hlstd{(rbind,}
   \hlkwd{misspec_simulator}\hlstd{(}\hlkwc{beta} \hlstd{= beta,} \hlkwc{n} \hlstd{= n,} \hlkwc{shape} \hlstd{=} \hlnum{40}\hlstd{,} \hlkwc{bins} \hlstd{= bins,} \hlkwc{B} \hlstd{= B)))}
 \end{alltt}
-
-
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in chol.default(crossprod(x) + lambda[j] * diag(v)): the leading minor of order 5 is not positive definite}}
-
-{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.184 0 0.184}}\begin{alltt}
+\begin{verbatim}
+##     user   system  elapsed 
+## 5861.412   64.214 2960.118
+\end{verbatim}
+\begin{alltt}
 \hlstd{diagnostics.misspec.250.3.40} \hlkwb{<-} \hlkwd{do.call}\hlstd{(rbind,} \hlkwd{lapply}\hlstd{(}\hlkwd{split}\hlstd{(out.misspec.250.3.40,}
   \hlkwc{f} \hlstd{=} \hlkwd{as.factor}\hlstd{(}\hlkwd{rownames}\hlstd{(out.misspec.250.3.40))),}
   \hlkwc{FUN} \hlstd{=} \hlkwa{function}\hlstd{(}\hlkwc{xx}\hlstd{)} \hlkwd{colMeans}\hlstd{(}\hlkwd{matrix}\hlstd{(xx,} \hlkwc{nrow} \hlstd{= B),} \hlkwc{na.rm} \hlstd{=} \hlnum{TRUE}\hlstd{)))}
 \end{alltt}
-
-
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in split(out.misspec.250.3.40, f = as.factor(rownames(out.misspec.250.3.40))): object 'out.misspec.250.3.40' not found}}\end{kframe}
+\end{kframe}
 \end{knitrout}
 
 
@@ -3781,18 +3738,16 @@ when $n = 250$ and shape = $60$.
 \hlkwd{system.time}\hlstd{(out.misspec.250.3.60} \hlkwb{<-} \hlkwd{do.call}\hlstd{(rbind,}
   \hlkwd{misspec_simulator}\hlstd{(}\hlkwc{beta} \hlstd{= beta,} \hlkwc{n} \hlstd{= n,} \hlkwc{shape} \hlstd{=} \hlnum{60}\hlstd{,} \hlkwc{bins} \hlstd{= bins,} \hlkwc{B} \hlstd{= B)))}
 \end{alltt}
-
-
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in chol.default(crossprod(x) + lambda[j] * diag(v)): the leading minor of order 5 is not positive definite}}
-
-{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.183 0 0.183}}\begin{alltt}
+\begin{verbatim}
+##     user   system  elapsed 
+## 5614.171   64.384 2929.282
+\end{verbatim}
+\begin{alltt}
 \hlstd{diagnostics.misspec.250.3.60} \hlkwb{<-} \hlkwd{do.call}\hlstd{(rbind,} \hlkwd{lapply}\hlstd{(}\hlkwd{split}\hlstd{(out.misspec.250.3.60,}
   \hlkwc{f} \hlstd{=} \hlkwd{as.factor}\hlstd{(}\hlkwd{rownames}\hlstd{(out.misspec.250.3.60))),}
   \hlkwc{FUN} \hlstd{=} \hlkwa{function}\hlstd{(}\hlkwc{xx}\hlstd{)} \hlkwd{colMeans}\hlstd{(}\hlkwd{matrix}\hlstd{(xx,} \hlkwc{nrow} \hlstd{= B),} \hlkwc{na.rm} \hlstd{=} \hlnum{TRUE}\hlstd{)))}
 \end{alltt}
-
-
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in split(out.misspec.250.3.60, f = as.factor(rownames(out.misspec.250.3.60))): object 'out.misspec.250.3.60' not found}}\end{kframe}
+\end{kframe}
 \end{knitrout}
 
 
@@ -3806,18 +3761,16 @@ when $n = 250$ and shape = $80$.
 \hlkwd{system.time}\hlstd{(out.misspec.250.3.80} \hlkwb{<-} \hlkwd{do.call}\hlstd{(rbind,}
   \hlkwd{misspec_simulator}\hlstd{(}\hlkwc{beta} \hlstd{= beta,} \hlkwc{n} \hlstd{= n,} \hlkwc{shape} \hlstd{=} \hlnum{80}\hlstd{,} \hlkwc{bins} \hlstd{= bins,} \hlkwc{B} \hlstd{= B)))}
 \end{alltt}
-
-
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in chol.default(crossprod(x) + lambda[j] * diag(v)): the leading minor of order 5 is not positive definite}}
-
-{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.188 0 0.189}}\begin{alltt}
+\begin{verbatim}
+##     user   system  elapsed 
+## 5422.927   63.890 2895.559
+\end{verbatim}
+\begin{alltt}
 \hlstd{diagnostics.misspec.250.3.80} \hlkwb{<-} \hlkwd{do.call}\hlstd{(rbind,} \hlkwd{lapply}\hlstd{(}\hlkwd{split}\hlstd{(out.misspec.250.3.80,}
   \hlkwc{f} \hlstd{=} \hlkwd{as.factor}\hlstd{(}\hlkwd{rownames}\hlstd{(out.misspec.250.3.80))),}
   \hlkwc{FUN} \hlstd{=} \hlkwa{function}\hlstd{(}\hlkwc{xx}\hlstd{)} \hlkwd{colMeans}\hlstd{(}\hlkwd{matrix}\hlstd{(xx,} \hlkwc{nrow} \hlstd{= B),} \hlkwc{na.rm} \hlstd{=} \hlnum{TRUE}\hlstd{)))}
 \end{alltt}
-
-
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in split(out.misspec.250.3.80, f = as.factor(rownames(out.misspec.250.3.80))): object 'out.misspec.250.3.80' not found}}\end{kframe}
+\end{kframe}
 \end{knitrout}
 
 
@@ -3831,29 +3784,22 @@ when $n = 250$ and shape = $100$.
 \hlkwd{system.time}\hlstd{(out.misspec.250.3.100} \hlkwb{<-} \hlkwd{do.call}\hlstd{(rbind,}
   \hlkwd{misspec_simulator}\hlstd{(}\hlkwc{beta} \hlstd{= beta,} \hlkwc{n} \hlstd{= n,} \hlkwc{shape} \hlstd{=} \hlnum{100}\hlstd{,} \hlkwc{bins} \hlstd{= bins,} \hlkwc{B} \hlstd{= B)))}
 \end{alltt}
-
-
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in chol.default(crossprod(x) + lambda[j] * diag(v)): the leading minor of order 5 is not positive definite}}
-
-{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.199 0 0.2}}\begin{alltt}
+\begin{verbatim}
+##     user   system  elapsed 
+## 5322.018   63.511 2886.179
+\end{verbatim}
+\begin{alltt}
 \hlstd{diagnostics.misspec.250.3.100} \hlkwb{<-} \hlkwd{do.call}\hlstd{(rbind,} \hlkwd{lapply}\hlstd{(}\hlkwd{split}\hlstd{(out.misspec.250.3.100,}
   \hlkwc{f} \hlstd{=} \hlkwd{as.factor}\hlstd{(}\hlkwd{rownames}\hlstd{(out.misspec.250.3.100))),}
   \hlkwc{FUN} \hlstd{=} \hlkwa{function}\hlstd{(}\hlkwc{xx}\hlstd{)} \hlkwd{colMeans}\hlstd{(}\hlkwd{matrix}\hlstd{(xx,} \hlkwc{nrow} \hlstd{= B),} \hlkwc{na.rm} \hlstd{=} \hlnum{TRUE}\hlstd{)))}
 \end{alltt}
-
-
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in split(out.misspec.250.3.100, f = as.factor(rownames(out.misspec.250.3.100))): object 'out.misspec.250.3.100' not found}}\end{kframe}
+\end{kframe}
 \end{knitrout}
 
 
 %Reorganize the output.
 
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 
-
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(parse(text = paste("{}diagnostics.misspec.250.3"{}, j, sep = "{}."{}))): object 'diagnostics.misspec.250.3.5' not found}}\end{kframe}
-\end{knitrout}
 
 
 
@@ -3871,18 +3817,16 @@ when $n = 500$ and shape = $5$.
 \hlkwd{system.time}\hlstd{(out.misspec.500.3.5} \hlkwb{<-} \hlkwd{do.call}\hlstd{(rbind,}
   \hlkwd{misspec_simulator}\hlstd{(}\hlkwc{beta} \hlstd{= beta,} \hlkwc{n} \hlstd{= n,} \hlkwc{shape} \hlstd{=} \hlnum{5}\hlstd{,} \hlkwc{bins} \hlstd{= bins,} \hlkwc{B} \hlstd{= B)))}
 \end{alltt}
-
-
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in chol.default(crossprod(x) + lambda[j] * diag(v)): the leading minor of order 5 is not positive definite}}
-
-{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.262 0 0.261}}\begin{alltt}
+\begin{verbatim}
+##      user    system   elapsed 
+## 20210.909    87.323  9029.320
+\end{verbatim}
+\begin{alltt}
 \hlstd{diagnostics.misspec.500.3.5} \hlkwb{<-} \hlkwd{do.call}\hlstd{(rbind,} \hlkwd{lapply}\hlstd{(}\hlkwd{split}\hlstd{(out.misspec.500.3.5,}
   \hlkwc{f} \hlstd{=} \hlkwd{as.factor}\hlstd{(}\hlkwd{rownames}\hlstd{(out.misspec.500.3.5))),}
   \hlkwc{FUN} \hlstd{=} \hlkwa{function}\hlstd{(}\hlkwc{xx}\hlstd{)} \hlkwd{colMeans}\hlstd{(}\hlkwd{matrix}\hlstd{(xx,} \hlkwc{nrow} \hlstd{= B),} \hlkwc{na.rm} \hlstd{=} \hlnum{TRUE}\hlstd{)))}
 \end{alltt}
-
-
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in split(out.misspec.500.3.5, f = as.factor(rownames(out.misspec.500.3.5))): object 'out.misspec.500.3.5' not found}}\end{kframe}
+\end{kframe}
 \end{knitrout}
 
 
@@ -3896,18 +3840,16 @@ when $n = 500$ and shape = $20$.
 \hlkwd{system.time}\hlstd{(out.misspec.500.3.20} \hlkwb{<-} \hlkwd{do.call}\hlstd{(rbind,}
   \hlkwd{misspec_simulator}\hlstd{(}\hlkwc{beta} \hlstd{= beta,} \hlkwc{n} \hlstd{= n,} \hlkwc{shape} \hlstd{=} \hlnum{20}\hlstd{,} \hlkwc{bins} \hlstd{= bins,} \hlkwc{B} \hlstd{= B)))}
 \end{alltt}
-
-
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in chol.default(crossprod(x) + lambda[j] * diag(v)): the leading minor of order 5 is not positive definite}}
-
-{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.219 0 0.218}}\begin{alltt}
+\begin{verbatim}
+##      user    system   elapsed 
+## 17103.868    82.806  8430.188
+\end{verbatim}
+\begin{alltt}
 \hlstd{diagnostics.misspec.500.3.20} \hlkwb{<-} \hlkwd{do.call}\hlstd{(rbind,} \hlkwd{lapply}\hlstd{(}\hlkwd{split}\hlstd{(out.misspec.500.3.20,}
   \hlkwc{f} \hlstd{=} \hlkwd{as.factor}\hlstd{(}\hlkwd{rownames}\hlstd{(out.misspec.500.3.20))),}
   \hlkwc{FUN} \hlstd{=} \hlkwa{function}\hlstd{(}\hlkwc{xx}\hlstd{)} \hlkwd{colMeans}\hlstd{(}\hlkwd{matrix}\hlstd{(xx,} \hlkwc{nrow} \hlstd{= B),} \hlkwc{na.rm} \hlstd{=} \hlnum{TRUE}\hlstd{)))}
 \end{alltt}
-
-
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in split(out.misspec.500.3.20, f = as.factor(rownames(out.misspec.500.3.20))): object 'out.misspec.500.3.20' not found}}\end{kframe}
+\end{kframe}
 \end{knitrout}
 
 
@@ -3921,18 +3863,16 @@ when $n = 500$ and shape = $40$.
 \hlkwd{system.time}\hlstd{(out.misspec.500.3.40} \hlkwb{<-} \hlkwd{do.call}\hlstd{(rbind,}
   \hlkwd{misspec_simulator}\hlstd{(}\hlkwc{beta} \hlstd{= beta,} \hlkwc{n} \hlstd{= n,} \hlkwc{shape} \hlstd{=} \hlnum{40}\hlstd{,} \hlkwc{bins} \hlstd{= bins,} \hlkwc{B} \hlstd{= B)))}
 \end{alltt}
-
-
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in chol.default(crossprod(x) + lambda[j] * diag(v)): the leading minor of order 5 is not positive definite}}
-
-{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.235 0 0.235}}\begin{alltt}
+\begin{verbatim}
+##      user    system   elapsed 
+## 16427.670    83.417  8442.279
+\end{verbatim}
+\begin{alltt}
 \hlstd{diagnostics.misspec.500.3.40} \hlkwb{<-} \hlkwd{do.call}\hlstd{(rbind,} \hlkwd{lapply}\hlstd{(}\hlkwd{split}\hlstd{(out.misspec.500.3.40,}
   \hlkwc{f} \hlstd{=} \hlkwd{as.factor}\hlstd{(}\hlkwd{rownames}\hlstd{(out.misspec.500.3.40))),}
   \hlkwc{FUN} \hlstd{=} \hlkwa{function}\hlstd{(}\hlkwc{xx}\hlstd{)} \hlkwd{colMeans}\hlstd{(}\hlkwd{matrix}\hlstd{(xx,} \hlkwc{nrow} \hlstd{= B),} \hlkwc{na.rm} \hlstd{=} \hlnum{TRUE}\hlstd{)))}
 \end{alltt}
-
-
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in split(out.misspec.500.3.40, f = as.factor(rownames(out.misspec.500.3.40))): object 'out.misspec.500.3.40' not found}}\end{kframe}
+\end{kframe}
 \end{knitrout}
 
 
@@ -3946,18 +3886,16 @@ when $n = 500$ and shape = $60$.
 \hlkwd{system.time}\hlstd{(out.misspec.500.3.60} \hlkwb{<-} \hlkwd{do.call}\hlstd{(rbind,}
   \hlkwd{misspec_simulator}\hlstd{(}\hlkwc{beta} \hlstd{= beta,} \hlkwc{n} \hlstd{= n,} \hlkwc{shape} \hlstd{=} \hlnum{60}\hlstd{,} \hlkwc{bins} \hlstd{= bins,} \hlkwc{B} \hlstd{= B)))}
 \end{alltt}
-
-
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in chol.default(crossprod(x) + lambda[j] * diag(v)): the leading minor of order 5 is not positive definite}}
-
-{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.303 0 0.302}}\begin{alltt}
+\begin{verbatim}
+##      user    system   elapsed 
+## 15736.889    79.244  8318.346
+\end{verbatim}
+\begin{alltt}
 \hlstd{diagnostics.misspec.500.3.60} \hlkwb{<-} \hlkwd{do.call}\hlstd{(rbind,} \hlkwd{lapply}\hlstd{(}\hlkwd{split}\hlstd{(out.misspec.500.3.60,}
   \hlkwc{f} \hlstd{=} \hlkwd{as.factor}\hlstd{(}\hlkwd{rownames}\hlstd{(out.misspec.500.3.60))),}
   \hlkwc{FUN} \hlstd{=} \hlkwa{function}\hlstd{(}\hlkwc{xx}\hlstd{)} \hlkwd{colMeans}\hlstd{(}\hlkwd{matrix}\hlstd{(xx,} \hlkwc{nrow} \hlstd{= B),} \hlkwc{na.rm} \hlstd{=} \hlnum{TRUE}\hlstd{)))}
 \end{alltt}
-
-
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in split(out.misspec.500.3.60, f = as.factor(rownames(out.misspec.500.3.60))): object 'out.misspec.500.3.60' not found}}\end{kframe}
+\end{kframe}
 \end{knitrout}
 
 
@@ -3971,18 +3909,16 @@ when $n = 500$ and shape = $80$.
 \hlkwd{system.time}\hlstd{(out.misspec.500.3.80} \hlkwb{<-} \hlkwd{do.call}\hlstd{(rbind,}
   \hlkwd{misspec_simulator}\hlstd{(}\hlkwc{beta} \hlstd{= beta,} \hlkwc{n} \hlstd{= n,} \hlkwc{shape} \hlstd{=} \hlnum{80}\hlstd{,} \hlkwc{bins} \hlstd{= bins,} \hlkwc{B} \hlstd{= B)))}
 \end{alltt}
-
-
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in chol.default(crossprod(x) + lambda[j] * diag(v)): the leading minor of order 5 is not positive definite}}
-
-{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.225 0 0.226}}\begin{alltt}
+\begin{verbatim}
+##      user    system   elapsed 
+## 15476.458    76.296  8321.263
+\end{verbatim}
+\begin{alltt}
 \hlstd{diagnostics.misspec.500.3.80} \hlkwb{<-} \hlkwd{do.call}\hlstd{(rbind,} \hlkwd{lapply}\hlstd{(}\hlkwd{split}\hlstd{(out.misspec.500.3.80,}
   \hlkwc{f} \hlstd{=} \hlkwd{as.factor}\hlstd{(}\hlkwd{rownames}\hlstd{(out.misspec.500.3.80))),}
   \hlkwc{FUN} \hlstd{=} \hlkwa{function}\hlstd{(}\hlkwc{xx}\hlstd{)} \hlkwd{colMeans}\hlstd{(}\hlkwd{matrix}\hlstd{(xx,} \hlkwc{nrow} \hlstd{= B),} \hlkwc{na.rm} \hlstd{=} \hlnum{TRUE}\hlstd{)))}
 \end{alltt}
-
-
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in split(out.misspec.500.3.80, f = as.factor(rownames(out.misspec.500.3.80))): object 'out.misspec.500.3.80' not found}}\end{kframe}
+\end{kframe}
 \end{knitrout}
 
 
@@ -3996,29 +3932,22 @@ when $n = 500$ and shape = $100$.
 \hlkwd{system.time}\hlstd{(out.misspec.500.3.100} \hlkwb{<-} \hlkwd{do.call}\hlstd{(rbind,}
   \hlkwd{misspec_simulator}\hlstd{(}\hlkwc{beta} \hlstd{= beta,} \hlkwc{n} \hlstd{= n,} \hlkwc{shape} \hlstd{=} \hlnum{100}\hlstd{,} \hlkwc{bins} \hlstd{= bins,} \hlkwc{B} \hlstd{= B)))}
 \end{alltt}
-
-
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in chol.default(crossprod(x) + lambda[j] * diag(v)): the leading minor of order 5 is not positive definite}}
-
-{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Timing stopped at: 0.218 0 0.218}}\begin{alltt}
+\begin{verbatim}
+##      user    system   elapsed 
+## 15664.489    81.434  8328.236
+\end{verbatim}
+\begin{alltt}
 \hlstd{diagnostics.misspec.500.3.100} \hlkwb{<-} \hlkwd{do.call}\hlstd{(rbind,} \hlkwd{lapply}\hlstd{(}\hlkwd{split}\hlstd{(out.misspec.500.3.100,}
   \hlkwc{f} \hlstd{=} \hlkwd{as.factor}\hlstd{(}\hlkwd{rownames}\hlstd{(out.misspec.500.3.100))),}
   \hlkwc{FUN} \hlstd{=} \hlkwa{function}\hlstd{(}\hlkwc{xx}\hlstd{)} \hlkwd{colMeans}\hlstd{(}\hlkwd{matrix}\hlstd{(xx,} \hlkwc{nrow} \hlstd{= B),} \hlkwc{na.rm} \hlstd{=} \hlnum{TRUE}\hlstd{)))}
 \end{alltt}
-
-
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in split(out.misspec.500.3.100, f = as.factor(rownames(out.misspec.500.3.100))): object 'out.misspec.500.3.100' not found}}\end{kframe}
+\end{kframe}
 \end{knitrout}
 
 
 %Reorganize the output.
 
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 
-
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(parse(text = paste("{}diagnostics.misspec.500.3"{}, j, sep = "{}."{}))): object 'diagnostics.misspec.500.3.5' not found}}\end{kframe}
-\end{knitrout}
 
 
 \newpage
@@ -4027,33 +3956,38 @@ when $n = 500$ and shape = $100$.
 
 Results form our simulations are depicted in 
 Figures~\ref{Fig:misspec.150}-\ref{Fig:misspec.inx.500}.  
-For all five prediction regions we depict the estimatated area, prediction 
-error, and local coverage probabilities with respect to binning in 
-Figures~\ref{Fig:misspec.150}, \ref{Fig:misspec.250}, and 
+For all prediction regions under consideration we depict the estimatated 
+area, prediction error, and local coverage probabilities with respect to 
+binning in Figures~\ref{Fig:misspec.150}, \ref{Fig:misspec.250}, and 
 \ref{Fig:misspec.500} for $n = 150$, $250$, and $500$ respectively.  For all 
-five prediction regions we depict the local coverage probabilities across $x$ 
+prediction regions we depict the local coverage probabilities across $x$ 
 in Figures~\ref{Fig:misspec.inx.150}, \ref{Fig:misspec.inx.250}, and 
 \ref{Fig:misspec.inx.500} for $n = 150$, $250$, and $500$ respectively.
 
 In these simulations, we expect for the LSLW conformal prediction region to 
 perform well.  The model misspecification is modest, the Gamma data  
 appears to be almost symmetric, albeit heterogenous, about a cubic mean 
-function.  From these simulations we see that the parametric conformal 
-prediction region is similar to the LSLW prediciton region in area and 
-prediction error.  Both the parametric and LSLW conformal 
-prediction regions possess finite-sample, albeit slightly conservative, 
-local validity with respect to binning and they both give almost nominal 
-finite-sample conditional validity across the support.
-Moreover, these prediciton regions visually fit the data well as seen in 
-Section~\ref{sec:misspecplots}.
+function.  
+We also expect for the misspecified transformation based conformal 
+prediction region to have poor local and conditional coverage properties 
+when compared with the binned parametric conformal prediction region.
+From these simulations we see that the parametric conformal 
+prediction regions are similar to the LSLW prediciton region in area and 
+prediction error.  However, these prediction have drastically different 
+coverage properties.  The binned parametric conformal prediction region 
+possesses desirable local and conditional coverages in comparison to the 
+others, and LSLW conformal prediction region gives exhibit slight 
+undercoverage.  {\bf Revisit} Moreover, these prediciton regions visually 
+fit the data well as seen in Section~\ref{sec:misspecplots}.
 The nonparametric conformal prediction region gives closer to nominal 
 coverage than both the parametric and LSLW conformal prediction regions, 
 and it possesses finite-sample local validity with respect to 
 binning.  However, this prediction region is larger, gives higher 
 prediciton error than the parametric and LSLW conformal prediction 
 regions, and does not visually fit the data well for most simulation settings 
-as seen in Section~\ref{sec:misspecplots}.  The misspecified HD and LS 
-conformal prediction regions  provide extreme undercoverage at small values 
+as seen in Section~\ref{sec:misspecplots}.  The misspecified transformation 
+based conformal prediction region and the HD and LS 
+conformal prediction regions exhibit extreme undercoverage at small values 
 of $x$ and extreme overcoverage at large values of $x$.  These prediction 
 regions are also larger, they give higher prediciton error than the 
 parametric and LSLW conformal prediction regions, and the LS conformal 
@@ -4063,6 +3997,11 @@ settings as seen in Section~\ref{sec:misspecplots}.
 
 
 % Diagnostics, n = 150
+%<<>>=
+%out.misspec.150.2.2[1:7, ]
+%diagnostics.misspec.150.2.2
+%@
+
 \newpage
 \begin{figure}[h!]
 \begin{center}
@@ -4082,8 +4021,9 @@ settings as seen in Section~\ref{sec:misspecplots}.
   when $n = 150$ and the number of bins equals 2.  
   The specific diagnostics used to compare these prediciton regions is the 
     area,
-    prediction error, and
-    the coverage probability with respect to binning  
+    prediction error, 
+    marginal coverage probability, 
+    and the coverage probability with respect to binning  
     across shape parameter values.
   The average of 200 Monte Carlo samples at each shape parameter value in 
   these simulation settings form the lines that are depicted in this figure.}
@@ -4128,9 +4068,10 @@ settings as seen in Section~\ref{sec:misspecplots}.
   correctly specified highest density prediction regions when $n = 250$ 
   and the number of bins equals 3.  
   The specific diagnostics used to compare these prediciton regions is the 
-    area (top-left panel),
-    prediction error (top-right panel), and
-    the coverage probability with respect to binning (bottom row) 
+    area,
+    prediction error, 
+    marginal coverage probability,     
+    and the coverage probability with respect to binning 
     across shape parameter values.
   The average of 50 Monte Carlo samples at each shape parameter value in 
   these simulation settings form the lines that are depicted in this figure.}
@@ -4176,9 +4117,10 @@ settings as seen in Section~\ref{sec:misspecplots}.
   correctly specified highest density prediction region when $n = 500$ and the 
   number of bins equals 3.  
   The specific diagnostics used to compare these prediciton regions is the 
-    area (top-left panel),
-    prediction error (top-right panel), and
-    the coverage probability with respect to binning (bottom row) 
+    area,
+    prediction error, 
+    marginal coverage probability,     
+    and the coverage probability with respect to binning  
     across shape parameter values.
   The average of 50 Monte Carlo samples at each shape parameter value in 
   these simulation settings form the lines that are depicted in this figure.}
@@ -4222,6 +4164,12 @@ When $n = 150$ we build the parametric and nonparametric conformal prediction
 regions using 2 bins.  When $n = 250, 500$ we build the parametric and 
 nonparametric conformal prediction regions using 3 bins.  These number of bin 
 choices correspond to the bin width asymptotics of \citet{lei2014distribution}. 
+
+
+
+\begin{center}
+{\Huge Revised up to here}
+\end{center}
 
 
 \subsection{Simulations}

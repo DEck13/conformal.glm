@@ -643,11 +643,6 @@ dignostics and local coverage probabilities for each prediction region
 for every generated dataset.
 
 
-\begin{center}
-{\Huge Revised up to here}
-\end{center}
-
-
 <<>>=
 dat <- data.frame(y = y, x1 = x)
 gamma_simulator <- function(beta, n = 500, alpha = 0.10, bins = 3, 
@@ -1618,7 +1613,7 @@ regression model with one variable.  We specify the inverse link function
 (the defualt in the \texttt{glm} function) and we set 
 $\beta = (1.25, -1)^T$.  This value of $\beta$ is chosen so that the generated 
 Gamma data is increasing, on average, in $x$ and exhibits increasing 
-variability in $x$.  We investigate the performance of the five prediction 
+variability in $x$.  We investigate the performance of the prediction 
 regions across different sample size and shape parameter combinations.  We 
 consider sample sizes of $n \in \{150, 250, 500\}$ and shape parameter values 
 of $\{0.5, 0.75, 1, 1.5, 2, 5, 7, 10, 12, 15, 20, 25, 30, 40, 50, 60, 70, 80, 90, 100\}$.  
@@ -1639,8 +1634,9 @@ in Section~\ref{sec:Gamma-Results}.
 \subsection{Simulations}
 
 We perform Monte Carlo simulations to investigate the coverage properties, 
-size, and prediction error of the Gamma conformal prediction region under 
-transformation...
+size, and prediction error of the binned parametric and nonparametric 
+conformal, transform under the true data generating Gamma model conformal, 
+LSLW conformal, LS conformal, and HD prediction regions.  
 
 <<>>=
 beta <- c(1.25, -1)
@@ -2739,31 +2735,31 @@ for(j in shapes ){
 \subsection{Results}
 \label{sec:Gamma-Results}
 
-Results form our simulations are depicted in 
+Results from our simulations are depicted in 
 Figures~\ref{Fig:gamma.150}-\ref{Fig:gamma.inx.500}.  
-For all five prediction regions we depict the estimatated area, prediction 
-error, and local coverage probabilities with respect to binning in 
+We depict the estimatated area, prediction error, marginal coverage, and 
+local coverage probabilities with respect to binning in 
 Figures~\ref{Fig:gamma.150}, \ref{Fig:gamma.250}, and \ref{Fig:gamma.500} 
-for $n = 150$, $250$, and $500$ respectively.  For all five prediction 
+for $n = 150$, $250$, and $500$ respectively.  For all prediction 
 regions we depict the local coverage probabilities across $x$ in
 Figures~\ref{Fig:gamma.inx.150}, \ref{Fig:gamma.inx.250}, and 
 \ref{Fig:gamma.inx.500} for $n = 150$, $250$, and $500$ respectively.
 
-From these simulations we see that the parametric conformal prediction region 
-is similar to the HD prediciton region in area, prediction error, and 
-appearance (as seen in Section~\ref{sec:gammaplots}).  Moreover, the 
-parametric conformal prediction region possess finite-sample, albeit slightly 
-conservative, local validity with respect to binning and possess nominal 
-finite-sample conditional coverage over most of the support. 
-The LSLW conformal prediction region is smaller than than both the parametric 
-conformal prediction region and the HD prediction region.  However, it has a 
-higher prediciton error than these regions and it is more conservative than 
-the parametric conformal prediction region in most of our simulation 
-settings.  It also does not fit the data well when the deviations about the 
+From these simulations we see that both parametric conformal prediction 
+regions are similar to the HD prediciton region in area, prediction error, and 
+appearance (as seen in Section~\ref{sec:gammaplots}), where the transformation 
+based conformal prediction region is slightly preferrable to its binned counterpart.  
+Moreover, the parametric conformal prediction regions possess finite-sample, 
+albeit slightly conservative, local validity with respect to binning and 
+possess nominal finite-sample conditional coverage over most of the support. 
+The LSLW conformal prediction region provides lower prediciton error than the 
+parametric conformal prediciton regions.  However, the LSLW conformal 
+prediction possesses some erratic coverage properties.  
+{\bf Revisit} It also does not fit the data well when the deviations about the 
 estimated mean function are clearly not symmetric as evidenced by 
 in Section~\ref{sec:gammaplots}.  These figures correspond to data generated 
 from a Gamma distribution with small shape parameter values.  
-The nonparametric conformal prediction region gives closer to nominal 
+The binned nonparametric conformal prediction region gives closer to nominal 
 coverage and it possesses finite-sample local validity with respect to 
 binning.  However, this prediction region is larger and gives higher 
 prediciton error than the parametric and LSLW conformal prediction 
@@ -2817,6 +2813,19 @@ lines(log(shapes), HD.error.gamma.150, col = "blue", lty = 4, lwd = 1.5)
 axis(2)
 mtext("prediction error", side = 2, cex = 1.25, line = 2)
 
+plot.new()
+plot.window(xlim = c(log(min(shapes)), log(max(shapes))), 
+  ylim = c(0.80, 1.00))
+lines(log(shapes), para.marginal.gamma.150, col = "red", lty = 1, lwd = 1.5)
+lines(log(shapes), transform.marginal.gamma.150, col = "red", lty = 2, lwd = 1.5)
+lines(log(shapes), nonpara.marginal.gamma.150, col = "green", lty = 2, lwd = 1.5)
+lines(log(shapes), LSLW.marginal.gamma.150, col = "purple", lty = 1, lwd = 1.5)
+lines(log(shapes), LS.marginal.gamma.150, col = "black", lty = 2, lwd = 1.5)
+lines(log(shapes), HD.marginal.gamma.150, col = "blue", lty = 4, lwd = 1.5)
+abline(h = 0.90, lty = 1, col = "grey", lwd = 1)
+axis(2)
+mtext("marginal coverage", side = 2, cex = 1.25, line = 2)
+
 s <- length(shapes)
 plot.new()
 plot.window(xlim = c(log(min(shapes)), log(max(shapes))), 
@@ -2857,10 +2866,11 @@ mtext("Simulation Setting A", side = 3, cex = 1.25, line = 0.5, outer = TRUE)
   least squares locally weighted conformal prediciton region and the 
   highest density predcition region when $n = 150$ and the number of bins 
   equals 2.  
-  The specific diagnostics used to compare these prediciton regions is the 
+  The specific diagnostics used to compare these prediciton regions are the 
     area,
-    prediction error, and
-    the coverage probability with respect to binning  
+    prediction error, 
+    marginal coverage probability,
+    and the coverage probability with respect to binning  
     across shape parameter values.
   The average of 200 Monte Carlo samples at each shape parameter value in 
   these simulation settings form the lines that are depicted in this figure.}
@@ -2885,7 +2895,7 @@ lines(inx, nonpara.inx.gamma.150[26:50], col = "green", lty = 2, lwd = 1.5)
 lines(inx, LSLW.inx.gamma.150[26:50], col = "purple", lty = 1, lwd = 1.5)
 lines(inx, LS.inx.gamma.150[26:50], col = "black", lty = 2, lwd = 1.5)
 lines(inx, HD.inx.gamma.150[26:50], col = "blue", lty = 4, lwd = 1.5)
-abline(h = 0.90, lty = 1, col = "grey", lwd = 1.5)
+abline(h = 0.90, lty = 1, col = "grey", lwd = 2)
 axis(2)
 mtext("shape = 1", side = 3, cex = 1, line = 2)
 
@@ -2906,7 +2916,7 @@ lines(inx, nonpara.inx.gamma.150[51:75], col = "green", lty = 2, lwd = 1.5)
 lines(inx, LSLW.inx.gamma.150[51:75], col = "purple", lty = 1, lwd = 1.5)
 lines(inx, LS.inx.gamma.150[51:75], col = "black", lty = 2, lwd = 1.5)
 lines(inx, HD.inx.gamma.150[51:75], col = "blue", lty = 4, lwd = 1.5)
-abline(h = 0.90, lty = 1, col = "grey", lwd = 1.5)
+abline(h = 0.90, lty = 1, col = "grey", lwd = 2)
 mtext("shape = 2", side = 3, cex = 1, line = 2)
 
 # shape = 5
@@ -2918,7 +2928,7 @@ lines(inx, nonpara.inx.gamma.150[101:125], col = "green", lty = 2, lwd = 1.5)
 lines(inx, LSLW.inx.gamma.150[101:125], col = "purple", lty = 1, lwd = 1.5)
 lines(inx, LS.inx.gamma.150[101:125], col = "black", lty = 2, lwd = 1.5)
 lines(inx, HD.inx.gamma.150[101:125], col = "blue", lty = 4, lwd = 1.5)
-abline(h = 0.90, lty = 1, col = "grey", lwd = 1.5)
+abline(h = 0.90, lty = 1, col = "grey", lwd = 2)
 mtext("shape = 5", side = 3, cex = 1, line = 2)
 
 # shape = 7
@@ -2930,7 +2940,7 @@ lines(inx, nonpara.inx.gamma.150[126:150], col = "green", lty = 2, lwd = 1.5)
 lines(inx, LSLW.inx.gamma.150[126:150], col = "purple", lty = 1, lwd = 1.5)
 lines(inx, LS.inx.gamma.150[126:150], col = "black", lty = 2, lwd = 1.5)
 lines(inx, HD.inx.gamma.150[126:150], col = "blue", lty = 4, lwd = 1.5)
-abline(h = 0.90, lty = 1, col = "grey", lwd = 1.5)
+abline(h = 0.90, lty = 1, col = "grey", lwd = 2)
 axis(2)
 mtext("shape = 7", side = 3, cex = 1, line = 2)
 
@@ -2943,7 +2953,7 @@ lines(inx, nonpara.inx.gamma.150[151:175], col = "green", lty = 2, lwd = 1.5)
 lines(inx, LSLW.inx.gamma.150[151:175], col = "purple", lty = 1, lwd = 1.5)
 lines(inx, LS.inx.gamma.150[151:175], col = "black", lty = 2, lwd = 1.5)
 lines(inx, HD.inx.gamma.150[151:175], col = "blue", lty = 4, lwd = 1.5)
-abline(h = 0.90, lty = 1, col = "grey", lwd = 1.5)
+abline(h = 0.90, lty = 1, col = "grey", lwd = 2)
 mtext("shape = 10", side = 3, cex = 1, line = 2)
 
 # shape = 12
@@ -2955,7 +2965,7 @@ lines(inx, nonpara.inx.gamma.150[176:200], col = "green", lty = 2, lwd = 1.5)
 lines(inx, LSLW.inx.gamma.150[176:200], col = "purple", lty = 1, lwd = 1.5)
 lines(inx, LS.inx.gamma.150[176:200], col = "black", lty = 2, lwd = 1.5)
 lines(inx, HD.inx.gamma.150[176:200], col = "blue", lty = 4, lwd = 1.5)
-abline(h = 0.90, lty = 1, col = "grey", lwd = 1.5)
+abline(h = 0.90, lty = 1, col = "grey", lwd = 2)
 mtext("shape = 12", side = 3, cex = 1, line = 2)
 
 # shape = 15
@@ -2967,7 +2977,7 @@ lines(inx, nonpara.inx.gamma.150[201:225], col = "green", lty = 2, lwd = 1.5)
 lines(inx, LSLW.inx.gamma.150[201:225], col = "purple", lty = 1, lwd = 1.5)
 lines(inx, LS.inx.gamma.150[201:225], col = "black", lty = 2, lwd = 1.5)
 lines(inx, HD.inx.gamma.150[201:225], col = "blue", lty = 4, lwd = 1.5)
-abline(h = 0.90, lty = 1, col = "grey", lwd = 1.5)
+abline(h = 0.90, lty = 1, col = "grey", lwd = 2)
 mtext("shape = 15", side = 3, cex = 1, line = 2)
 
 # shape = 20
@@ -2979,7 +2989,7 @@ lines(inx, nonpara.inx.gamma.150[226:250], col = "green", lty = 2, lwd = 1.5)
 lines(inx, LSLW.inx.gamma.150[226:250], col = "purple", lty = 1, lwd = 1.5)
 lines(inx, LS.inx.gamma.150[226:250], col = "black", lty = 2, lwd = 1.5)
 lines(inx, HD.inx.gamma.150[226:250], col = "blue", lty = 4, lwd = 1.5)
-abline(h = 0.90, lty = 1, col = "grey", lwd = 1.5)
+abline(h = 0.90, lty = 1, col = "grey", lwd = 2)
 axis(2)
 mtext("shape = 20", side = 3, cex = 1, line = 2)
 
@@ -2992,7 +3002,7 @@ lines(inx, nonpara.inx.gamma.150[251:275], col = "green", lty = 2, lwd = 1.5)
 lines(inx, LSLW.inx.gamma.150[251:275], col = "purple", lty = 1, lwd = 1.5)
 lines(inx, LS.inx.gamma.150[251:275], col = "black", lty = 2, lwd = 1.5)
 lines(inx, HD.inx.gamma.150[251:275], col = "blue", lty = 4, lwd = 1.5)
-abline(h = 0.90, lty = 1, col = "grey", lwd = 1.5)
+abline(h = 0.90, lty = 1, col = "grey", lwd = 2)
 mtext("shape = 25", side = 3, cex = 1, line = 2)
 
 # shape = 30
@@ -3004,7 +3014,7 @@ lines(inx, nonpara.inx.gamma.150[276:300], col = "green", lty = 2, lwd = 1.5)
 lines(inx, LSLW.inx.gamma.150[276:300], col = "purple", lty = 1, lwd = 1.5)
 lines(inx, LS.inx.gamma.150[276:300], col = "black", lty = 2, lwd = 1.5)
 lines(inx, HD.inx.gamma.150[276:300], col = "blue", lty = 4, lwd = 1.5)
-abline(h = 0.90, lty = 1, col = "grey", lwd = 1.5)
+abline(h = 0.90, lty = 1, col = "grey", lwd = 2)
 mtext("shape = 30", side = 3, cex = 1, line = 2)
 
 # shape = 40
@@ -3016,7 +3026,7 @@ lines(inx, nonpara.inx.gamma.150[301:325], col = "green", lty = 2, lwd = 1.5)
 lines(inx, LSLW.inx.gamma.150[301:325], col = "purple", lty = 1, lwd = 1.5)
 lines(inx, LS.inx.gamma.150[301:325], col = "black", lty = 2, lwd = 1.5)
 lines(inx, HD.inx.gamma.150[301:325], col = "blue", lty = 4, lwd = 1.5)
-abline(h = 0.90, lty = 1, col = "grey", lwd = 1.5)
+abline(h = 0.90, lty = 1, col = "grey", lwd = 2)
 mtext("shape = 40", side = 3, cex = 1, line = 2)
 
 # shape = 50
@@ -3028,7 +3038,7 @@ lines(inx, nonpara.inx.gamma.150[326:350], col = "green", lty = 2, lwd = 1.5)
 lines(inx, LSLW.inx.gamma.150[326:350], col = "purple", lty = 1, lwd = 1.5)
 lines(inx, LS.inx.gamma.150[326:350], col = "black", lty = 2, lwd = 1.5)
 lines(inx, HD.inx.gamma.150[326:350], col = "blue", lty = 4, lwd = 1.5)
-abline(h = 0.90, lty = 1, col = "grey", lwd = 1.5)
+abline(h = 0.90, lty = 1, col = "grey", lwd = 2)
 axis(1); axis(2)
 mtext("shape = 50", side = 3, cex = 1, line = 2)
 
@@ -3041,7 +3051,7 @@ lines(inx, nonpara.inx.gamma.150[351:375], col = "green", lty = 2, lwd = 1.5)
 lines(inx, LSLW.inx.gamma.150[351:375], col = "purple", lty = 1, lwd = 1.5)
 lines(inx, LS.inx.gamma.150[351:375], col = "black", lty = 2, lwd = 1.5)
 lines(inx, HD.inx.gamma.150[351:375], col = "blue", lty = 4, lwd = 1.5)
-abline(h = 0.90, lty = 1, col = "grey", lwd = 1.5)
+abline(h = 0.90, lty = 1, col = "grey", lwd = 2)
 axis(1)
 mtext("shape = 60", side = 3, cex = 1, line = 2)
 
@@ -3054,7 +3064,7 @@ lines(inx, nonpara.inx.gamma.150[376:400], col = "green", lty = 2, lwd = 1.5)
 lines(inx, LSLW.inx.gamma.150[376:400], col = "purple", lty = 1, lwd = 1.5)
 lines(inx, LS.inx.gamma.150[376:400], col = "black", lty = 2, lwd = 1.5)
 lines(inx, HD.inx.gamma.150[376:400], col = "blue", lty = 4, lwd = 1.5)
-abline(h = 0.90, lty = 1, col = "grey", lwd = 1.5)
+abline(h = 0.90, lty = 1, col = "grey", lwd = 2)
 axis(1)
 mtext("shape = 70", side = 3, cex = 1, line = 2)
 
@@ -3067,7 +3077,7 @@ lines(inx, nonpara.inx.gamma.150[401:425], col = "green", lty = 2, lwd = 1.5)
 lines(inx, LSLW.inx.gamma.150[401:425], col = "purple", lty = 1, lwd = 1.5)
 lines(inx, LS.inx.gamma.150[401:425], col = "black", lty = 2, lwd = 1.5)
 lines(inx, HD.inx.gamma.150[401:425], col = "blue", lty = 4, lwd = 1.5)
-abline(h = 0.90, lty = 1, col = "grey", lwd = 1.5)
+abline(h = 0.90, lty = 1, col = "grey", lwd = 2)
 axis(1)
 mtext("shape = 80", side = 3, cex = 1, line = 2)
 
@@ -3088,7 +3098,7 @@ mtext("coverage", side = 2, cex = 1.25, line = 0, outer = TRUE)
 \begin{figure}[h!]
 \begin{center}
 <<Fig-gamma-250, echo = FALSE>>=
-par(mfrow = c(3,2), oma = c(4,4,3,0), mar = c(1,1,1,2))
+par(mfrow = c(3,3), oma = c(4,4,3,0), mar = c(1,1,1,2))
 shapes <- c(0.5, 0.75, 1, 1.5, 2, 5, 7, 10, 12, 15, 20, 25)
 
 plot.new()
@@ -3114,30 +3124,39 @@ lines(log(shapes), HD.error.gamma.250, col = "blue", lty = 4, lwd = 1.5)
 axis(2)
 mtext("prediction error", side = 2, cex = 1, line = 2)
 
+plot.new()
+plot.window(xlim = c(log(min(shapes)), log(max(shapes))), 
+  ylim = c(0, 0.60))
+legend(-0.40, 0.55, legend=c("bin param", "transform param",
+  "bin nonparam", "LSLW", "LS", 
+  "HD", "nominal coverage"), col=c("red", "red", "green", "purple", 
+  "black", "blue", "grey"), cex = 1.25, 
+  lty=c(1,2,2,1,2,4,1), bty = "n")
+
 s <- length(shapes)
 plot.new()
 plot.window(xlim = c(log(min(shapes)), log(max(shapes))), 
-  ylim = c(0.80, 1.00))
+  ylim = c(0.70, 1))
 lines(log(shapes), para.local.gamma.250[3*(1:s) - 2], col = "red", lty = 1, lwd = 1.5)
 lines(log(shapes), transform.local.gamma.250[3*(1:s) - 2], col = "red", lty = 2, lwd = 1.5)
 lines(log(shapes), nonpara.local.gamma.250[3*(1:s) - 2], col = "green", lty = 2, lwd = 1.5)
 lines(log(shapes), LSLW.local.gamma.250[3*(1:s) - 2], col = "purple", lty = 1, lwd = 1.5)
 lines(log(shapes), LS.local.gamma.250[3*(1:s) - 2], col = "black", lty = 2, lwd = 1.5)
 lines(log(shapes), HD.local.gamma.250[3*(1:s) - 2], col = "blue", lty = 4, lwd = 1.5)
-abline(h = 0.90, lty = 1, col = "grey", lwd = 1.5)
-axis(1); axis(2)
+abline(h = 0.90, lty = 1, col = "grey", lwd = 2)
+axis(2)
 mtext("coverage when 0 < x < 1/3", side = 2, cex = 1, line = 2)
 
 plot.new()
 plot.window(xlim = c(log(min(shapes)), log(max(shapes))), 
-  ylim = c(0.80, 1.00))
+  ylim = c(0.70, 1))
 lines(log(shapes), para.local.gamma.250[3*(1:s) - 1], col = "red", lty = 1, lwd = 1.5)
 lines(log(shapes), transform.local.gamma.250[3*(1:s) - 1], col = "red", lty = 2, lwd = 1.5)
 lines(log(shapes), nonpara.local.gamma.250[3*(1:s) - 1], col = "green", lty = 2, lwd = 1.5)
 lines(log(shapes), LSLW.local.gamma.250[3*(1:s) - 1], col = "purple", lty = 1, lwd = 1.5)
 lines(log(shapes), LS.local.gamma.250[3*(1:s) - 1], col = "black", lty = 2, lwd = 1.5)
 lines(log(shapes), HD.local.gamma.250[3*(1:s) - 1], col = "blue", lty = 4, lwd = 1.5)
-abline(h = 0.90, lty = 1, col = "grey", lwd = 1.5)
+abline(h = 0.90, lty = 1, col = "grey", lwd = 2)
 axis(1); axis(2)
 mtext("coverage when 1/3 <= x < 2/3", side = 2, cex = 1, line = 2)
 
@@ -3150,18 +3169,21 @@ lines(log(shapes), nonpara.local.gamma.250[3*(1:s)], col = "green", lty = 2, lwd
 lines(log(shapes), LSLW.local.gamma.250[3*(1:s)], col = "purple", lty = 1, lwd = 1.5)
 lines(log(shapes), LS.local.gamma.250[3*(1:s)], col = "black", lty = 2, lwd = 1.5)
 lines(log(shapes), HD.local.gamma.250[3*(1:s)], col = "blue", lty = 4, lwd = 1.5)
-abline(h = 0.90, lty = 1, col = "grey", lwd = 1.5)
+abline(h = 0.90, lty = 1, col = "grey", lwd = 2)
 axis(1); axis(2)
 mtext("coverage when 2/3 < x < 1", side = 2, cex = 1, line = 2)
 
 plot.new()
 plot.window(xlim = c(log(min(shapes)), log(max(shapes))), 
-  ylim = c(0, 0.60))
-legend(-0.25, 0.55, legend=c("bin param", "transform param",
-  "bin nonparam", "LSLW", "LS", 
-  "HD", "nominal coverage"), col=c("red", "red", "green", "purple", 
-  "black", "blue", "grey"), cex = 1.25, 
-  lty=c(1,2,2,1,2,4,1), bty = "n")
+  ylim = c(0.80, 0.95))
+lines(log(shapes), para.marginal.gamma.250, col = "red", lty = 1, lwd = 1.5)
+lines(log(shapes), transform.marginal.gamma.250, col = "red", lty = 2, lwd = 1.5)
+lines(log(shapes), nonpara.marginal.gamma.250, col = "green", lty = 2, lwd = 1.5)
+lines(log(shapes), LSLW.marginal.gamma.250, col = "purple", lty = 1, lwd = 1.5)
+lines(log(shapes), LS.marginal.gamma.250, col = "black", lty = 2, lwd = 1.5)
+lines(log(shapes), HD.marginal.gamma.250, col = "blue", lty = 4, lwd = 1.5)
+axis(1); axis(2)
+mtext("marginal coverage", side = 2, cex = 1, line = 2)
 
 mtext("log(shape)", side = 1, cex = 1.25, line = 2, outer = TRUE)
 mtext("Simulation Setting A", side = 3, cex = 1.25, line = 0.5, outer = TRUE)
@@ -3176,9 +3198,10 @@ mtext("Simulation Setting A", side = 3, cex = 1.25, line = 0.5, outer = TRUE)
   highest density prediction region when $n = 250$ and the number of bins 
   equals 3.  
   The specific diagnostics used to compare these prediciton regions is the 
-    area (top-left panel),
-    prediction error (top-right panel), and
-    the coverage probability with respect to binning (bottom row) 
+    area,
+    prediction error, 
+    marginal coverage probability,
+    and the coverage probability with respect to binning 
     across shape parameter values.
   The average of 50 Monte Carlo samples at each shape parameter value in 
   these simulation settings form the lines that are depicted in this figure.}
@@ -3204,7 +3227,7 @@ lines(inx, nonpara.inx.gamma.250[1:25], col = "green", lty = 2, lwd = 1.5)
 lines(inx, LSLW.inx.gamma.250[1:25], col = "purple", lty = 1, lwd = 1.5)
 lines(inx, LS.inx.gamma.250[1:25], col = "black", lty = 2, lwd = 1.5)
 lines(inx, HD.inx.gamma.250[1:25], col = "blue", lty = 4, lwd = 1.5)
-abline(h = 0.90, lty = 1, col = "grey", lwd = 1.5)
+abline(h = 0.90, lty = 1, col = "grey", lwd = 2)
 axis(2)
 mtext("shape = 0.5", side = 3, cex = 1, line = 2)
 
@@ -3225,7 +3248,7 @@ lines(inx, nonpara.inx.gamma.250[26:50], col = "green", lty = 2, lwd = 1.5)
 lines(inx, LSLW.inx.gamma.250[26:50], col = "purple", lty = 1, lwd = 1.5)
 lines(inx, LS.inx.gamma.250[26:50], col = "black", lty = 2, lwd = 1.5)
 lines(inx, HD.inx.gamma.250[26:50], col = "blue", lty = 4, lwd = 1.5)
-abline(h = 0.90, lty = 1, col = "grey", lwd = 1.5)
+abline(h = 0.90, lty = 1, col = "grey", lwd = 2)
 mtext("shape = 0.75", side = 3, cex = 1, line = 2)
 
 # shape = 1
@@ -3237,7 +3260,7 @@ lines(inx, nonpara.inx.gamma.250[51:75], col = "green", lty = 2, lwd = 1.5)
 lines(inx, LSLW.inx.gamma.250[51:75], col = "purple", lty = 1, lwd = 1.5)
 lines(inx, LS.inx.gamma.250[51:75], col = "black", lty = 2, lwd = 1.5)
 lines(inx, HD.inx.gamma.250[51:75], col = "blue", lty = 4, lwd = 1.5)
-abline(h = 0.90, lty = 1, col = "grey", lwd = 1.5)
+abline(h = 0.90, lty = 1, col = "grey", lwd = 2)
 mtext("shape = 1", side = 3, cex = 1, line = 2)
 
 # shape = 1.5
@@ -3249,7 +3272,7 @@ lines(inx, nonpara.inx.gamma.250[76:100], col = "green", lty = 2, lwd = 1.5)
 lines(inx, LSLW.inx.gamma.250[76:100], col = "purple", lty = 1, lwd = 1.5)
 lines(inx, LS.inx.gamma.250[76:100], col = "black", lty = 2, lwd = 1.5)
 lines(inx, HD.inx.gamma.250[76:100], col = "blue", lty = 4, lwd = 1.5)
-abline(h = 0.90, lty = 1, col = "grey", lwd = 1.5)
+abline(h = 0.90, lty = 1, col = "grey", lwd = 2)
 axis(2)
 mtext("shape = 1.5", side = 3, cex = 1, line = 2)
 
@@ -3262,7 +3285,7 @@ lines(inx, nonpara.inx.gamma.250[101:125], col = "green", lty = 2, lwd = 1.5)
 lines(inx, LSLW.inx.gamma.250[101:125], col = "purple", lty = 1, lwd = 1.5)
 lines(inx, LS.inx.gamma.250[101:125], col = "black", lty = 2, lwd = 1.5)
 lines(inx, HD.inx.gamma.250[101:125], col = "blue", lty = 4, lwd = 1.5)
-abline(h = 0.90, lty = 1, col = "grey", lwd = 1.5)
+abline(h = 0.90, lty = 1, col = "grey", lwd = 2)
 mtext("shape = 2", side = 3, cex = 1, line = 2)
 
 # shape = 5
@@ -3274,7 +3297,7 @@ lines(inx, nonpara.inx.gamma.250[126:150], col = "green", lty = 2, lwd = 1.5)
 lines(inx, LSLW.inx.gamma.250[126:150], col = "purple", lty = 1, lwd = 1.5)
 lines(inx, LS.inx.gamma.250[126:150], col = "black", lty = 2, lwd = 1.5)
 lines(inx, HD.inx.gamma.250[126:150], col = "blue", lty = 4, lwd = 1.5)
-abline(h = 0.90, lty = 1, col = "grey", lwd = 1.5)
+abline(h = 0.90, lty = 1, col = "grey", lwd = 2)
 mtext("shape = 5", side = 3, cex = 1, line = 2)
 
 # shape = 7
@@ -3286,7 +3309,7 @@ lines(inx, nonpara.inx.gamma.250[151:175], col = "green", lty = 2, lwd = 1.5)
 lines(inx, LSLW.inx.gamma.250[151:175], col = "purple", lty = 1, lwd = 1.5)
 lines(inx, LS.inx.gamma.250[151:175], col = "black", lty = 2, lwd = 1.5)
 lines(inx, HD.inx.gamma.250[151:175], col = "blue", lty = 4, lwd = 1.5)
-abline(h = 0.90, lty = 1, col = "grey", lwd = 1.5)
+abline(h = 0.90, lty = 1, col = "grey", lwd = 2)
 mtext("shape = 7", side = 3, cex = 1, line = 2)
 
 # shape = 10
@@ -3298,7 +3321,7 @@ lines(inx, nonpara.inx.gamma.250[176:200], col = "green", lty = 2, lwd = 1.5)
 lines(inx, LSLW.inx.gamma.250[176:200], col = "purple", lty = 1, lwd = 1.5)
 lines(inx, LS.inx.gamma.250[176:200], col = "black", lty = 2, lwd = 1.5)
 lines(inx, HD.inx.gamma.250[176:200], col = "blue", lty = 4, lwd = 1.5)
-abline(h = 0.90, lty = 1, col = "grey", lwd = 1.5)
+abline(h = 0.90, lty = 1, col = "grey", lwd = 2)
 axis(2)
 mtext("shape = 10", side = 3, cex = 1, line = 2)
 
@@ -3311,7 +3334,7 @@ lines(inx, nonpara.inx.gamma.250[201:225], col = "green", lty = 2, lwd = 1.5)
 lines(inx, LSLW.inx.gamma.250[201:225], col = "purple", lty = 1, lwd = 1.5)
 lines(inx, LS.inx.gamma.250[201:225], col = "black", lty = 2, lwd = 1.5)
 lines(inx, HD.inx.gamma.250[201:225], col = "blue", lty = 4, lwd = 1.5)
-abline(h = 0.90, lty = 1, col = "grey", lwd = 1.5)
+abline(h = 0.90, lty = 1, col = "grey", lwd = 2)
 axis(1)
 mtext("shape = 12", side = 3, cex = 1, line = 2)
 
@@ -3324,7 +3347,7 @@ lines(inx, nonpara.inx.gamma.250[226:250], col = "green", lty = 2, lwd = 1.5)
 lines(inx, LSLW.inx.gamma.250[226:250], col = "purple", lty = 1, lwd = 1.5)
 lines(inx, LS.inx.gamma.250[226:250], col = "black", lty = 2, lwd = 1.5)
 lines(inx, HD.inx.gamma.250[226:250], col = "blue", lty = 4, lwd = 1.5)
-abline(h = 0.90, lty = 1, col = "grey", lwd = 1.5)
+abline(h = 0.90, lty = 1, col = "grey", lwd = 2)
 axis(1)
 mtext("shape = 15", side = 3, cex = 1, line = 2)
 
@@ -3337,7 +3360,7 @@ lines(inx, nonpara.inx.gamma.250[251:275], col = "green", lty = 2, lwd = 1.5)
 lines(inx, LSLW.inx.gamma.250[251:275], col = "purple", lty = 1, lwd = 1.5)
 lines(inx, LS.inx.gamma.250[251:275], col = "black", lty = 2, lwd = 1.5)
 lines(inx, HD.inx.gamma.250[251:275], col = "blue", lty = 4, lwd = 1.5)
-abline(h = 0.90, lty = 1, col = "grey", lwd = 1.5)
+abline(h = 0.90, lty = 1, col = "grey", lwd = 2)
 axis(1)
 mtext("shape = 20", side = 3, cex = 1, line = 2)
 
@@ -3350,7 +3373,7 @@ lines(inx, nonpara.inx.gamma.250[276:300], col = "green", lty = 2, lwd = 1.5)
 lines(inx, LSLW.inx.gamma.250[276:300], col = "purple", lty = 1, lwd = 1.5)
 lines(inx, LS.inx.gamma.250[276:300], col = "black", lty = 2, lwd = 1.5)
 lines(inx, HD.inx.gamma.250[276:300], col = "blue", lty = 4, lwd = 1.5)
-abline(h = 0.90, lty = 1, col = "grey", lwd = 1.5)
+abline(h = 0.90, lty = 1, col = "grey", lwd = 2)
 axis(1); axis(2)
 mtext("shape = 25", side = 3, cex = 1, line = 2)
 
@@ -3371,7 +3394,7 @@ mtext("coverage", side = 2, cex = 1.25, line = 0, outer = TRUE)
 \begin{figure}[h!]
 \begin{center}
 <<Fig-gamma-500, echo = FALSE>>=
-par(mfrow = c(3,2), oma = c(4,4,2,0), mar = c(1,1,1,2))
+par(mfrow = c(3,3), oma = c(4,4,2,0), mar = c(1,1,1,2))
 shapes <- c(0.5, 0.75, 1, 1.5, 2, 5, 7, 10, 12, 15, 20, 25)
 
 plot.new()
@@ -3397,6 +3420,15 @@ lines(log(shapes), HD.error.gamma.500, col = "blue", lty = 4, lwd = 1.5)
 axis(2)
 mtext("prediction error", side = 2, cex = 1, line = 2)
 
+plot.new()
+plot.window(xlim = c(log(min(shapes)), log(max(shapes))), 
+  ylim = c(0, 0.60))
+legend(-0.40, 0.60, legend=c("bin param", "transform param",
+  "bin nonparam", "LSLW", "LS", 
+  "HD", "nominal coverage"), col=c("red", "red", "green", "purple", 
+  "black", "blue", "grey"), cex = 1.25, 
+  lty=c(1,2,2,1,2,4,1), bty = "n")
+
 s <- length(shapes)
 plot.new()
 plot.window(xlim = c(log(min(shapes)), log(max(shapes))), 
@@ -3407,8 +3439,8 @@ lines(log(shapes), nonpara.local.gamma.500[3*(1:s) - 2], col = "green", lty = 2,
 lines(log(shapes), LSLW.local.gamma.500[3*(1:s) - 2], col = "purple", lty = 1, lwd = 1.5)
 lines(log(shapes), LS.local.gamma.500[3*(1:s) - 2], col = "black", lty = 2, lwd = 1.5)
 lines(log(shapes), HD.local.gamma.500[3*(1:s) - 2], col = "blue", lty = 4, lwd = 1.5)
-abline(h = 0.90, lty = 1, col = "grey", lwd = 1.5)
-axis(1); axis(2)
+abline(h = 0.90, lty = 1, col = "grey", lwd = 2)
+axis(2)
 mtext("coverage when 0 < x < 1/3", side = 2, cex = 1, line = 2)
 
 plot.new()
@@ -3420,38 +3452,56 @@ lines(log(shapes), nonpara.local.gamma.500[3*(1:s) - 1], col = "green", lty = 2,
 lines(log(shapes), LSLW.local.gamma.500[3*(1:s) - 1], col = "purple", lty = 1, lwd = 1.5)
 lines(log(shapes), LS.local.gamma.500[3*(1:s) - 1], col = "black", lty = 2, lwd = 1.5)
 lines(log(shapes), HD.local.gamma.500[3*(1:s) - 1], col = "blue", lty = 4, lwd = 1.5)
-abline(h = 0.90, lty = 1, col = "grey", lwd = 1.5)
+abline(h = 0.90, lty = 1, col = "grey", lwd = 2)
 axis(1); axis(2)
 mtext("coverage when 1/3 <= x < 2/3", side = 2, cex = 1, line = 2)
 
 plot.new()
 plot.window(xlim = c(log(min(shapes)), log(max(shapes))), 
-  ylim = c(0.70, 0.98))
+  ylim = c(0.75, 0.98))
 lines(log(shapes), para.local.gamma.500[3*(1:s)], col = "red", lty = 1, lwd = 1.5)
 lines(log(shapes), transform.local.gamma.500[3*(1:s)], col = "red", lty = 2, lwd = 1.5)
 lines(log(shapes), nonpara.local.gamma.500[3*(1:s)], col = "green", lty = 2, lwd = 1.5)
 lines(log(shapes), LSLW.local.gamma.500[3*(1:s)], col = "purple", lty = 1, lwd = 1.5)
 lines(log(shapes), LS.local.gamma.500[3*(1:s)], col = "black", lty = 2, lwd = 1.5)
 lines(log(shapes), HD.local.gamma.500[3*(1:s)], col = "blue", lty = 4, lwd = 1.5)
-abline(h = 0.90, lty = 1, col = "grey", lwd = 1.5)
+abline(h = 0.90, lty = 1, col = "grey", lwd = 2)
 axis(1); axis(2)
 mtext("coverage when 2/3 < x < 1", side = 2, cex = 1, line = 2)
 
 plot.new()
 plot.window(xlim = c(log(min(shapes)), log(max(shapes))), 
-  ylim = c(0, 0.60))
-legend(-0.25, 0.55, legend=c("bin param", "transform param",
-  "bin nonparam", "LSLW", "LS", 
-  "HD", "nominal coverage"), col=c("red", "red", "green", "purple", 
-  "black", "blue", "grey"), cex = 1.25, 
-  lty=c(1,2,2,1,2,4,1), bty = "n")
+  ylim = c(0.85, 0.93))
+lines(log(shapes), para.marginal.gamma.500, col = "red", lty = 1, lwd = 1.5)
+lines(log(shapes), transform.marginal.gamma.500, col = "red", lty = 2, lwd = 1.5)
+lines(log(shapes), nonpara.marginal.gamma.500, col = "green", lty = 2, lwd = 1.5)
+lines(log(shapes), LSLW.marginal.gamma.500, col = "purple", lty = 1, lwd = 1.5)
+lines(log(shapes), LS.marginal.gamma.500, col = "black", lty = 2, lwd = 1.5)
+lines(log(shapes), HD.marginal.gamma.500, col = "blue", lty = 4, lwd = 1.5)
+axis(2)
+mtext("marginal coverage", side = 2, cex = 1, line = 2)
+axis(1)
 
 mtext("log(shape)", side = 1, cex = 1.25, line = 2, outer = TRUE)
 mtext("Simulation Setting A", side = 3, cex = 1.25, line = 0.5, outer = TRUE)
 @
 \end{center}
-\caption{Diagnostic plots for prediction regions when the model is correctly 
-  specified, $n = 500$, and the number of bins is equal to $3$.}
+\caption{This figure compares the performance of the 
+  binned parametric,
+  transformation,
+  binned nonparametric,
+  least squares, and 
+  least squares locally weighted conformal prediciton region and the 
+  highest density prediction region when $n = 500$ and the number of bins 
+  equals 3.  
+  The specific diagnostics used to compare these prediciton regions is the 
+    area,
+    prediction error, 
+    marginal coverage probability,
+    and the coverage probability with respect to binning 
+    across shape parameter values.
+  The average of 50 Monte Carlo samples at each shape parameter value in 
+  these simulation settings form the lines that are depicted in this figure.}
 \label{Fig:gamma.500}
 \end{figure}
 
@@ -3474,7 +3524,7 @@ lines(inx, nonpara.inx.gamma.500[1:25], col = "green", lty = 2, lwd = 1.5)
 lines(inx, LSLW.inx.gamma.500[1:25], col = "purple", lty = 1, lwd = 1.5)
 lines(inx, LS.inx.gamma.500[1:25], col = "black", lty = 2, lwd = 1.5)
 lines(inx, HD.inx.gamma.500[1:25], col = "blue", lty = 4, lwd = 1.5)
-abline(h = 0.90, lty = 1, col = "grey", lwd = 1.5)
+abline(h = 0.90, lty = 1, col = "grey", lwd = 2)
 axis(2)
 mtext("shape = 0.5", side = 3, cex = 1, line = 2)
 
@@ -3495,7 +3545,7 @@ lines(inx, nonpara.inx.gamma.500[26:50], col = "green", lty = 2, lwd = 1.5)
 lines(inx, LSLW.inx.gamma.500[26:50], col = "purple", lty = 1, lwd = 1.5)
 lines(inx, LS.inx.gamma.500[26:50], col = "black", lty = 2, lwd = 1.5)
 lines(inx, HD.inx.gamma.500[26:50], col = "blue", lty = 4, lwd = 1.5)
-abline(h = 0.90, lty = 1, col = "grey", lwd = 1.5)
+abline(h = 0.90, lty = 1, col = "grey", lwd = 2)
 mtext("shape = 0.75", side = 3, cex = 1, line = 2)
 
 # shape = 1
@@ -3507,7 +3557,7 @@ lines(inx, nonpara.inx.gamma.500[51:75], col = "green", lty = 2, lwd = 1.5)
 lines(inx, LSLW.inx.gamma.500[51:75], col = "purple", lty = 1, lwd = 1.5)
 lines(inx, LS.inx.gamma.500[51:75], col = "black", lty = 2, lwd = 1.5)
 lines(inx, HD.inx.gamma.500[51:75], col = "blue", lty = 4, lwd = 1.5)
-abline(h = 0.90, lty = 1, col = "grey", lwd = 1.5)
+abline(h = 0.90, lty = 1, col = "grey", lwd = 2)
 mtext("shape = 1", side = 3, cex = 1, line = 2)
 
 # shape = 1.5
@@ -3519,7 +3569,7 @@ lines(inx, nonpara.inx.gamma.500[76:100], col = "green", lty = 2, lwd = 1.5)
 lines(inx, LSLW.inx.gamma.500[76:100], col = "purple", lty = 1, lwd = 1.5)
 lines(inx, LS.inx.gamma.500[76:100], col = "black", lty = 2, lwd = 1.5)
 lines(inx, HD.inx.gamma.500[76:100], col = "blue", lty = 4, lwd = 1.5)
-abline(h = 0.90, lty = 1, col = "grey", lwd = 1.5)
+abline(h = 0.90, lty = 1, col = "grey", lwd = 2)
 axis(2)
 mtext("shape = 1.5", side = 3, cex = 1, line = 2)
 
@@ -3532,7 +3582,7 @@ lines(inx, nonpara.inx.gamma.500[101:125], col = "green", lty = 2, lwd = 1.5)
 lines(inx, LSLW.inx.gamma.500[101:125], col = "purple", lty = 1, lwd = 1.5)
 lines(inx, LS.inx.gamma.500[101:125], col = "black", lty = 2, lwd = 1.5)
 lines(inx, HD.inx.gamma.500[101:125], col = "blue", lty = 4, lwd = 1.5)
-abline(h = 0.90, lty = 1, col = "grey", lwd = 1.5)
+abline(h = 0.90, lty = 1, col = "grey", lwd = 2)
 mtext("shape = 2", side = 3, cex = 1, line = 2)
 
 # shape = 5
@@ -3544,7 +3594,7 @@ lines(inx, nonpara.inx.gamma.500[126:150], col = "green", lty = 2, lwd = 1.5)
 lines(inx, LSLW.inx.gamma.500[126:150], col = "purple", lty = 1, lwd = 1.5)
 lines(inx, LS.inx.gamma.500[126:150], col = "black", lty = 2, lwd = 1.5)
 lines(inx, HD.inx.gamma.500[126:150], col = "blue", lty = 4, lwd = 1.5)
-abline(h = 0.90, lty = 1, col = "grey", lwd = 1.5)
+abline(h = 0.90, lty = 1, col = "grey", lwd = 2)
 mtext("shape = 5", side = 3, cex = 1, line = 2)
 
 # shape = 7
@@ -3556,7 +3606,7 @@ lines(inx, nonpara.inx.gamma.500[151:175], col = "green", lty = 2, lwd = 1.5)
 lines(inx, LSLW.inx.gamma.500[151:175], col = "purple", lty = 1, lwd = 1.5)
 lines(inx, LS.inx.gamma.500[151:175], col = "black", lty = 2, lwd = 1.5)
 lines(inx, HD.inx.gamma.500[151:175], col = "blue", lty = 4, lwd = 1.5)
-abline(h = 0.90, lty = 1, col = "grey", lwd = 1.5)
+abline(h = 0.90, lty = 1, col = "grey", lwd = 2)
 mtext("shape = 7", side = 3, cex = 1, line = 2)
 
 # shape = 10
@@ -3568,7 +3618,7 @@ lines(inx, nonpara.inx.gamma.500[176:200], col = "green", lty = 2, lwd = 1.5)
 lines(inx, LSLW.inx.gamma.500[176:200], col = "purple", lty = 1, lwd = 1.5)
 lines(inx, LS.inx.gamma.500[176:200], col = "black", lty = 2, lwd = 1.5)
 lines(inx, HD.inx.gamma.500[176:200], col = "blue", lty = 4, lwd = 1.5)
-abline(h = 0.90, lty = 1, col = "grey", lwd = 1.5)
+abline(h = 0.90, lty = 1, col = "grey", lwd = 2)
 axis(2)
 mtext("shape = 10", side = 3, cex = 1, line = 2)
 
@@ -3581,7 +3631,7 @@ lines(inx, nonpara.inx.gamma.500[201:225], col = "green", lty = 2, lwd = 1.5)
 lines(inx, LSLW.inx.gamma.500[201:225], col = "purple", lty = 1, lwd = 1.5)
 lines(inx, LS.inx.gamma.500[201:225], col = "black", lty = 2, lwd = 1.5)
 lines(inx, HD.inx.gamma.500[201:225], col = "blue", lty = 4, lwd = 1.5)
-abline(h = 0.90, lty = 1, col = "grey", lwd = 1.5)
+abline(h = 0.90, lty = 1, col = "grey", lwd = 2)
 axis(1)
 mtext("shape = 12", side = 3, cex = 1, line = 2)
 
@@ -3594,7 +3644,7 @@ lines(inx, nonpara.inx.gamma.500[226:250], col = "green", lty = 2, lwd = 1.5)
 lines(inx, LSLW.inx.gamma.500[226:250], col = "purple", lty = 1, lwd = 1.5)
 lines(inx, LS.inx.gamma.500[226:250], col = "black", lty = 2, lwd = 1.5)
 lines(inx, HD.inx.gamma.500[226:250], col = "blue", lty = 4, lwd = 1.5)
-abline(h = 0.90, lty = 1, col = "grey", lwd = 1.5)
+abline(h = 0.90, lty = 1, col = "grey", lwd = 2)
 axis(1)
 mtext("shape = 15", side = 3, cex = 1, line = 2)
 
@@ -3607,7 +3657,7 @@ lines(inx, nonpara.inx.gamma.500[251:275], col = "green", lty = 2, lwd = 1.5)
 lines(inx, LSLW.inx.gamma.500[251:275], col = "purple", lty = 1, lwd = 1.5)
 lines(inx, LS.inx.gamma.500[251:275], col = "black", lty = 2, lwd = 1.5)
 lines(inx, HD.inx.gamma.500[251:275], col = "blue", lty = 4, lwd = 1.5)
-abline(h = 0.90, lty = 1, col = "grey", lwd = 1.5)
+abline(h = 0.90, lty = 1, col = "grey", lwd = 2)
 axis(1)
 mtext("shape = 20", side = 3, cex = 1, line = 2)
 
@@ -3620,7 +3670,7 @@ lines(inx, nonpara.inx.gamma.500[276:300], col = "green", lty = 2, lwd = 1.5)
 lines(inx, LSLW.inx.gamma.500[276:300], col = "purple", lty = 1, lwd = 1.5)
 lines(inx, LS.inx.gamma.500[276:300], col = "black", lty = 2, lwd = 1.5)
 lines(inx, HD.inx.gamma.500[276:300], col = "blue", lty = 4, lwd = 1.5)
-abline(h = 0.90, lty = 1, col = "grey", lwd = 1.5)
+abline(h = 0.90, lty = 1, col = "grey", lwd = 2)
 axis(1); axis(2)
 mtext("shape = 25", side = 3, cex = 1, line = 2)
 
@@ -3628,21 +3678,9 @@ mtext("x", side = 1, cex = 1.25, line = 2, outer = TRUE)
 mtext("coverage", side = 2, cex = 1.25, line = 0, outer = TRUE)
 @
 \end{center}
-\caption{This figure compares the performance of the 
-  binned parametric,
-  transformation, 
-  binned nonparametric,
-  least squares, and 
-  least squares locally weighted conformal prediciton region and the 
-  highest density prediction region when $n = 500$ and the number of bins 
-  equals 3.  
-  The specific diagnostics used to compare these prediciton regions is the 
-    area (top-left panel),
-    prediction error (top-right panel), and
-    the coverage probability with respect to binning (bottom row) 
-    across shape parameter values.
-  The average of 50 Monte Carlo samples at each shape parameter value in 
-  these simulation settings form the lines that are depicted in this figure.}
+\caption{Plot of the estimated coverage probabilities of prediction regions 
+  across $x$ and shape parameter values when the model is correctly 
+  specified, $n = 500$, and the number of bins is equal to $3$.}
 \label{Fig:gamma.inx.500}
 \end{figure}
 
@@ -3656,29 +3694,32 @@ mtext("coverage", side = 2, cex = 1.25, line = 0, outer = TRUE)
 \section{Gamma-Gaussian model misspecification}
 \label{sec:misspec}
 
-In this Section, we compare the parametric conformal prediction 
-region, the nonparametric conformal prediction region, the LSLW conformal 
-prediction region, the LS conformal prediction region, and the HD prediction 
-region under model misspecification.  The data generating process is Gamma 
-with an inverse link function and we set $\beta = (0.5, 1)^T$.
-We consider sample sizes of $n \in \{150, 250, 500\}$ and shape parameter 
-values of $\{5, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100\}$ when $n = 150$ and 
-shape parameter values of $\{5, 20, 40, 60, 80, 100\}$ when $n = 250, 500$.  
-This value of $\beta$ and these shape parameter values are chosen so that 
-errors about a cubic regression model appear to be almost symmetric.  In this 
-analysis the parametric, LSLW, and LS conformal prediction regions and the HD 
-prediction region are fit assuming this misspecified cubic regression model 
-with homoscedastic normal errors.  When $n = 150$ we build the parametric and 
-nonparametric conformal prediction regions using 2 bins.  When $n = 250, 500$ 
-we build the parametric and nonparametric conformal prediction regions using 
-3 bins.  These number of bin choices correspond to the bin width asymptotics 
-of \citet{lei2014distribution}. 
+In this Section, we compare the binned parametric and nonparametric conformal 
+prediction regions, the transformation based conformal prediction region, 
+the LSLW conformal prediction region, the LS conformal prediction region, 
+and the HD prediction region under model misspecification.  The data 
+generating process is Gamma with an inverse link function and we set 
+$\beta = (0.5, 1)^T$.   We consider sample sizes of $n \in \{150, 250, 500\}$ 
+and shape parameter values of $\{5, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100\}$ 
+when $n = 150$ and shape parameter values of $\{5, 20, 40, 60, 80, 100\}$ 
+when $n = 250, 500$.  This value of $\beta$ and these shape parameter values 
+are chosen so that errors about a cubic regression model appear to be almost 
+symmetric.  In this analysis the binned and transformation based parametric, 
+LSLW, and LS conformal prediction regions are fit assuming this misspecified 
+cubic regression model with homoscedastic normal errors, and the HD prediction 
+region is fit to the true data generating Gamma model.  When $n = 150$ we 
+build the binned parametric and nonparametric conformal prediction regions 
+using 2 bins.  When $n = 250, 500$ we build the parametric and nonparametric 
+conformal prediction regions using 3 bins.  These number of bin choices 
+correspond to the bin width asymptotics of \citet{lei2014distribution}. 
 
+We also compare the HD prediction region fit to the misspecified cubic 
+regression model with homoscedastic normal errors when $n = 150$.  
 
 
 \subsection{Simulations}
 
-The following function computes our diagnostic measures for the five 
+The following function computes our diagnostic measures for the six 
 prediction regions under investigation in the univariate case where data 
 is assumed to be Gamma with inverse link function and the fitted model is 
 Gaussian with a cubic fit.  
@@ -3713,7 +3754,7 @@ misspec_simulator <- function(beta, n = 150, shape = 0.5,
     model <- obj$model
     dat <- obj$dat
     model$data <- dat
-    x <- model$x[, -1]
+    x <- model$x[, 2]
     y <- model$y
     p1.tibs <- conformal.pred(x = cbind(x,x^2,x^3), y = y, 
       x0 = cbind(x,x^2,x^3), 
@@ -3745,11 +3786,12 @@ misspec_simulator <- function(beta, n = 150, shape = 0.5,
     fit.int = lm(y ~ x1 + I(x1^2) + I(x1^3), data = dat)
     betaMLE <- coefficients(fit.int)
     sdMLE <- summary(fit.int)$sigma
-    meanMLE <- as.numeric(cbind(1, x, x^2, x^3) %*% betaMLE)    
+    meanMLE <- as.numeric(cbind(1, x, x^2, x^3) %*% betaMLE) 
     HDCI <- do.call(rbind, lapply(1:n, function(j){ 
-      hdi(qnorm, 1 - alpha, mean = meanMLE, sd = sdMLE)
+      hdi(qnorm, 1 - alpha, mean = meanMLE[j], sd = sdMLE)
     }))
 
+    model.true <- obj$model.true
     betaMLE.true <- coefficients(model.true)
     shapeMLE.true <- as.numeric(gamma.shape(model.true)[1])
     rateMLE.true <- cbind(1, x) %*% betaMLE.true * shapeMLE.true
@@ -4078,55 +4120,57 @@ para.inx.misspec.150 <- nonpara.inx.misspec.150 <-
   transform.inx.misspec.150 <- NULL  
 
 shapes <- c(0.75, 1, 2, 5, 7, 10, 12, 15, 20, 25, 
-  30, 40, 50, 60, 70, 80, 90, 100)
+  30, 40, 50, 60, 70, 80)
+#shapes <- c(0.75, 1, 2, 5, 7, 10, 12, 15, 20, 25, 
+#  30, 40, 50, 60, 70, 80, 90, 100)
 for(j in shapes ){
   internal.output <- eval(parse(text=paste("diagnostics.misspec.150.2", j, sep = ".")))
   k <- which(shapes == j)
 
   # marginal coverages
   HD.marginal.misspec.150[k] <- as.numeric(internal.output[1, 1])
-  LS.marginal.misspec.150[k] <- as.numeric(internal.output[2, 1])
-  LSLW.marginal.misspec.150[k] <- as.numeric(internal.output[3, 1])
-  nonpara.marginal.misspec.150[k] <- as.numeric(internal.output[4, 1])
-  para.marginal.misspec.150[k] <- as.numeric(internal.output[5, 1])
-  transform.marginal.misspec.150[k] <- as.numeric(internal.output[6, 1])
-  trueHD.marginal.misspec.150[k] <- as.numeric(internal.output[7, 1])
+  trueHD.marginal.misspec.150[k] <- as.numeric(internal.output[2, 1])  
+  LS.marginal.misspec.150[k] <- as.numeric(internal.output[3, 1])
+  LSLW.marginal.misspec.150[k] <- as.numeric(internal.output[4, 1])
+  nonpara.marginal.misspec.150[k] <- as.numeric(internal.output[5, 1])
+  para.marginal.misspec.150[k] <- as.numeric(internal.output[6, 1])
+  transform.marginal.misspec.150[k] <- as.numeric(internal.output[7, 1])
 
   # local coverages
   HD.local.misspec.150[(2*k-1):(2*k)] <- as.numeric(internal.output[1, 2:3])
-  LS.local.misspec.150[(2*k-1):(2*k)] <- as.numeric(internal.output[2, 2:3])
-  LSLW.local.misspec.150[(2*k-1):(2*k)] <- as.numeric(internal.output[3, 2:3])
-  nonpara.local.misspec.150[(2*k-1):(2*k)] <- as.numeric(internal.output[4, 2:3])
-  para.local.misspec.150[(2*k-1):(2*k)] <- as.numeric(internal.output[5, 2:3])
-  transform.local.misspec.150[(2*k-1):(2*k)] <- as.numeric(internal.output[6, 2:3])
-  trueHD.local.misspec.150[(2*k-1):(2*k)] <- as.numeric(internal.output[7, 2:3])
+  trueHD.local.misspec.150[(2*k-1):(2*k)] <- as.numeric(internal.output[2, 2:3])  
+  LS.local.misspec.150[(2*k-1):(2*k)] <- as.numeric(internal.output[3, 2:3])
+  LSLW.local.misspec.150[(2*k-1):(2*k)] <- as.numeric(internal.output[4, 2:3])
+  nonpara.local.misspec.150[(2*k-1):(2*k)] <- as.numeric(internal.output[5, 2:3])
+  para.local.misspec.150[(2*k-1):(2*k)] <- as.numeric(internal.output[6, 2:3])
+  transform.local.misspec.150[(2*k-1):(2*k)] <- as.numeric(internal.output[7, 2:3])
 
   # conditional coverages
   HD.inx.misspec.150[((25*(k-1)+1)):(25*k)] <- as.numeric(internal.output[1, 4:28])
-  LS.inx.misspec.150[((25*(k-1)+1)):(25*k)] <- as.numeric(internal.output[2, 4:28])
-  LSLW.inx.misspec.150[((25*(k-1)+1)):(25*k)] <- as.numeric(internal.output[3, 4:28])
-  nonpara.inx.misspec.150[((25*(k-1)+1)):(25*k)] <- as.numeric(internal.output[4, 4:28])
-  para.inx.misspec.150[((25*(k-1)+1)):(25*k)] <- as.numeric(internal.output[5, 4:28])
-  transform.inx.misspec.150[((25*(k-1)+1)):(25*k)] <- as.numeric(internal.output[6, 4:28])
-  trueHD.inx.misspec.150[((25*(k-1)+1)):(25*k)] <- as.numeric(internal.output[7, 4:28])
+  trueHD.inx.misspec.150[((25*(k-1)+1)):(25*k)] <- as.numeric(internal.output[2, 4:28])
+  LS.inx.misspec.150[((25*(k-1)+1)):(25*k)] <- as.numeric(internal.output[3, 4:28])
+  LSLW.inx.misspec.150[((25*(k-1)+1)):(25*k)] <- as.numeric(internal.output[4, 4:28])
+  nonpara.inx.misspec.150[((25*(k-1)+1)):(25*k)] <- as.numeric(internal.output[5, 4:28])
+  para.inx.misspec.150[((25*(k-1)+1)):(25*k)] <- as.numeric(internal.output[6, 4:28])
+  transform.inx.misspec.150[((25*(k-1)+1)):(25*k)] <- as.numeric(internal.output[7, 4:28])
 
   # area
   HD.area.misspec.150[k] <- as.numeric(internal.output[1, 29])
-  LS.area.misspec.150[k] <- as.numeric(internal.output[2, 29])
-  LSLW.area.misspec.150[k] <- as.numeric(internal.output[3, 29])
-  nonpara.area.misspec.150[k] <- as.numeric(internal.output[4, 29])
-  para.area.misspec.150[k] <- as.numeric(internal.output[5, 29])
-  transform.area.misspec.150[k] <- as.numeric(internal.output[6, 29])
-  trueHD.area.misspec.150[k] <- as.numeric(internal.output[7, 29])
+  trueHD.area.misspec.150[k] <- as.numeric(internal.output[2, 29])  
+  LS.area.misspec.150[k] <- as.numeric(internal.output[3, 29])
+  LSLW.area.misspec.150[k] <- as.numeric(internal.output[4, 29])
+  nonpara.area.misspec.150[k] <- as.numeric(internal.output[5, 29])
+  para.area.misspec.150[k] <- as.numeric(internal.output[6, 29])
+  transform.area.misspec.150[k] <- as.numeric(internal.output[7, 29])
 
   # prediction error
   HD.error.misspec.150[k] <- as.numeric(internal.output[1, 30])
-  LS.error.misspec.150[k] <- as.numeric(internal.output[2, 30])
-  LSLW.error.misspec.150[k] <- as.numeric(internal.output[3, 30])
-  nonpara.error.misspec.150[k] <- as.numeric(internal.output[4, 30])
-  para.error.misspec.150[k] <- as.numeric(internal.output[5, 30])
-  transform.error.misspec.150[k] <- as.numeric(internal.output[6, 30])
-  trueHD.error.misspec.150[k] <- as.numeric(internal.output[7, 30])  
+  trueHD.error.misspec.150[k] <- as.numeric(internal.output[2, 30])    
+  LS.error.misspec.150[k] <- as.numeric(internal.output[3, 30])
+  LSLW.error.misspec.150[k] <- as.numeric(internal.output[4, 30])
+  nonpara.error.misspec.150[k] <- as.numeric(internal.output[5, 30])
+  para.error.misspec.150[k] <- as.numeric(internal.output[6, 30])
+  transform.error.misspec.150[k] <- as.numeric(internal.output[7, 30])
 }
 @
 
@@ -4244,48 +4288,48 @@ for(j in shapes ){
 
   # marginal coverages
   HD.marginal.misspec.250[k] <- as.numeric(internal.output[1, 1])
-  LS.marginal.misspec.250[k] <- as.numeric(internal.output[2, 1])
-  LSLW.marginal.misspec.250[k] <- as.numeric(internal.output[3, 1])
-  nonpara.marginal.misspec.250[k] <- as.numeric(internal.output[4, 1])
-  para.marginal.misspec.250[k] <- as.numeric(internal.output[5, 1])
-  transform.marginal.misspec.250[k] <- as.numeric(internal.output[6, 1])
-  trueHD.marginal.misspec.250[k] <- as.numeric(internal.output[7, 1])
+  trueHD.marginal.misspec.250[k] <- as.numeric(internal.output[2, 1])  
+  LS.marginal.misspec.250[k] <- as.numeric(internal.output[3, 1])
+  LSLW.marginal.misspec.250[k] <- as.numeric(internal.output[4, 1])
+  nonpara.marginal.misspec.250[k] <- as.numeric(internal.output[5, 1])
+  para.marginal.misspec.250[k] <- as.numeric(internal.output[6, 1])
+  transform.marginal.misspec.250[k] <- as.numeric(internal.output[7, 1])
 
   # local coverages
   HD.local.misspec.250[(3*(k-1)+1):(3*k)] <- as.numeric(internal.output[1, 2:4])
-  LS.local.misspec.250[(3*(k-1)+1):(3*k)] <- as.numeric(internal.output[2, 2:4])
-  LSLW.local.misspec.250[(3*(k-1)+1):(3*k)] <- as.numeric(internal.output[3, 2:4])
-  nonpara.local.misspec.250[(3*(k-1)+1):(3*k)] <- as.numeric(internal.output[4, 2:4])
-  para.local.misspec.250[(3*(k-1)+1):(3*k)] <- as.numeric(internal.output[5, 2:4])
-  transform.local.misspec.250[(3*(k-1)+1):(3*k)] <- as.numeric(internal.output[6, 2:4])
-  trueHD.local.misspec.250[(3*(k-1)+1):(3*k)] <- as.numeric(internal.output[7, 2:4])
+  trueHD.local.misspec.250[(3*(k-1)+1):(3*k)] <- as.numeric(internal.output[2, 2:4])  
+  LS.local.misspec.250[(3*(k-1)+1):(3*k)] <- as.numeric(internal.output[3, 2:4])
+  LSLW.local.misspec.250[(3*(k-1)+1):(3*k)] <- as.numeric(internal.output[4, 2:4])
+  nonpara.local.misspec.250[(3*(k-1)+1):(3*k)] <- as.numeric(internal.output[5, 2:4])
+  para.local.misspec.250[(3*(k-1)+1):(3*k)] <- as.numeric(internal.output[6, 2:4])
+  transform.local.misspec.250[(3*(k-1)+1):(3*k)] <- as.numeric(internal.output[7, 2:4])
 
   # conditional coverages
   HD.inx.misspec.250[((25*(k-1)+1)):(25*k)] <- as.numeric(internal.output[1, 5:29])
-  LS.inx.misspec.250[((25*(k-1)+1)):(25*k)] <- as.numeric(internal.output[2, 5:29])
-  LSLW.inx.misspec.250[((25*(k-1)+1)):(25*k)] <- as.numeric(internal.output[3, 5:29])
-  nonpara.inx.misspec.250[((25*(k-1)+1)):(25*k)] <- as.numeric(internal.output[4, 5:29])
-  para.inx.misspec.250[((25*(k-1)+1)):(25*k)] <- as.numeric(internal.output[5, 5:29])
-  transform.inx.misspec.250[((25*(k-1)+1)):(25*k)] <- as.numeric(internal.output[6, 5:29])
-  trueHD.inx.misspec.250[((25*(k-1)+1)):(25*k)] <- as.numeric(internal.output[7, 5:29])
+  trueHD.inx.misspec.250[((25*(k-1)+1)):(25*k)] <- as.numeric(internal.output[2, 5:29])  
+  LS.inx.misspec.250[((25*(k-1)+1)):(25*k)] <- as.numeric(internal.output[3, 5:29])
+  LSLW.inx.misspec.250[((25*(k-1)+1)):(25*k)] <- as.numeric(internal.output[4, 5:29])
+  nonpara.inx.misspec.250[((25*(k-1)+1)):(25*k)] <- as.numeric(internal.output[5, 5:29])
+  para.inx.misspec.250[((25*(k-1)+1)):(25*k)] <- as.numeric(internal.output[6, 5:29])
+  transform.inx.misspec.250[((25*(k-1)+1)):(25*k)] <- as.numeric(internal.output[7, 5:29])
 
   # area
   HD.area.misspec.250[k] <- as.numeric(internal.output[1, 30])
-  LS.area.misspec.250[k] <- as.numeric(internal.output[2, 30])
-  LSLW.area.misspec.250[k] <- as.numeric(internal.output[3, 30])
-  nonpara.area.misspec.250[k] <- as.numeric(internal.output[4, 30])
-  para.area.misspec.250[k] <- as.numeric(internal.output[5, 30])
-  transform.area.misspec.250[k] <- as.numeric(internal.output[6, 30])
-  trueHD.area.misspec.250[k] <- as.numeric(internal.output[7, 30])
+  trueHD.area.misspec.250[k] <- as.numeric(internal.output[2, 30])  
+  LS.area.misspec.250[k] <- as.numeric(internal.output[3, 30])
+  LSLW.area.misspec.250[k] <- as.numeric(internal.output[4, 30])
+  nonpara.area.misspec.250[k] <- as.numeric(internal.output[5, 30])
+  para.area.misspec.250[k] <- as.numeric(internal.output[6, 30])
+  transform.area.misspec.250[k] <- as.numeric(internal.output[7, 30])
 
   # prediction error
   HD.error.misspec.250[k] <- as.numeric(internal.output[1, 31])
-  LS.error.misspec.250[k] <- as.numeric(internal.output[2, 31])
-  LSLW.error.misspec.250[k] <- as.numeric(internal.output[3, 31])
-  nonpara.error.misspec.250[k] <- as.numeric(internal.output[4, 31])
-  para.error.misspec.250[k] <- as.numeric(internal.output[5, 31])
-  transform.error.misspec.250[k] <- as.numeric(internal.output[6, 31])
-  trueHD.error.misspec.250[k] <- as.numeric(internal.output[7, 31])  
+  trueHD.error.misspec.250[k] <- as.numeric(internal.output[2, 31]) 
+  LS.error.misspec.250[k] <- as.numeric(internal.output[3, 31])
+  LSLW.error.misspec.250[k] <- as.numeric(internal.output[4, 31])
+  nonpara.error.misspec.250[k] <- as.numeric(internal.output[5, 31])
+  para.error.misspec.250[k] <- as.numeric(internal.output[6, 31])
+  transform.error.misspec.250[k] <- as.numeric(internal.output[7, 31])
 }
 @
 
@@ -4404,48 +4448,48 @@ for(j in shapes ){
 
   # marginal coverages
   HD.marginal.misspec.500[k] <- as.numeric(internal.output[1, 1])
-  LS.marginal.misspec.500[k] <- as.numeric(internal.output[2, 1])
-  LSLW.marginal.misspec.500[k] <- as.numeric(internal.output[3, 1])
-  nonpara.marginal.misspec.500[k] <- as.numeric(internal.output[4, 1])
-  para.marginal.misspec.500[k] <- as.numeric(internal.output[5, 1])
-  transform.marginal.misspec.500[k] <- as.numeric(internal.output[6, 1])
-  trueHD.marginal.misspec.500[k] <- as.numeric(internal.output[7, 1])
+  trueHD.marginal.misspec.500[k] <- as.numeric(internal.output[2, 1])
+  LS.marginal.misspec.500[k] <- as.numeric(internal.output[3, 1])
+  LSLW.marginal.misspec.500[k] <- as.numeric(internal.output[4, 1])
+  nonpara.marginal.misspec.500[k] <- as.numeric(internal.output[5, 1])
+  para.marginal.misspec.500[k] <- as.numeric(internal.output[6, 1])
+  transform.marginal.misspec.500[k] <- as.numeric(internal.output[7, 1])
 
   # local coverages
   HD.local.misspec.500[(3*(k-1)+1):(3*k)] <- as.numeric(internal.output[1, 2:4])
-  LS.local.misspec.500[(3*(k-1)+1):(3*k)] <- as.numeric(internal.output[2, 2:4])
-  LSLW.local.misspec.500[(3*(k-1)+1):(3*k)] <- as.numeric(internal.output[3, 2:4])
-  nonpara.local.misspec.500[(3*(k-1)+1):(3*k)] <- as.numeric(internal.output[4, 2:4])
-  para.local.misspec.500[(3*(k-1)+1):(3*k)] <- as.numeric(internal.output[5, 2:4])
-  transform.local.misspec.500[(3*(k-1)+1):(3*k)] <- as.numeric(internal.output[6, 2:4])
-  trueHD.local.misspec.500[(3*(k-1)+1):(3*k)] <- as.numeric(internal.output[7, 2:4])
+  trueHD.local.misspec.500[(3*(k-1)+1):(3*k)] <- as.numeric(internal.output[2, 2:4])
+  LS.local.misspec.500[(3*(k-1)+1):(3*k)] <- as.numeric(internal.output[3, 2:4])
+  LSLW.local.misspec.500[(3*(k-1)+1):(3*k)] <- as.numeric(internal.output[4, 2:4])
+  nonpara.local.misspec.500[(3*(k-1)+1):(3*k)] <- as.numeric(internal.output[5, 2:4])
+  para.local.misspec.500[(3*(k-1)+1):(3*k)] <- as.numeric(internal.output[6, 2:4])
+  transform.local.misspec.500[(3*(k-1)+1):(3*k)] <- as.numeric(internal.output[7, 2:4])
 
   # conditional coverages
   HD.inx.misspec.500[((25*(k-1)+1)):(25*k)] <- as.numeric(internal.output[1, 5:29])
-  LS.inx.misspec.500[((25*(k-1)+1)):(25*k)] <- as.numeric(internal.output[2, 5:29])
-  LSLW.inx.misspec.500[((25*(k-1)+1)):(25*k)] <- as.numeric(internal.output[3, 5:29])
-  nonpara.inx.misspec.500[((25*(k-1)+1)):(25*k)] <- as.numeric(internal.output[4, 5:29])
-  para.inx.misspec.500[((25*(k-1)+1)):(25*k)] <- as.numeric(internal.output[5, 5:29])
-  transform.inx.misspec.500[((25*(k-1)+1)):(25*k)] <- as.numeric(internal.output[6, 5:29])
-  trueHD.inx.misspec.500[((25*(k-1)+1)):(25*k)] <- as.numeric(internal.output[7, 5:29])
+  trueHD.inx.misspec.500[((25*(k-1)+1)):(25*k)] <- as.numeric(internal.output[2, 5:29])  
+  LS.inx.misspec.500[((25*(k-1)+1)):(25*k)] <- as.numeric(internal.output[3, 5:29])
+  LSLW.inx.misspec.500[((25*(k-1)+1)):(25*k)] <- as.numeric(internal.output[4, 5:29])
+  nonpara.inx.misspec.500[((25*(k-1)+1)):(25*k)] <- as.numeric(internal.output[5, 5:29])
+  para.inx.misspec.500[((25*(k-1)+1)):(25*k)] <- as.numeric(internal.output[6, 5:29])
+  transform.inx.misspec.500[((25*(k-1)+1)):(25*k)] <- as.numeric(internal.output[7, 5:29])
 
   # area
   HD.area.misspec.500[k] <- as.numeric(internal.output[1, 30])
-  LS.area.misspec.500[k] <- as.numeric(internal.output[2, 30])
-  LSLW.area.misspec.500[k] <- as.numeric(internal.output[3, 30])
-  nonpara.area.misspec.500[k] <- as.numeric(internal.output[4, 30])
-  para.area.misspec.500[k] <- as.numeric(internal.output[5, 30])
-  transform.area.misspec.500[k] <- as.numeric(internal.output[6, 30])
-  trueHD.area.misspec.500[k] <- as.numeric(internal.output[7, 30])
+  trueHD.area.misspec.500[k] <- as.numeric(internal.output[2, 30])
+  LS.area.misspec.500[k] <- as.numeric(internal.output[3, 30])
+  LSLW.area.misspec.500[k] <- as.numeric(internal.output[4, 30])
+  nonpara.area.misspec.500[k] <- as.numeric(internal.output[5, 30])
+  para.area.misspec.500[k] <- as.numeric(internal.output[6, 30])
+  transform.area.misspec.500[k] <- as.numeric(internal.output[7, 30])
 
   # prediction error
   HD.error.misspec.500[k] <- as.numeric(internal.output[1, 31])
-  LS.error.misspec.500[k] <- as.numeric(internal.output[2, 31])
-  LSLW.error.misspec.500[k] <- as.numeric(internal.output[3, 31])
-  nonpara.error.misspec.500[k] <- as.numeric(internal.output[4, 31])
-  para.error.misspec.500[k] <- as.numeric(internal.output[5, 31])
+  trueHD.error.misspec.500[k] <- as.numeric(internal.output[2, 31])  
+  LS.error.misspec.500[k] <- as.numeric(internal.output[3, 31])
+  LSLW.error.misspec.500[k] <- as.numeric(internal.output[4, 31])
+  nonpara.error.misspec.500[k] <- as.numeric(internal.output[5, 31])
+  para.error.misspec.500[k] <- as.numeric(internal.output[6, 31])
   transform.error.misspec.500[k] <- as.numeric(internal.output[6, 31])
-  trueHD.error.misspec.500[k] <- as.numeric(internal.output[7, 31])  
 }
 @
 
@@ -4456,33 +4500,38 @@ for(j in shapes ){
 
 Results form our simulations are depicted in 
 Figures~\ref{Fig:misspec.150}-\ref{Fig:misspec.inx.500}.  
-For all five prediction regions we depict the estimatated area, prediction 
-error, and local coverage probabilities with respect to binning in 
-Figures~\ref{Fig:misspec.150}, \ref{Fig:misspec.250}, and 
+For all prediction regions under consideration we depict the estimatated 
+area, prediction error, and local coverage probabilities with respect to 
+binning in Figures~\ref{Fig:misspec.150}, \ref{Fig:misspec.250}, and 
 \ref{Fig:misspec.500} for $n = 150$, $250$, and $500$ respectively.  For all 
-five prediction regions we depict the local coverage probabilities across $x$ 
+prediction regions we depict the local coverage probabilities across $x$ 
 in Figures~\ref{Fig:misspec.inx.150}, \ref{Fig:misspec.inx.250}, and 
 \ref{Fig:misspec.inx.500} for $n = 150$, $250$, and $500$ respectively.
 
 In these simulations, we expect for the LSLW conformal prediction region to 
 perform well.  The model misspecification is modest, the Gamma data  
 appears to be almost symmetric, albeit heterogenous, about a cubic mean 
-function.  From these simulations we see that the parametric conformal 
-prediction region is similar to the LSLW prediciton region in area and 
-prediction error.  Both the parametric and LSLW conformal 
-prediction regions possess finite-sample, albeit slightly conservative, 
-local validity with respect to binning and they both give almost nominal 
-finite-sample conditional validity across the support.
-Moreover, these prediciton regions visually fit the data well as seen in 
-Section~\ref{sec:misspecplots}.
+function.  
+We also expect for the misspecified transformation based conformal 
+prediction region to have poor local and conditional coverage properties 
+when compared with the binned parametric conformal prediction region.
+From these simulations we see that the parametric conformal 
+prediction regions are similar to the LSLW prediciton region in area and 
+prediction error.  However, these prediction have drastically different 
+coverage properties.  The binned parametric conformal prediction region 
+possesses desirable local and conditional coverages in comparison to the 
+others, and LSLW conformal prediction region gives exhibit slight 
+undercoverage.  {\bf Revisit} Moreover, these prediciton regions visually 
+fit the data well as seen in Section~\ref{sec:misspecplots}.
 The nonparametric conformal prediction region gives closer to nominal 
 coverage than both the parametric and LSLW conformal prediction regions, 
 and it possesses finite-sample local validity with respect to 
 binning.  However, this prediction region is larger, gives higher 
 prediciton error than the parametric and LSLW conformal prediction 
 regions, and does not visually fit the data well for most simulation settings 
-as seen in Section~\ref{sec:misspecplots}.  The misspecified HD and LS 
-conformal prediction regions  provide extreme undercoverage at small values 
+as seen in Section~\ref{sec:misspecplots}.  The misspecified transformation 
+based conformal prediction region and the HD and LS 
+conformal prediction regions exhibit extreme undercoverage at small values 
 of $x$ and extreme overcoverage at large values of $x$.  These prediction 
 regions are also larger, they give higher prediciton error than the 
 parametric and LSLW conformal prediction regions, and the LS conformal 
@@ -4492,13 +4541,20 @@ settings as seen in Section~\ref{sec:misspecplots}.
 
 
 % Diagnostics, n = 150
+%<<>>=
+%out.misspec.150.2.2[1:7, ]
+%diagnostics.misspec.150.2.2
+%@
+
 \newpage
 \begin{figure}[h!]
 \begin{center}
 <<Fig-misspec-150, echo = FALSE>>=
 par(mfrow = c(3,2), oma = c(4,4,2,0), mar = c(1,1,1,2))
 shapes <- c(0.75, 1, 2, 5, 7, 10, 12, 15, 20, 25, 
-  30, 40, 50, 60, 70, 80, 90, 100)
+  30, 40, 50, 60, 70, 80)
+#shapes <- c(0.75, 1, 2, 5, 7, 10, 12, 15, 20, 25, 
+#  30, 40, 50, 60, 70, 80, 90, 100)
 
 plot.new()
 plot.window(xlim = c(log(min(shapes)), log(max(shapes))), ylim = c(0.90, 3.50))
@@ -4515,7 +4571,7 @@ mtext("area", side = 2, cex = 1.25, line = 2)
 plot.new()
 plot.window(xlim = c(log(min(shapes)), log(max(shapes))), 
   ylim = c(0, 0.60))
-legend(-0.25, 0.55, legend=c("miss bin param", "miss transform param", 
+legend(0, 0.55, legend=c("miss bin param", "miss transform param", 
   "nonparam", "LSLW", "LS", "miss HD", "true HD", 
   "nominal coverage"), 
   col=c("red", "red", "green", "purple", "black", "blue", "orange", "grey"), 
@@ -4523,7 +4579,7 @@ legend(-0.25, 0.55, legend=c("miss bin param", "miss transform param",
 
 plot.new()
 plot.window(xlim = c(log(min(shapes)), log(max(shapes))), 
-  ylim = c(-0.05, 0.50))
+  ylim = c(0, 0.25))
 lines(log(shapes), para.error.misspec.150, col = "red", lty = 1, lwd = 1.5)
 lines(log(shapes), transform.error.misspec.150, col = "red", lty = 2, lwd = 1.5)
 lines(log(shapes), nonpara.error.misspec.150, col = "green", lty = 2, lwd = 1.5)
@@ -4533,6 +4589,21 @@ lines(log(shapes), HD.error.misspec.150, col = "blue", lty = 4, lwd = 1.5)
 lines(log(shapes), trueHD.error.misspec.150, col = "orange", lty = 1, lwd = 1.5)
 axis(2)
 mtext("prediction error", side = 2, cex = 1.25, line = 2)
+
+plot.new()
+plot.window(xlim = c(log(min(shapes)), log(max(shapes))), 
+  ylim = c(0.85, 0.95))
+lines(log(shapes), para.marginal.misspec.150, col = "red", lty = 1, lwd = 1.5)
+lines(log(shapes), transform.marginal.misspec.150, col = "red", lty = 2, lwd = 1.5)
+lines(log(shapes), nonpara.marginal.misspec.150, col = "green", lty = 2, lwd = 1.5)
+lines(log(shapes), LSLW.marginal.misspec.150, col = "purple", lty = 1, lwd = 1.5)
+lines(log(shapes), LS.marginal.misspec.150, col = "black", lty = 2, lwd = 1.5)
+lines(log(shapes), HD.marginal.misspec.150, col = "blue", lty = 4, lwd = 1.5)
+lines(log(shapes), trueHD.marginal.misspec.150, col = "orange", lty = 1, lwd = 1.5)
+abline(h = 0.90, lty = 1, col = "grey", lwd = 2)
+axis(2)
+mtext("marginal coverage", side = 2, cex = 1.25, line = 2)
+
 
 s <- length(shapes)
 plot.new()
@@ -4545,8 +4616,8 @@ lines(log(shapes), LSLW.local.misspec.150[2*(1:s) - 1], col = "purple", lty = 1,
 lines(log(shapes), LS.local.misspec.150[2*(1:s) - 1], col = "black", lty = 2, lwd = 1.5)
 lines(log(shapes), HD.local.misspec.150[2*(1:s) - 1], col = "blue", lty = 4, lwd = 1.5)
 lines(log(shapes), trueHD.local.misspec.150[2*(1:s) - 1], col = "orange", lty = 1, lwd = 1.5)
-abline(h = 0.90, lty = 1, col = "grey", lwd = 1.5)
-axis(1)
+abline(h = 0.90, lty = 1, col = "grey", lwd = 2)
+axis(1); axis(2)
 mtext("coverage when 0 < x < 1/2", side = 2, cex = 1, line = 2)
 
 plot.new()
@@ -4559,8 +4630,8 @@ lines(log(shapes), LSLW.local.misspec.150[2*(1:s)], col = "purple", lty = 1, lwd
 lines(log(shapes), LS.local.misspec.150[2*(1:s)], col = "black", lty = 2, lwd = 1.5)
 lines(log(shapes), HD.local.misspec.150[2*(1:s)], col = "blue", lty = 4, lwd = 1.5)
 lines(log(shapes), trueHD.local.misspec.150[2*(1:s)], col = "orange", lty = 1, lwd = 1.5)
-abline(h = 0.90, lty = 1, col = "grey", lwd = 1.5)
-axis(1); axis(2)
+abline(h = 0.90, lty = 1, col = "grey", lwd = 2)
+axis(1)
 mtext("coverage when 1/2 <= x < 1", side = 2, cex = 1, line = 2)
 
 mtext("log(shape)", side = 1, cex = 1.25, line = 2, outer = TRUE)
@@ -4577,8 +4648,9 @@ mtext("Simulation Setting B", side = 3, cex = 1.25, line = 0.5, outer = TRUE)
   when $n = 150$ and the number of bins equals 2.  
   The specific diagnostics used to compare these prediciton regions is the 
     area,
-    prediction error, and
-    the coverage probability with respect to binning  
+    prediction error, 
+    marginal coverage probability, 
+    and the coverage probability with respect to binning  
     across shape parameter values.
   The average of 200 Monte Carlo samples at each shape parameter value in 
   these simulation settings form the lines that are depicted in this figure.}
@@ -4605,14 +4677,14 @@ lines(inx, LSLW.inx.misspec.150[1:25], col = "purple", lty = 1, lwd = 1.5)
 lines(inx, LS.inx.misspec.150[1:25], col = "black", lty = 2, lwd = 1.5)
 lines(inx, HD.inx.misspec.150[1:25], col = "blue", lty = 4, lwd = 1.5)
 lines(inx, trueHD.inx.misspec.150[1:25], col = "orange", lty = 1, lwd = 1.5)
-abline(h = 0.90, lty = 1, col = "grey", lwd = 1.5)
+abline(h = 0.90, lty = 1, col = "grey", lwd = 2)
 axis(2)
 mtext("shape = 0.75", side = 3, cex = 1, line = 2)
 
 plot.new()
 plot.window(xlim = c(log(min(shapes)), log(max(shapes))), 
   ylim = c(0, 0.60))
-legend(-0.25, 0.55, legend=c("miss bin param", "miss transform", 
+legend(-0.25, 0.60, legend=c("miss bin param", "miss transform", 
   " bin nonparam", "LSLW", "LS", "miss HD", "true HD", 
   "nominal coverage"), 
   col=c("red", "red", "green", "purple", "black", "blue", "orange", "grey"), cex = 0.90,
@@ -4628,7 +4700,7 @@ lines(inx, LSLW.inx.misspec.150[26:50], col = "purple", lty = 1, lwd = 1.5)
 lines(inx, LS.inx.misspec.150[26:50], col = "black", lty = 2, lwd = 1.5)
 lines(inx, HD.inx.misspec.150[26:50], col = "blue", lty = 4, lwd = 1.5)
 lines(inx, trueHD.inx.misspec.150[26:50], col = "orange", lty = 1, lwd = 1.5)
-abline(h = 0.90, lty = 1, col = "grey", lwd = 1.5)
+abline(h = 0.90, lty = 1, col = "grey", lwd = 2)
 mtext("shape = 1", side = 3, cex = 1, line = 2)
 
 # shape = 2
@@ -4641,7 +4713,7 @@ lines(inx, LSLW.inx.misspec.150[51:75], col = "purple", lty = 1, lwd = 1.5)
 lines(inx, LS.inx.misspec.150[51:75], col = "black", lty = 2, lwd = 1.5)
 lines(inx, HD.inx.misspec.150[51:75], col = "blue", lty = 4, lwd = 1.5)
 lines(inx, trueHD.inx.misspec.150[51:75], col = "orange", lty = 1, lwd = 1.5)
-abline(h = 0.90, lty = 1, col = "grey", lwd = 1.5)
+abline(h = 0.90, lty = 1, col = "grey", lwd = 2)
 mtext("shape = 2", side = 3, cex = 1, line = 2)
 
 # shape = 5
@@ -4654,7 +4726,7 @@ lines(inx, LSLW.inx.misspec.150[76:100], col = "purple", lty = 1, lwd = 1.5)
 lines(inx, LS.inx.misspec.150[76:100], col = "black", lty = 2, lwd = 1.5)
 lines(inx, HD.inx.misspec.150[76:100], col = "blue", lty = 4, lwd = 1.5)
 lines(inx, trueHD.inx.misspec.150[76:100], col = "orange", lty = 1, lwd = 1.5)
-abline(h = 0.90, lty = 1, col = "grey", lwd = 1.5)
+abline(h = 0.90, lty = 1, col = "grey", lwd = 2)
 axis(2)
 mtext("shape = 5", side = 3, cex = 1, line = 2)
 
@@ -4668,7 +4740,7 @@ lines(inx, LSLW.inx.misspec.150[101:125], col = "purple", lty = 1, lwd = 1.5)
 lines(inx, LS.inx.misspec.150[101:125], col = "black", lty = 2, lwd = 1.5)
 lines(inx, HD.inx.misspec.150[101:125], col = "blue", lty = 4, lwd = 1.5)
 lines(inx, trueHD.inx.misspec.150[101:125], col = "orange", lty = 1, lwd = 1.5)
-abline(h = 0.90, lty = 1, col = "grey", lwd = 1.5)
+abline(h = 0.90, lty = 1, col = "grey", lwd = 2)
 mtext("shape = 7", side = 3, cex = 1, line = 2)
 
 # shape = 10
@@ -4681,7 +4753,7 @@ lines(inx, LSLW.inx.misspec.150[126:150], col = "purple", lty = 1, lwd = 1.5)
 lines(inx, LS.inx.misspec.150[126:150], col = "black", lty = 2, lwd = 1.5)
 lines(inx, HD.inx.misspec.150[126:150], col = "blue", lty = 4, lwd = 1.5)
 lines(inx, trueHD.inx.misspec.150[126:150], col = "orange", lty = 1, lwd = 1.5)
-abline(h = 0.90, lty = 1, col = "grey", lwd = 1.5)
+abline(h = 0.90, lty = 1, col = "grey", lwd = 2)
 mtext("shape = 10", side = 3, cex = 1, line = 2)
 
 # shape = 12
@@ -4694,7 +4766,7 @@ lines(inx, LSLW.inx.misspec.150[151:175], col = "purple", lty = 1, lwd = 1.5)
 lines(inx, LS.inx.misspec.150[151:175], col = "black", lty = 2, lwd = 1.5)
 lines(inx, HD.inx.misspec.150[151:175], col = "blue", lty = 4, lwd = 1.5)
 lines(inx, trueHD.inx.misspec.150[151:175], col = "orange", lty = 1, lwd = 1.5)
-abline(h = 0.90, lty = 1, col = "grey", lwd = 1.5)
+abline(h = 0.90, lty = 1, col = "grey", lwd = 2)
 mtext("shape = 12", side = 3, cex = 1, line = 2)
 
 # shape = 15
@@ -4707,7 +4779,7 @@ lines(inx, LSLW.inx.misspec.150[176:200], col = "purple", lty = 1, lwd = 1.5)
 lines(inx, LS.inx.misspec.150[176:200], col = "black", lty = 2, lwd = 1.5)
 lines(inx, HD.inx.misspec.150[176:200], col = "blue", lty = 4, lwd = 1.5)
 lines(inx, trueHD.inx.misspec.150[176:200], col = "orange", lty = 1, lwd = 1.5)
-abline(h = 0.90, lty = 1, col = "grey", lwd = 1.5)
+abline(h = 0.90, lty = 1, col = "grey", lwd = 2)
 axis(2)
 mtext("shape = 15", side = 3, cex = 1, line = 2)
 
@@ -4721,7 +4793,7 @@ lines(inx, LSLW.inx.misspec.150[201:225], col = "purple", lty = 1, lwd = 1.5)
 lines(inx, LS.inx.misspec.150[201:225], col = "black", lty = 2, lwd = 1.5)
 lines(inx, HD.inx.misspec.150[201:225], col = "blue", lty = 4, lwd = 1.5)
 lines(inx, trueHD.inx.misspec.150[201:225], col = "orange", lty = 1, lwd = 1.5)
-abline(h = 0.90, lty = 1, col = "grey", lwd = 1.5)
+abline(h = 0.90, lty = 1, col = "grey", lwd = 2)
 mtext("shape = 20", side = 3, cex = 1, line = 2)
 
 # shape = 25
@@ -4734,7 +4806,7 @@ lines(inx, LSLW.inx.misspec.150[226:250], col = "purple", lty = 1, lwd = 1.5)
 lines(inx, LS.inx.misspec.150[226:250], col = "black", lty = 2, lwd = 1.5)
 lines(inx, HD.inx.misspec.150[226:250], col = "blue", lty = 4, lwd = 1.5)
 lines(inx, trueHD.inx.misspec.150[226:250], col = "orange", lty = 1, lwd = 1.5)
-abline(h = 0.90, lty = 1, col = "grey", lwd = 1.5)
+abline(h = 0.90, lty = 1, col = "grey", lwd = 2)
 mtext("shape = 25", side = 3, cex = 1, line = 2)
 
 # shape = 30
@@ -4747,7 +4819,7 @@ lines(inx, LSLW.inx.misspec.150[251:275], col = "purple", lty = 1, lwd = 1.5)
 lines(inx, LS.inx.misspec.150[251:275], col = "black", lty = 2, lwd = 1.5)
 lines(inx, HD.inx.misspec.150[251:275], col = "blue", lty = 4, lwd = 1.5)
 lines(inx, trueHD.inx.misspec.150[251:275], col = "orange", lty = 1, lwd = 1.5)
-abline(h = 0.90, lty = 1, col = "grey", lwd = 1.5)
+abline(h = 0.90, lty = 1, col = "grey", lwd = 2)
 mtext("shape = 30", side = 3, cex = 1, line = 2)
 
 # shape = 40
@@ -4760,7 +4832,7 @@ lines(inx, LSLW.inx.misspec.150[276:300], col = "purple", lty = 1, lwd = 1.5)
 lines(inx, LS.inx.misspec.150[276:300], col = "black", lty = 2, lwd = 1.5)
 lines(inx, HD.inx.misspec.150[276:300], col = "blue", lty = 4, lwd = 1.5)
 lines(inx, trueHD.inx.misspec.150[276:300], col = "orange", lty = 1, lwd = 1.5)
-abline(h = 0.90, lty = 1, col = "grey", lwd = 1.5)
+abline(h = 0.90, lty = 1, col = "grey", lwd = 2)
 axis(1); axis(2)
 mtext("shape = 40", side = 3, cex = 1, line = 2)
 
@@ -4774,7 +4846,7 @@ lines(inx, LSLW.inx.misspec.150[301:325], col = "purple", lty = 1, lwd = 1.5)
 lines(inx, LS.inx.misspec.150[301:325], col = "black", lty = 2, lwd = 1.5)
 lines(inx, HD.inx.misspec.150[301:325], col = "blue", lty = 4, lwd = 1.5)
 lines(inx, trueHD.inx.misspec.150[301:325], col = "orange", lty = 1, lwd = 1.5)
-abline(h = 0.90, lty = 1, col = "grey", lwd = 1.5)
+abline(h = 0.90, lty = 1, col = "grey", lwd = 2)
 axis(1)
 mtext("shape = 50", side = 3, cex = 1, line = 2)
 
@@ -4788,7 +4860,7 @@ lines(inx, LSLW.inx.misspec.150[326:350], col = "purple", lty = 1, lwd = 1.5)
 lines(inx, LS.inx.misspec.150[326:350], col = "black", lty = 2, lwd = 1.5)
 lines(inx, HD.inx.misspec.150[326:350], col = "blue", lty = 4, lwd = 1.5)
 lines(inx, trueHD.inx.misspec.150[326:350], col = "orange", lty = 1, lwd = 1.5)
-abline(h = 0.90, lty = 1, col = "grey", lwd = 1.5)
+abline(h = 0.90, lty = 1, col = "grey", lwd = 2)
 axis(1)
 mtext("shape = 60", side = 3, cex = 1, line = 2)
 
@@ -4802,7 +4874,7 @@ lines(inx, LSLW.inx.misspec.150[351:375], col = "purple", lty = 1, lwd = 1.5)
 lines(inx, LS.inx.misspec.150[351:375], col = "black", lty = 2, lwd = 1.5)
 lines(inx, HD.inx.misspec.150[351:375], col = "blue", lty = 4, lwd = 1.5)
 lines(inx, trueHD.inx.misspec.150[351:375], col = "orange", lty = 1, lwd = 1.5)
-abline(h = 0.90, lty = 1, col = "grey", lwd = 1.5)
+abline(h = 0.90, lty = 1, col = "grey", lwd = 2)
 axis(1)
 mtext("shape = 70", side = 3, cex = 1, line = 2)
 
@@ -4822,7 +4894,7 @@ mtext("coverage", side = 2, cex = 1.25, line = 0, outer = TRUE)
 \begin{figure}[h!]
 \begin{center}
 <<Fig-misspec-250, echo = FALSE>>=
-par(mfrow = c(3,2), oma = c(4,4,2,0), mar = c(1,1,1,2))
+par(mfrow = c(3,3), oma = c(4,4,2,0), mar = c(1,1,1,2))
 shapes <- c(5, 20, 40, 60, 80, 100)
 
 plot.new()
@@ -4849,52 +4921,65 @@ lines(log(shapes), trueHD.error.misspec.250, col = "blue", lty = 4, lwd = 1.5)
 axis(2)
 mtext("prediction error", side = 2, cex = 1, line = 2)
 
+plot.new()
+plot.window(xlim = c(0, 1), ylim = c(0, 0.60))
+legend(0, 0.60, legend=c("miss bin param", "miss transform",  
+  "miss bin nonparam", "LSLW", "LS", "true HD", "nominal coverage"), 
+  col=c("red", "red", "green", "purple", "black", "blue", "grey"), 
+  cex = 1.25, lty=c(1,2,2,1,2,4,1), bty = "n")
+
 s <- length(shapes)
 plot.new()
 plot.window(xlim = c(log(min(shapes)), log(max(shapes))), 
-  ylim = c(0.78, 1.00))
+  ylim = c(0.70, 1.00))
 lines(log(shapes), para.local.misspec.250[3*(1:s) - 2], col = "red", lty = 1, lwd = 1.5)
 lines(log(shapes), transform.local.misspec.250[3*(1:s) - 2], col = "red", lty = 2, lwd = 1.5)
 lines(log(shapes), nonpara.local.misspec.250[3*(1:s) - 2], col = "green", lty = 2, lwd = 1.5)
 lines(log(shapes), LSLW.local.misspec.250[3*(1:s) - 2], col = "purple", lty = 1, lwd = 1.5)
 lines(log(shapes), LS.local.misspec.250[3*(1:s) - 2], col = "black", lty = 2, lwd = 1.5)
 lines(log(shapes), trueHD.local.misspec.250[3*(1:s) - 2], col = "blue", lty = 4, lwd = 1.5)
-abline(h = 0.90, lty = 1, col = "grey", lwd = 1.5)
-axis(1); axis(2)
+abline(h = 0.90, lty = 1, col = "grey", lwd = 2)
+axis(2)
 mtext("coverage when 0 < x < 1/3", side = 2, cex = 1, line = 2)
 
 plot.new()
 plot.window(xlim = c(log(min(shapes)), log(max(shapes))), 
-  ylim = c(0.78, 1.00))
+  ylim = c(0.70, 1.00))
 lines(log(shapes), para.local.misspec.250[3*(1:s) - 1], col = "red", lty = 1, lwd = 1.5)
 lines(log(shapes), transform.local.misspec.250[3*(1:s) - 1], col = "red", lty = 2, lwd = 1.5)
 lines(log(shapes), nonpara.local.misspec.250[3*(1:s) - 1], col = "green", lty = 2, lwd = 1.5)
 lines(log(shapes), LSLW.local.misspec.250[3*(1:s) - 1], col = "purple", lty = 1, lwd = 1.5)
 lines(log(shapes), LS.local.misspec.250[3*(1:s) - 1], col = "black", lty = 2, lwd = 1.5)
 lines(log(shapes), trueHD.local.misspec.250[3*(1:s) - 1], col = "blue", lty = 4, lwd = 1.5)
-abline(h = 0.90, lty = 1, col = "grey", lwd = 1.5)
+abline(h = 0.90, lty = 1, col = "grey", lwd = 2)
 axis(1); axis(2)
 mtext("coverage when 1/3 <= x < 2/3", side = 2, cex = 1, line = 2)
 
 plot.new()
 plot.window(xlim = c(log(min(shapes)), log(max(shapes))), 
-  ylim = c(0.78, 1.00))
+  ylim = c(0.70, 1.00))
 lines(log(shapes), para.local.misspec.250[3*(1:s)], col = "red", lty = 1, lwd = 1.5)
 lines(log(shapes), transform.local.misspec.250[3*(1:s)], col = "red", lty = 2, lwd = 1.5)
 lines(log(shapes), nonpara.local.misspec.250[3*(1:s)], col = "green", lty = 2, lwd = 1.5)
 lines(log(shapes), LSLW.local.misspec.250[3*(1:s)], col = "purple", lty = 1, lwd = 1.5)
 lines(log(shapes), LS.local.misspec.250[3*(1:s)], col = "black", lty = 2, lwd = 1.5)
 lines(log(shapes), trueHD.local.misspec.250[3*(1:s)], col = "blue", lty = 4, lwd = 1.5)
-abline(h = 0.90, lty = 1, col = "grey", lwd = 1.5)
+abline(h = 0.90, lty = 1, col = "grey", lwd = 2)
 axis(1); axis(2)
 mtext("coverage when 2/3 <= x < 1", side = 2, cex = 1, line = 2)
 
 plot.new()
-plot.window(xlim = c(0, 1), ylim = c(0, 0.60))
-legend(-0.25, 0.55, legend=c("miss bin param", "miss transform",  
-  "miss bin nonparam", "LSLW", "LS", "true HD", "nominal coverage"), 
-  col=c("red", "red", "green", "purple", "black", "blue", "grey"), 
-  cex = 1.25, lty=c(1,2,2,1,2,4,1), bty = "n")
+plot.window(xlim = c(log(min(shapes)), log(max(shapes))), 
+  ylim = c(0.78, 0.95))
+lines(log(shapes), para.marginal.misspec.250, col = "red", lty = 1, lwd = 1.5)
+lines(log(shapes), transform.marginal.misspec.250, col = "red", lty = 2, lwd = 1.5)
+lines(log(shapes), nonpara.marginal.misspec.250, col = "green", lty = 2, lwd = 1.5)
+lines(log(shapes), LSLW.marginal.misspec.250, col = "purple", lty = 1, lwd = 1.5)
+lines(log(shapes), LS.marginal.misspec.250, col = "black", lty = 2, lwd = 1.5)
+lines(log(shapes), trueHD.marginal.misspec.250, col = "blue", lty = 4, lwd = 1.5)
+abline(h = 0.90, lty = 1, col = "grey", lwd = 2)
+axis(1); axis(2)
+mtext("marginal coverage", side = 2, cex = 1, line = 2)
 
 mtext("log(shape)", side = 1, cex = 1.25, line = 2, outer = TRUE)
 mtext("Simulation Setting B", side = 3, cex = 1.25, line = 0.5, outer = TRUE)
@@ -4909,9 +4994,10 @@ mtext("Simulation Setting B", side = 3, cex = 1.25, line = 0.5, outer = TRUE)
   correctly specified highest density prediction regions when $n = 250$ 
   and the number of bins equals 3.  
   The specific diagnostics used to compare these prediciton regions is the 
-    area (top-left panel),
-    prediction error (top-right panel), and
-    the coverage probability with respect to binning (bottom row) 
+    area,
+    prediction error, 
+    marginal coverage probability,     
+    and the coverage probability with respect to binning 
     across shape parameter values.
   The average of 50 Monte Carlo samples at each shape parameter value in 
   these simulation settings form the lines that are depicted in this figure.}
@@ -4935,7 +5021,7 @@ lines(inx, nonpara.inx.misspec.250[1:25], col = "green", lty = 2, lwd = 1.5)
 lines(inx, LSLW.inx.misspec.250[1:25], col = "purple", lty = 1, lwd = 1.5)
 lines(inx, LS.inx.misspec.250[1:25], col = "black", lty = 2, lwd = 1.5)
 lines(inx, trueHD.inx.misspec.250[1:25], col = "blue", lty = 4, lwd = 1.5)
-abline(h = 0.90, lty = 1, col = "grey", lwd = 1.5)
+abline(h = 0.90, lty = 1, col = "grey", lwd = 2)
 axis(2)
 mtext("shape = 5", side = 3, cex = 1, line = 2)
 
@@ -4955,7 +5041,7 @@ lines(inx, nonpara.inx.misspec.250[26:50], col = "green", lty = 2, lwd = 1.5)
 lines(inx, LSLW.inx.misspec.250[26:50], col = "purple", lty = 1, lwd = 1.5)
 lines(inx, LS.inx.misspec.250[26:50], col = "black", lty = 2, lwd = 1.5)
 lines(inx, trueHD.inx.misspec.250[26:50], col = "blue", lty = 4, lwd = 1.5)
-abline(h = 0.90, lty = 1, col = "grey", lwd = 1.5)
+abline(h = 0.90, lty = 1, col = "grey", lwd = 2)
 axis(2)
 mtext("shape = 20", side = 3, cex = 1, line = 2)
 
@@ -4967,7 +5053,7 @@ lines(inx, nonpara.inx.misspec.250[51:75], col = "green", lty = 2, lwd = 1.5)
 lines(inx, LSLW.inx.misspec.250[51:75], col = "purple", lty = 1, lwd = 1.5)
 lines(inx, LS.inx.misspec.250[51:75], col = "black", lty = 2, lwd = 1.5)
 lines(inx, trueHD.inx.misspec.250[51:75], col = "blue", lty = 4, lwd = 1.5)
-abline(h = 0.90, lty = 1, col = "grey", lwd = 1.5)
+abline(h = 0.90, lty = 1, col = "grey", lwd = 2)
 mtext("shape = 40", side = 3, cex = 1, line = 2)
 
 plot.new()
@@ -4978,7 +5064,7 @@ lines(inx, nonpara.inx.misspec.250[76:100], col = "green", lty = 2, lwd = 1.5)
 lines(inx, LSLW.inx.misspec.250[76:100], col = "purple", lty = 1, lwd = 1.5)
 lines(inx, LS.inx.misspec.250[76:100], col = "black", lty = 2, lwd = 1.5)
 lines(inx, trueHD.inx.misspec.250[76:100], col = "blue", lty = 4, lwd = 1.5)
-abline(h = 0.90, lty = 1, col = "grey", lwd = 1.5)
+abline(h = 0.90, lty = 1, col = "grey", lwd = 2)
 axis(2)
 mtext("shape = 60", side = 3, cex = 1, line = 2)
 
@@ -4990,7 +5076,7 @@ lines(inx, nonpara.inx.misspec.250[101:125], col = "green", lty = 2, lwd = 1.5)
 lines(inx, LSLW.inx.misspec.250[101:125], col = "purple", lty = 1, lwd = 1.5)
 lines(inx, LS.inx.misspec.250[101:125], col = "black", lty = 2, lwd = 1.5)
 lines(inx, trueHD.inx.misspec.250[101:125], col = "blue", lty = 4, lwd = 1.5)
-abline(h = 0.90, lty = 1, col = "grey", lwd = 1.5)
+abline(h = 0.90, lty = 1, col = "grey", lwd = 2)
 axis(1)
 mtext("shape = 80", side = 3, cex = 1, line = 2)
 
@@ -5002,7 +5088,7 @@ lines(inx, nonpara.inx.misspec.250[126:150], col = "green", lty = 2, lwd = 1.5)
 lines(inx, LSLW.inx.misspec.250[126:150], col = "purple", lty = 1, lwd = 1.5)
 lines(inx, LS.inx.misspec.250[126:150], col = "black", lty = 2, lwd = 1.5)
 lines(inx, trueHD.inx.misspec.250[126:150], col = "blue", lty = 4, lwd = 1.5)
-abline(h = 0.90, lty = 1, col = "grey", lwd = 1.5)
+abline(h = 0.90, lty = 1, col = "grey", lwd = 2)
 axis(1); axis(2)
 mtext("shape = 100", side = 3, cex = 1, line = 2)
 
@@ -5023,7 +5109,7 @@ mtext("coverage", side = 2, cex = 1.25, line = 0, outer = TRUE)
 \begin{figure}[h!]
 \begin{center}
 <<Fig-misspec-500, echo = FALSE>>=
-par(mfrow = c(3,2), oma = c(4,4,2,0), mar = c(1,1,1,2))
+par(mfrow = c(3,3), oma = c(4,4,2,0), mar = c(1,1,1,2))
 shapes <- c(5, 20, 40, 60, 80, 100)
 
 plot.new()
@@ -5050,50 +5136,63 @@ axis(2)
 mtext("prediction error", side = 2, cex = 1, line = 2)
 
 plot.new()
+plot.window(xlim = c(0, 1), ylim = c(0, 0.60))
+legend(0, 0.60, legend=c("miss bin param", "miss transform", 
+  "bin nonparam", "LSLW", "LS", "true HD", "nominal coverage"), 
+  col=c("red", "red", "green", "purple", "black", "blue", "grey"), 
+  cex = 1.25, lty=c(1,2,2,1,2,4,1), bty = "n")
+
+plot.new()
 plot.window(xlim = c(log(min(shapes)), log(max(shapes))), 
-  ylim = c(0.78, 1.00))
+  ylim = c(0.70, 1))
 lines(log(shapes), para.local.misspec.500[3*(1:s) - 2], col = "red", lty = 1, lwd = 1.5)
 lines(log(shapes), transform.local.misspec.500[3*(1:s) - 2], col = "red", lty = 2, lwd = 1.5)
 lines(log(shapes), nonpara.local.misspec.500[3*(1:s) - 2], col = "green", lty = 2, lwd = 1.5)
 lines(log(shapes), LSLW.local.misspec.500[3*(1:s) - 2], col = "purple", lty = 1, lwd = 1.5)
 lines(log(shapes), LS.local.misspec.500[3*(1:s) - 2], col = "black", lty = 2, lwd = 1.5)
 lines(log(shapes), HD.local.misspec.500[3*(1:s) - 2], col = "blue", lty = 4, lwd = 1.5)
-abline(h = 0.90, lty = 1, col = "grey", lwd = 1.5)
-axis(1); axis(2)
+abline(h = 0.90, lty = 1, col = "grey", lwd = 2)
+axis(2)
 mtext("coverage when 0 <= x < 1/3", side = 2, cex = 1, line = 2)
 
 plot.new()
 plot.window(xlim = c(log(min(shapes)), log(max(shapes))), 
-  ylim = c(0.78, 1.00))
+  ylim = c(0.70, 1))
 lines(log(shapes), para.local.misspec.500[3*(1:s) - 1], col = "red", lty = 1, lwd = 1.5)
 lines(log(shapes), transform.local.misspec.500[3*(1:s) - 1], col = "red", lty = 2, lwd = 1.5)
 lines(log(shapes), nonpara.local.misspec.500[3*(1:s) - 1], col = "green", lty = 2, lwd = 1.5)
 lines(log(shapes), LSLW.local.misspec.500[3*(1:s) - 1], col = "purple", lty = 1, lwd = 1.5)
 lines(log(shapes), LS.local.misspec.500[3*(1:s) - 1], col = "black", lty = 2, lwd = 1.5)
 lines(log(shapes), HD.local.misspec.500[3*(1:s) - 1], col = "blue", lty = 4, lwd = 1.5)
-abline(h = 0.90, lty = 1, col = "grey", lwd = 1.5)
+abline(h = 0.90, lty = 1, col = "grey", lwd = 2)
 axis(1); axis(2)
 mtext("coverage when 1/3 <= x < 2/3", side = 2, cex = 1, line = 2)
 
 plot.new()
 plot.window(xlim = c(log(min(shapes)), log(max(shapes))), 
-  ylim = c(0.78, 1.00))
+  ylim = c(0.70, 1))
 lines(log(shapes), para.local.misspec.500[3*(1:s)], col = "red", lty = 1, lwd = 1.5)
 lines(log(shapes), transform.local.misspec.500[3*(1:s)], col = "red", lty = 2, lwd = 1.5)
 lines(log(shapes), nonpara.local.misspec.500[3*(1:s)], col = "green", lty = 2, lwd = 1.5)
 lines(log(shapes), LSLW.local.misspec.500[3*(1:s)], col = "purple", lty = 1, lwd = 1.5)
 lines(log(shapes), LS.local.misspec.500[3*(1:s)], col = "black", lty = 2, lwd = 1.5)
 lines(log(shapes), HD.local.misspec.500[3*(1:s)], col = "blue", lty = 4, lwd = 1.5)
-abline(h = 0.90, lty = 1, col = "grey", lwd = 1.5)
+abline(h = 0.90, lty = 1, col = "grey", lwd = 2)
 axis(1); axis(2)
 mtext("coverage when 2/3 <= x < 1", side = 2, cex = 1, line = 2)
 
 plot.new()
-plot.window(xlim = c(0, 1), ylim = c(0, 0.60))
-legend(-0.25, 0.55, legend=c("miss bin param", 
-  "bin nonparam", "LSLW", "LS", "true HD", "nominal coverage"), 
-  col=c("red", "red", "green", "purple", "black", "blue", "grey"), 
-  cex = 1.25, lty=c(1,2,2,1,2,4,1), bty = "n")
+plot.window(xlim = c(log(min(shapes)), log(max(shapes))), 
+   ylim = c(0.80, 0.95))
+lines(log(shapes), para.marginal.misspec.500, col = "red", lty = 1, lwd = 1.5)
+lines(log(shapes), transform.marginal.misspec.500, col = "red", lty = 2, lwd = 1.5)
+lines(log(shapes), nonpara.marginal.misspec.500, col = "green", lty = 2, lwd = 1.5)
+lines(log(shapes), LSLW.marginal.misspec.500, col = "purple", lty = 1, lwd = 1.5)
+lines(log(shapes), LS.marginal.misspec.500, col = "black", lty = 2, lwd = 1.5)
+lines(log(shapes), HD.marginal.misspec.500, col = "blue", lty = 4, lwd = 1.5)
+abline(h = 0.90, lty = 1, col = "grey", lwd = 2)
+axis(1); axis(2)
+mtext("marginal coverage", side = 2, cex = 1, line = 2)
 
 mtext("log(shape)", side = 1, cex = 1.25, line = 2, outer = TRUE)
 mtext("Simulation Setting B", side = 3, cex = 1.25, line = 0.5, outer = TRUE)
@@ -5108,9 +5207,10 @@ mtext("Simulation Setting B", side = 3, cex = 1.25, line = 0.5, outer = TRUE)
   correctly specified highest density prediction region when $n = 500$ and the 
   number of bins equals 3.  
   The specific diagnostics used to compare these prediciton regions is the 
-    area (top-left panel),
-    prediction error (top-right panel), and
-    the coverage probability with respect to binning (bottom row) 
+    area,
+    prediction error, 
+    marginal coverage probability,     
+    and the coverage probability with respect to binning  
     across shape parameter values.
   The average of 50 Monte Carlo samples at each shape parameter value in 
   these simulation settings form the lines that are depicted in this figure.}
@@ -5134,13 +5234,13 @@ lines(inx, nonpara.inx.misspec.500[1:25], col = "green", lty = 2, lwd = 1.5)
 lines(inx, LSLW.inx.misspec.500[1:25], col = "purple", lty = 1, lwd = 1.5)
 lines(inx, LS.inx.misspec.500[1:25], col = "black", lty = 2, lwd = 1.5)
 lines(inx, HD.inx.misspec.500[1:25], col = "blue", lty = 4, lwd = 1.5)
-abline(h = 0.90, lty = 1, col = "grey", lwd = 1.5)
+abline(h = 0.90, lty = 1, col = "grey", lwd = 2)
 axis(2)
 mtext("shape = 5", side = 3, cex = 1, line = 2)
 
 plot.new()
 plot.window(xlim = c(0, 1), ylim = c(0, 0.60))
-legend(-0.25, 0.55, legend=c("miss bin param", "miss transform", 
+legend(0, 0.60, legend=c("miss bin param", "miss transform", 
   "bin nonparam", "LSLW", "LS", "true HD", "nominal coverage"), 
   col=c("red", "red", "green", "purple", "black", "blue", "grey"), 
   cex = 1, lty=c(1,2,2,1,2,4,1), bty = "n")
@@ -5153,7 +5253,7 @@ lines(inx, nonpara.inx.misspec.500[26:50], col = "green", lty = 2, lwd = 1.5)
 lines(inx, LSLW.inx.misspec.500[26:50], col = "purple", lty = 1, lwd = 1.5)
 lines(inx, LS.inx.misspec.500[26:50], col = "black", lty = 2, lwd = 1.5)
 lines(inx, HD.inx.misspec.500[26:50], col = "blue", lty = 4, lwd = 1.5)
-abline(h = 0.90, lty = 1, col = "grey", lwd = 1.5)
+abline(h = 0.90, lty = 1, col = "grey", lwd = 2)
 axis(2)
 mtext("shape = 20", side = 3, cex = 1, line = 2)
 
@@ -5165,7 +5265,7 @@ lines(inx, nonpara.inx.misspec.500[51:75], col = "green", lty = 2, lwd = 1.5)
 lines(inx, LSLW.inx.misspec.500[51:75], col = "purple", lty = 1, lwd = 1.5)
 lines(inx, LS.inx.misspec.500[51:75], col = "black", lty = 2, lwd = 1.5)
 lines(inx, HD.inx.misspec.500[51:75], col = "blue", lty = 4, lwd = 1.5)
-abline(h = 0.90, lty = 1, col = "grey", lwd = 1.5)
+abline(h = 0.90, lty = 1, col = "grey", lwd = 2)
 mtext("shape = 40", side = 3, cex = 1, line = 2)
 
 plot.new()
@@ -5176,7 +5276,7 @@ lines(inx, nonpara.inx.misspec.500[76:100], col = "green", lty = 2, lwd = 1.5)
 lines(inx, LSLW.inx.misspec.500[76:100], col = "purple", lty = 1, lwd = 1.5)
 lines(inx, LS.inx.misspec.500[76:100], col = "black", lty = 2, lwd = 1.5)
 lines(inx, HD.inx.misspec.500[76:100], col = "blue", lty = 4, lwd = 1.5)
-abline(h = 0.90, lty = 1, col = "grey", lwd = 1.5)
+abline(h = 0.90, lty = 1, col = "grey", lwd = 2)
 axis(2)
 mtext("shape = 60", side = 3, cex = 1, line = 2)
 
@@ -5188,7 +5288,7 @@ lines(inx, nonpara.inx.misspec.500[101:125], col = "green", lty = 2, lwd = 1.5)
 lines(inx, LSLW.inx.misspec.500[101:125], col = "purple", lty = 1, lwd = 1.5)
 lines(inx, LS.inx.misspec.500[101:125], col = "black", lty = 2, lwd = 1.5)
 lines(inx, HD.inx.misspec.500[101:125], col = "blue", lty = 4, lwd = 1.5)
-abline(h = 0.90, lty = 1, col = "grey", lwd = 1.5)
+abline(h = 0.90, lty = 1, col = "grey", lwd = 2)
 axis(1)
 mtext("shape = 80", side = 3, cex = 1, line = 2)
 
@@ -5200,7 +5300,7 @@ lines(inx, nonpara.inx.misspec.500[126:150], col = "green", lty = 2, lwd = 1.5)
 lines(inx, LSLW.inx.misspec.500[126:150], col = "purple", lty = 1, lwd = 1.5)
 lines(inx, LS.inx.misspec.500[126:150], col = "black", lty = 2, lwd = 1.5)
 lines(inx, HD.inx.misspec.500[126:150], col = "blue", lty = 4, lwd = 1.5)
-abline(h = 0.90, lty = 1, col = "grey", lwd = 1.5)
+abline(h = 0.90, lty = 1, col = "grey", lwd = 2)
 axis(1); axis(2)
 mtext("shape = 100", side = 3, cex = 1, line = 2)
 
@@ -5233,6 +5333,12 @@ When $n = 150$ we build the parametric and nonparametric conformal prediction
 regions using 2 bins.  When $n = 250, 500$ we build the parametric and 
 nonparametric conformal prediction regions using 3 bins.  These number of bin 
 choices correspond to the bin width asymptotics of \citet{lei2014distribution}. 
+
+
+
+\begin{center}
+{\Huge Revised up to here}
+\end{center}
 
 
 \subsection{Simulations}
