@@ -583,7 +583,7 @@ To assess finite-sample marginal validity we calculate the proportion of
 responses that fall within the prediction region.  To assess finite-sample 
 local validity with respect to binning we first bin the predictor data and 
 then, for each bin, we calculate the proportion of responses that fall 
-within the prediciton region. The same procedure is used to assess 
+within the prediction region. The same procedure is used to assess 
 finite-sample conditional validity, but we use a much finer binning regime 
 than what was used to assess finite-sample local validity.  
 
@@ -2746,14 +2746,14 @@ Figures~\ref{Fig:gamma.inx.150}, \ref{Fig:gamma.inx.250}, and
 \ref{Fig:gamma.inx.500} for $n = 150$, $250$, and $500$ respectively.
 
 From these simulations we see that both parametric conformal prediction 
-regions are similar to the HD prediciton region in area, prediction error, and 
+regions are similar to the HD prediction region in area, prediction error, and 
 appearance (as seen in Section~\ref{sec:gammaplots}), where the transformation 
 based conformal prediction region is slightly preferrable to its binned counterpart.  
 Moreover, the parametric conformal prediction regions possess finite-sample, 
 albeit slightly conservative, local validity with respect to binning and 
 possess nominal finite-sample conditional coverage over most of the support. 
-The LSLW conformal prediction region provides lower prediciton error than the 
-parametric conformal prediciton regions.  However, the LSLW conformal 
+The LSLW conformal prediction region provides lower prediction error than the 
+parametric conformal prediction regions.  However, the LSLW conformal 
 prediction possesses some erratic coverage properties.  
 It also does not fit the data well when the deviations about the 
 estimated mean function are clearly not symmetric as evidenced by 
@@ -2762,11 +2762,11 @@ from a Gamma distribution with small shape parameter values.
 The binned nonparametric conformal prediction region gives closer to nominal 
 coverage and it possesses finite-sample local validity with respect to 
 binning.  However, this prediction region is larger and gives higher 
-prediciton error than the parametric and LSLW conformal prediction 
-regions and HD prediction region.  The LS conformal prediciton region 
+prediction error than the parametric and LSLW conformal prediction 
+regions and HD prediction region.  The LS conformal prediction region 
 provides extreme overcoverage at small values of $x$ and extreme 
 undercoverage at large values of $x$.  This prediction region is also larger 
-and gives higher prediciton error than the parametric and LSLW conformal 
+and gives higher prediction error than the parametric and LSLW conformal 
 prediction regions and HD prediction region.
 
 
@@ -2863,10 +2863,10 @@ mtext("Simulation Setting A", side = 3, cex = 1.25, line = 0.5, outer = TRUE)
   transformation, 
   binned nonparametric,
   least squares, and 
-  least squares locally weighted conformal prediciton region and the 
+  least squares locally weighted conformal prediction region and the 
   highest density predcition region when $n = 150$ and the number of bins 
   equals 2.  
-  The specific diagnostics used to compare these prediciton regions are the 
+  The specific diagnostics used to compare these prediction regions are the 
     area,
     prediction error, 
     marginal coverage probability,
@@ -3194,10 +3194,10 @@ mtext("Simulation Setting A", side = 3, cex = 1.25, line = 0.5, outer = TRUE)
   transformation,
   binned nonparametric,
   least squares, and 
-  least squares locally weighted conformal prediciton region and the 
+  least squares locally weighted conformal prediction region and the 
   highest density prediction region when $n = 250$ and the number of bins 
   equals 3.  
-  The specific diagnostics used to compare these prediciton regions is the 
+  The specific diagnostics used to compare these prediction regions is the 
     area,
     prediction error, 
     marginal coverage probability,
@@ -3491,10 +3491,10 @@ mtext("Simulation Setting A", side = 3, cex = 1.25, line = 0.5, outer = TRUE)
   transformation,
   binned nonparametric,
   least squares, and 
-  least squares locally weighted conformal prediciton region and the 
+  least squares locally weighted conformal prediction region and the 
   highest density prediction region when $n = 500$ and the number of bins 
   equals 3.  
-  The specific diagnostics used to compare these prediciton regions is the 
+  The specific diagnostics used to compare these prediction regions is the 
     area,
     prediction error, 
     marginal coverage probability,
@@ -4516,24 +4516,24 @@ We also expect for the misspecified transformation based conformal
 prediction region to have poor local and conditional coverage properties 
 when compared with the binned parametric conformal prediction region.
 From these simulations we see that the parametric conformal 
-prediction regions are similar to the LSLW prediciton region in area and 
+prediction regions are similar to the LSLW prediction region in area and 
 prediction error.  However, these prediction have drastically different 
 coverage properties.  The binned parametric conformal prediction region 
 possesses desirable local and conditional coverages in comparison to the 
 others, and LSLW conformal prediction region gives exhibit slight 
-undercoverage.  Moreover, these prediciton regions visually 
+undercoverage.  Moreover, these prediction regions visually 
 fit the data well as seen in Section~\ref{sec:misspecplots}.
 The nonparametric conformal prediction region gives closer to nominal 
 coverage than both the parametric and LSLW conformal prediction regions, 
 and it possesses finite-sample local validity with respect to 
 binning.  However, this prediction region is larger, gives higher 
-prediciton error than the parametric and LSLW conformal prediction 
+prediction error than the parametric and LSLW conformal prediction 
 regions, and does not visually fit the data well for most simulation settings 
 as seen in Section~\ref{sec:misspecplots}.  The misspecified transformation 
 based conformal prediction region and the HD and LS 
 conformal prediction regions exhibit extreme undercoverage at small values 
 of $x$ and extreme overcoverage at large values of $x$.  These prediction 
-regions are also larger, they give higher prediciton error than the 
+regions are also larger, they give higher prediction error than the 
 binned parametric and LSLW conformal prediction regions, and the LS 
 conformal prediction region does not visually fit the data well for most 
 simulation settings as seen in Section~\ref{sec:misspecplots}. 
@@ -4631,7 +4631,7 @@ lines(log(shapes), LS.local.misspec.150[2*(1:s)], col = "black", lty = 2, lwd = 
 lines(log(shapes), HD.local.misspec.150[2*(1:s)], col = "blue", lty = 4, lwd = 1.5)
 lines(log(shapes), trueHD.local.misspec.150[2*(1:s)], col = "orange", lty = 1, lwd = 1.5)
 abline(h = 0.90, lty = 1, col = "grey", lwd = 2)
-axis(1)
+axis(1); axis(2)
 mtext("coverage when 1/2 <= x < 1", side = 2, cex = 1, line = 2)
 
 mtext("log(shape)", side = 1, cex = 1.25, line = 2, outer = TRUE)
@@ -4643,10 +4643,10 @@ mtext("Simulation Setting B", side = 3, cex = 1.25, line = 0.5, outer = TRUE)
   misspecified transformation,  
   binned nonparametric,
   least squares, and 
-  least squares locally weighted conformal prediciton regions and the 
+  least squares locally weighted conformal prediction regions and the 
   misspecified and correctly specified highest density prediction regions 
   when $n = 150$ and the number of bins equals 2.  
-  The specific diagnostics used to compare these prediciton regions is the 
+  The specific diagnostics used to compare these prediction regions is the 
     area,
     prediction error, 
     marginal coverage probability, 
@@ -4990,10 +4990,10 @@ mtext("Simulation Setting B", side = 3, cex = 1.25, line = 0.5, outer = TRUE)
   misspecified transformation, 
   binned nonparametric,
   least squares, and 
-  least squares locally weighted conformal prediciton region and the 
+  least squares locally weighted conformal prediction region and the 
   correctly specified highest density prediction regions when $n = 250$ 
   and the number of bins equals 3.  
-  The specific diagnostics used to compare these prediciton regions is the 
+  The specific diagnostics used to compare these prediction regions is the 
     area,
     prediction error, 
     marginal coverage probability,     
@@ -5203,10 +5203,10 @@ mtext("Simulation Setting B", side = 3, cex = 1.25, line = 0.5, outer = TRUE)
   misspecified transformation, 
   binned nonparametric,
   least squares, and 
-  least squares locally weighted conformal prediciton regions and the 
+  least squares locally weighted conformal prediction regions and the 
   correctly specified highest density prediction region when $n = 500$ and the 
   number of bins equals 3.  
-  The specific diagnostics used to compare these prediciton regions is the 
+  The specific diagnostics used to compare these prediction regions is the 
     area,
     prediction error, 
     marginal coverage probability,     
@@ -5534,12 +5534,12 @@ conformal prediction regions to perform nearly as well as the oracle HD
 prediction region.  These prediction regions also exhibit finite-sample 
 marginal validity, local validity with respect to binning, and near 
 conditional validity across the support.  The parametric conformal prediction 
-region is similar to the LS and LSLW conformal prediciton regions and the HD 
+region is similar to the LS and LSLW conformal prediction regions and the HD 
 prediction region in area, prediction error, finite-sample coverage 
-properties, and appearance.  However, the parametric conformal prediciton 
+properties, and appearance.  However, the parametric conformal prediction 
 region is slightly larger and gives more conservative coverage that these 
-other prediction regions.  The nonparametric conformal prediciton region 
-is larger and gives larger prediciton errors than the other prediciton 
+other prediction regions.  The nonparametric conformal prediction region 
+is larger and gives larger prediction errors than the other prediction 
 regions.  It also appears to not visually fit the data well while the others 
 do as seen in Section~\ref{sec:regressionplots}.
 
@@ -5787,7 +5787,7 @@ The nonparametric conformal prediction region is coarse and is larger than
 necessary when the mean function is steep relative to its variability.  
 The LS conformal prediction performs well when deviations about the estimated 
 mean function are symmetirc and is sensitive to mild departures from that 
-setting.  This prediciton region is seen to provide overcoverage 
+setting.  This prediction region is seen to provide overcoverage 
 (undercoverage) in regions of the predictor space where variability about the 
 estimated mean function is relatively small (large).
 
@@ -5877,7 +5877,7 @@ points(x, y, pch = 19, col = rgb(0,0,0,alpha=0.2))
 lines(x[ix], transformCI[ix, 1], col = "red", lwd = 1.5)
 lines(x[ix], transformCI[ix, 2], col = "red", lwd = 1.5)
 axis(2)
-mtext("Transform param \n Conformal", side = 3, cex = 1, line = 0)
+mtext("Transform param \n conformal", side = 3, cex = 1, line = 0)
 mtext("Setting A", side = 2, cex = 1, line = 2)
 
 ## bin parametric conformal
@@ -5886,7 +5886,7 @@ plot.window(xlim = c(0,1), ylim = c(min(y)-1, max(y)+1))
 points(x, y, pch = 19, col = rgb(0,0,0,alpha=0.2))
 lines(x[ix], paraCI[ix, 1], col = "red", lwd = 1.5)
 lines(x[ix], paraCI[ix, 2], col = "red", lwd = 1.5)
-mtext("Bin param \n Conformal", side = 3, cex = 1, line = 0)
+mtext("Bin param \n conformal", side = 3, cex = 1, line = 0)
 
 ## LSLW conformal
 plot.new()
@@ -5894,7 +5894,7 @@ plot.window(xlim = c(0,1), ylim = c(min(y)-1, max(y)+1))
 points(x, y, pch = 19, col = rgb(0,0,0,alpha=0.2))
 lines(x[ix], LSLWCI[ix, 1], col = "red", lwd = 1.5)
 lines(x[ix], LSLWCI[ix, 2], col = "red", lwd = 1.5)
-mtext("LSLW \n Conformal", side = 3, cex = 1, line = 0)
+mtext("LSLW \n conformal", side = 3, cex = 1, line = 0)
 
 ## nonparametric conformal
 # nonparametric conformal prediction region
@@ -5923,7 +5923,7 @@ plot.nonparametric <- function(region, x, y, bins){
 }    
 plot.nonparametric(region = nonparaCI, x = x, 
   y = y, bins = bins)
-mtext("Bin nonparam \n Conformal", side = 3, cex = 1, line = 0)
+mtext("Bin nonparam \n conformal", side = 3, cex = 1, line = 0)
 
 ## LS conformal
 #plot.new()
@@ -6119,7 +6119,7 @@ mtext("y", side = 2, cex = 1, line = 3, outer = TRUE)
 \subsection{Plots corresponding to Section~\ref{sec:Gamma}}
 \label{sec:gammaplots}
 
-%Plot of conformal prediciton regions in sim setting A when n = 150
+%Plot of conformal prediction regions in sim setting A when n = 150
 \begin{figure}[h!]
 \begin{center}
 <<conformal-plots-A-150, fig.height = 7, cache = TRUE, echo = FALSE>>=
@@ -6189,7 +6189,7 @@ points(x, y, pch = 19, col = rgb(0,0,0,alpha=0.2))
 lines(x[ix], transformCI[ix, 1], col = "red", lwd = 1.5)
 lines(x[ix], transformCI[ix, 2], col = "red", lwd = 1.5)
 axis(2)
-mtext("Transform param \n Conformal", side = 3, cex = 1, line = 0)
+mtext("Transform param \n conformal", side = 3, cex = 1, line = 0)
 mtext("shape = 0.75", side = 2, cex = 1, line = 2)
 
 ## bin parametric conformal
@@ -6198,7 +6198,7 @@ plot.window(xlim = c(0,1), ylim = c(min(y)-1, max(y)+1))
 points(x, y, pch = 19, col = rgb(0,0,0,alpha=0.2))
 lines(x[ix], paraCI[ix, 1], col = "red", lwd = 1.5)
 lines(x[ix], paraCI[ix, 2], col = "red", lwd = 1.5)
-mtext("Bin param \n Conformal", side = 3, cex = 1, line = 0)
+mtext("Bin param \n conformal", side = 3, cex = 1, line = 0)
 
 ## LSLW conformal
 plot.new()
@@ -6206,12 +6206,12 @@ plot.window(xlim = c(0,1), ylim = c(min(y)-1, max(y)+1))
 points(x, y, pch = 19, col = rgb(0,0,0,alpha=0.2))
 lines(x[ix], LSLWCI[ix, 1], col = "red", lwd = 1.5)
 lines(x[ix], LSLWCI[ix, 2], col = "red", lwd = 1.5)
-mtext("LSLW \n Conformal", side = 3, cex = 1, line = 0)
+mtext("LSLW \n conformal", side = 3, cex = 1, line = 0)
 
 ## nonparametric conformal
 plot.nonparametric(region = nonparaCI, x = x, 
   y = y, bins = bins)
-mtext("Bin nonparam\n Conformal", side = 3, cex = 1, line = 0)
+mtext("Bin nonparam\n conformal", side = 3, cex = 1, line = 0)
 
 
 ############ shape = 2 ################
@@ -6459,7 +6459,7 @@ mtext("y", side = 2, cex = 1, line = 2, outer = TRUE)
 
 
 \newpage
-%Plot of conformal prediciton regions in sim setting A when n = 250
+%Plot of conformal prediction regions in sim setting A when n = 250
 \begin{figure}[h!]
 \begin{center}
 <<conformal-plots-A-250, fig.height = 7, cache = TRUE, echo = FALSE>>=
@@ -6529,7 +6529,7 @@ points(x, y, pch = 19, col = rgb(0,0,0,alpha=0.2))
 lines(x[ix], transformCI[ix, 1], col = "red", lwd = 1.5)
 lines(x[ix], transformCI[ix, 2], col = "red", lwd = 1.5)
 axis(2)
-mtext("Transform param \n Conformal", side = 3, cex = 1, line = 0)
+mtext("Transform param \n conformal", side = 3, cex = 1, line = 0)
 mtext("shape = 0.75", side = 2, cex = 1, line = 2)
 
 ## bin parametric conformal
@@ -6538,7 +6538,7 @@ plot.window(xlim = c(0,1), ylim = c(min(y)-1, max(y)+1))
 points(x, y, pch = 19, col = rgb(0,0,0,alpha=0.2))
 lines(x[ix], paraCI[ix, 1], col = "red", lwd = 1.5)
 lines(x[ix], paraCI[ix, 2], col = "red", lwd = 1.5)
-mtext("Bin param \n Conformal", side = 3, cex = 1, line = 0)
+mtext("Bin param \n conformal", side = 3, cex = 1, line = 0)
 
 ## LSLW conformal
 plot.new()
@@ -6546,12 +6546,12 @@ plot.window(xlim = c(0,1), ylim = c(min(y)-1, max(y)+1))
 points(x, y, pch = 19, col = rgb(0,0,0,alpha=0.2))
 lines(x[ix], LSLWCI[ix, 1], col = "red", lwd = 1.5)
 lines(x[ix], LSLWCI[ix, 2], col = "red", lwd = 1.5)
-mtext("LSLW \n Conformal", side = 3, cex = 1, line = 0)
+mtext("LSLW \n conformal", side = 3, cex = 1, line = 0)
 
 ## nonparametric conformal
 plot.nonparametric(region = nonparaCI, x = x, 
   y = y, bins = bins)
-mtext("Bin nonparam\n Conformal", side = 3, cex = 1, line = 0)
+mtext("Bin nonparam\n conformal", side = 3, cex = 1, line = 0)
 
 
 ############ shape = 2 ################
@@ -6799,7 +6799,7 @@ mtext("y", side = 2, cex = 1, line = 2, outer = TRUE)
 
 
 \newpage
-%Plot of conformal prediciton regions in sim setting A when n = 500
+%Plot of conformal prediction regions in sim setting A when n = 500
 \begin{figure}[h!]
 \begin{center}
 <<conformal-plots-A-500, fig.height = 7, cache = TRUE, echo = FALSE>>=
@@ -6869,7 +6869,7 @@ points(x, y, pch = 19, col = rgb(0,0,0,alpha=0.2))
 lines(x[ix], transformCI[ix, 1], col = "red", lwd = 1.5)
 lines(x[ix], transformCI[ix, 2], col = "red", lwd = 1.5)
 axis(2)
-mtext("Transform param \n Conformal", side = 3, cex = 1, line = 0)
+mtext("Transform param \n conformal", side = 3, cex = 1, line = 0)
 mtext("shape = 0.75", side = 2, cex = 1, line = 2)
 
 ## bin parametric conformal
@@ -6878,7 +6878,7 @@ plot.window(xlim = c(0,1), ylim = c(min(y)-1, max(y)+1))
 points(x, y, pch = 19, col = rgb(0,0,0,alpha=0.2))
 lines(x[ix], paraCI[ix, 1], col = "red", lwd = 1.5)
 lines(x[ix], paraCI[ix, 2], col = "red", lwd = 1.5)
-mtext("Bin param \n Conformal", side = 3, cex = 1, line = 0)
+mtext("Bin param \n conformal", side = 3, cex = 1, line = 0)
 
 ## LSLW conformal
 plot.new()
@@ -6886,12 +6886,12 @@ plot.window(xlim = c(0,1), ylim = c(min(y)-1, max(y)+1))
 points(x, y, pch = 19, col = rgb(0,0,0,alpha=0.2))
 lines(x[ix], LSLWCI[ix, 1], col = "red", lwd = 1.5)
 lines(x[ix], LSLWCI[ix, 2], col = "red", lwd = 1.5)
-mtext("LSLW \n Conformal", side = 3, cex = 1, line = 0)
+mtext("LSLW \n conformal", side = 3, cex = 1, line = 0)
 
 ## nonparametric conformal
 plot.nonparametric(region = nonparaCI, x = x, 
   y = y, bins = bins)
-mtext("Bin nonparam\n Conformal", side = 3, cex = 1, line = 0)
+mtext("Bin nonparam\n conformal", side = 3, cex = 1, line = 0)
 
 
 ############ shape = 2 ################
@@ -7141,7 +7141,7 @@ mtext("y", side = 2, cex = 1, line = 2, outer = TRUE)
 \label{sec:misspecplots}
 
 
-%Plot of conformal prediciton regions in sim setting B when n = 150
+%Plot of conformal prediction regions in sim setting B when n = 150
 \begin{figure}[h!]
 \begin{center}
 <<conformal-plots-B-150, fig.height = 7, cache = TRUE, echo = FALSE>>=
@@ -7212,7 +7212,7 @@ points(x, y, pch = 19, col = rgb(0,0,0,alpha=0.2))
 lines(x[ix], transformCI[ix, 1], col = "red", lwd = 1.5)
 lines(x[ix], transformCI[ix, 2], col = "red", lwd = 1.5)
 axis(2)
-mtext("Transform param \n Conformal", side = 3, cex = 1, line = 0)
+mtext("Transform param \n conformal", side = 3, cex = 1, line = 0)
 mtext("shape = 0.75", side = 2, cex = 1, line = 2)
 
 ## bin parametric conformal
@@ -7221,7 +7221,7 @@ plot.window(xlim = c(0,1), ylim = c(min(y)-1, max(y)+1))
 points(x, y, pch = 19, col = rgb(0,0,0,alpha=0.2))
 lines(x[ix], paraCI[ix, 1], col = "red", lwd = 1.5)
 lines(x[ix], paraCI[ix, 2], col = "red", lwd = 1.5)
-mtext("Bin param \n Conformal", side = 3, cex = 1, line = 0)
+mtext("Bin param \n conformal", side = 3, cex = 1, line = 0)
 
 ## LSLW conformal
 plot.new()
@@ -7229,12 +7229,12 @@ plot.window(xlim = c(0,1), ylim = c(min(y)-1, max(y)+1))
 points(x, y, pch = 19, col = rgb(0,0,0,alpha=0.2))
 lines(x[ix], LSLWCI[ix, 1], col = "red", lwd = 1.5)
 lines(x[ix], LSLWCI[ix, 2], col = "red", lwd = 1.5)
-mtext("LSLW \n Conformal", side = 3, cex = 1, line = 0)
+mtext("LSLW \n conformal", side = 3, cex = 1, line = 0)
 
 ## nonparametric conformal
 plot.nonparametric(region = nonparaCI, x = x, 
   y = y, bins = bins)
-mtext("Bin nonparam\n Conformal", side = 3, cex = 1, line = 0)
+mtext("Bin nonparam\n conformal", side = 3, cex = 1, line = 0)
 
 
 ############ shape = 2 ################
@@ -7485,7 +7485,7 @@ mtext("y", side = 2, cex = 1, line = 2, outer = TRUE)
 
 
 \newpage
-%Plot of conformal prediciton regions in sim setting B when n = 250
+%Plot of conformal prediction regions in sim setting B when n = 250
 \begin{figure}[h!]
 \begin{center}
 <<conformal-plots-B-250, fig.height = 7, cache = TRUE, echo = FALSE>>=
@@ -7556,7 +7556,7 @@ points(x, y, pch = 19, col = rgb(0,0,0,alpha=0.2))
 lines(x[ix], transformCI[ix, 1], col = "red", lwd = 1.5)
 lines(x[ix], transformCI[ix, 2], col = "red", lwd = 1.5)
 axis(2)
-mtext("Transform param \n Conformal", side = 3, cex = 1, line = 0)
+mtext("Transform param \n conformal", side = 3, cex = 1, line = 0)
 mtext("shape = 0.75", side = 2, cex = 1, line = 2)
 
 ## bin parametric conformal
@@ -7565,7 +7565,7 @@ plot.window(xlim = c(0,1), ylim = c(min(y)-1, max(y)+1))
 points(x, y, pch = 19, col = rgb(0,0,0,alpha=0.2))
 lines(x[ix], paraCI[ix, 1], col = "red", lwd = 1.5)
 lines(x[ix], paraCI[ix, 2], col = "red", lwd = 1.5)
-mtext("Bin param \n Conformal", side = 3, cex = 1, line = 0)
+mtext("Bin param \n conformal", side = 3, cex = 1, line = 0)
 
 ## LSLW conformal
 plot.new()
@@ -7573,12 +7573,12 @@ plot.window(xlim = c(0,1), ylim = c(min(y)-1, max(y)+1))
 points(x, y, pch = 19, col = rgb(0,0,0,alpha=0.2))
 lines(x[ix], LSLWCI[ix, 1], col = "red", lwd = 1.5)
 lines(x[ix], LSLWCI[ix, 2], col = "red", lwd = 1.5)
-mtext("LSLW \n Conformal", side = 3, cex = 1, line = 0)
+mtext("LSLW \n conformal", side = 3, cex = 1, line = 0)
 
 ## nonparametric conformal
 plot.nonparametric(region = nonparaCI, x = x, 
   y = y, bins = bins)
-mtext("Bin nonparam\n Conformal", side = 3, cex = 1, line = 0)
+mtext("Bin nonparam\n conformal", side = 3, cex = 1, line = 0)
 
 
 ############ shape = 2 ################
@@ -7829,7 +7829,7 @@ mtext("y", side = 2, cex = 1, line = 2, outer = TRUE)
 
 
 \newpage
-%Plot of conformal prediciton regions in sim setting B when n = 500
+%Plot of conformal prediction regions in sim setting B when n = 500
 \begin{figure}[h!]
 \begin{center}
 <<conformal-plots-B-500, fig.height = 7, cache = TRUE, echo = FALSE>>=
@@ -7900,7 +7900,7 @@ points(x, y, pch = 19, col = rgb(0,0,0,alpha=0.2))
 lines(x[ix], transformCI[ix, 1], col = "red", lwd = 1.5)
 lines(x[ix], transformCI[ix, 2], col = "red", lwd = 1.5)
 axis(2)
-mtext("Transform param \n Conformal", side = 3, cex = 1, line = 0)
+mtext("Transform param \n conformal", side = 3, cex = 1, line = 0)
 mtext("shape = 0.75", side = 2, cex = 1, line = 2)
 
 ## bin parametric conformal
@@ -7909,7 +7909,7 @@ plot.window(xlim = c(0,1), ylim = c(min(y)-1, max(y)+1))
 points(x, y, pch = 19, col = rgb(0,0,0,alpha=0.2))
 lines(x[ix], paraCI[ix, 1], col = "red", lwd = 1.5)
 lines(x[ix], paraCI[ix, 2], col = "red", lwd = 1.5)
-mtext("Bin param \n Conformal", side = 3, cex = 1, line = 0)
+mtext("Bin param \n conformal", side = 3, cex = 1, line = 0)
 
 ## LSLW conformal
 plot.new()
@@ -7917,12 +7917,12 @@ plot.window(xlim = c(0,1), ylim = c(min(y)-1, max(y)+1))
 points(x, y, pch = 19, col = rgb(0,0,0,alpha=0.2))
 lines(x[ix], LSLWCI[ix, 1], col = "red", lwd = 1.5)
 lines(x[ix], LSLWCI[ix, 2], col = "red", lwd = 1.5)
-mtext("LSLW \n Conformal", side = 3, cex = 1, line = 0)
+mtext("LSLW \n conformal", side = 3, cex = 1, line = 0)
 
 ## nonparametric conformal
 plot.nonparametric(region = nonparaCI, x = x, 
   y = y, bins = bins)
-mtext("Bin nonparam\n Conformal", side = 3, cex = 1, line = 0)
+mtext("Bin nonparam\n conformal", side = 3, cex = 1, line = 0)
 
 
 ############ shape = 2 ################
@@ -8179,7 +8179,7 @@ mtext("y", side = 2, cex = 1, line = 2, outer = TRUE)
 \subsection{Plots corresponding to Section~\ref{sec:regression}}
 \label{sec:regressionplots}
 
-%Plot of conformal prediciton regions in sim setting C
+%Plot of conformal prediction regions in sim setting C
 \begin{figure}[h!]
 \begin{center}
 <<conformal-plots-C, fig.height = 7, cache = TRUE, echo = FALSE>>=
@@ -8237,7 +8237,7 @@ points(x, y, pch = 19, col = rgb(0,0,0,alpha=0.2))
 lines(x[ix], transformCI[ix, 1], col = "red", lwd = 1.5)
 lines(x[ix], transformCI[ix, 2], col = "red", lwd = 1.5)
 axis(2)
-mtext("Transform param \n Conformal", side = 3, cex = 1, line = 0)
+mtext("Transform param \n conformal", side = 3, cex = 1, line = 0)
 mtext("n = 150", side = 2, cex = 1, line = 2)
 
 ## bin parametric conformal
@@ -8246,7 +8246,7 @@ plot.window(xlim = c(0,1), ylim = c(min(y)-1, max(y)+1))
 points(x, y, pch = 19, col = rgb(0,0,0,alpha=0.2))
 lines(x[ix], paraCI[ix, 1], col = "red", lwd = 1.5)
 lines(x[ix], paraCI[ix, 2], col = "red", lwd = 1.5)
-mtext("Bin param \n Conformal", side = 3, cex = 1, line = 0)
+mtext("Bin param \n conformal", side = 3, cex = 1, line = 0)
 
 ## LSLW conformal
 plot.new()
@@ -8254,12 +8254,12 @@ plot.window(xlim = c(0,1), ylim = c(min(y)-1, max(y)+1))
 points(x, y, pch = 19, col = rgb(0,0,0,alpha=0.2))
 lines(x[ix], LSCI[ix, 1], col = "red", lwd = 1.5)
 lines(x[ix], LSCI[ix, 2], col = "red", lwd = 1.5)
-mtext("LS \n Conformal", side = 3, cex = 1, line = 0)
+mtext("LS \n conformal", side = 3, cex = 1, line = 0)
 
 ## nonparametric conformal
 plot.nonparametric(region = nonparaCI, x = x, 
   y = y, bins = bins)
-mtext("Bin nonparam\n Conformal", side = 3, cex = 1, line = 0)
+mtext("Bin nonparam\n conformal", side = 3, cex = 1, line = 0)
 
 
 ######### n = 250 ####################

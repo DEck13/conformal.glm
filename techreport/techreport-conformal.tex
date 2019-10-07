@@ -566,7 +566,7 @@ region.
 \hlkwd{xtable}\hlstd{(diagnostics,} \hlkwc{digits} \hlstd{=} \hlkwd{c}\hlstd{(}\hlnum{0}\hlstd{,} \hlnum{2}\hlstd{,} \hlnum{2}\hlstd{,} \hlnum{2}\hlstd{,} \hlnum{2}\hlstd{,} \hlnum{2}\hlstd{))}
 \end{alltt}
 \end{kframe}% latex table generated in R 3.4.4 by xtable 1.8-3 package
-% Fri Sep 27 15:51:26 2019
+% Mon Oct  7 13:40:01 2019
 \begin{table}[ht]
 \centering
 \begin{tabular}{rrrrrr}
@@ -644,7 +644,7 @@ To assess finite-sample marginal validity we calculate the proportion of
 responses that fall within the prediction region.  To assess finite-sample 
 local validity with respect to binning we first bin the predictor data and 
 then, for each bin, we calculate the proportion of responses that fall 
-within the prediciton region. The same procedure is used to assess 
+within the prediction region. The same procedure is used to assess 
 finite-sample conditional validity, but we use a much finer binning regime 
 than what was used to assess finite-sample local validity.  
 
@@ -1569,7 +1569,7 @@ Table 2 and Figure 4 in \citet{eck2019conformal} are shown below.
 \hlkwd{xtable}\hlstd{(diagnostics,} \hlkwc{digits} \hlstd{=} \hlkwd{c}\hlstd{(}\hlnum{0}\hlstd{,} \hlnum{3}\hlstd{,} \hlnum{3}\hlstd{,} \hlnum{3}\hlstd{,} \hlnum{3}\hlstd{,} \hlnum{3}\hlstd{,} \hlnum{3}\hlstd{,} \hlnum{3}\hlstd{))}
 \end{alltt}
 \end{kframe}% latex table generated in R 3.4.4 by xtable 1.8-3 package
-% Fri Sep 27 15:51:28 2019
+% Mon Oct  7 13:40:03 2019
 \begin{table}[ht]
 \centering
 \begin{tabular}{rrrrrrrr}
@@ -2888,14 +2888,14 @@ Figures~\ref{Fig:gamma.inx.150}, \ref{Fig:gamma.inx.250}, and
 \ref{Fig:gamma.inx.500} for $n = 150$, $250$, and $500$ respectively.
 
 From these simulations we see that both parametric conformal prediction 
-regions are similar to the HD prediciton region in area, prediction error, and 
+regions are similar to the HD prediction region in area, prediction error, and 
 appearance (as seen in Section~\ref{sec:gammaplots}), where the transformation 
 based conformal prediction region is slightly preferrable to its binned counterpart.  
 Moreover, the parametric conformal prediction regions possess finite-sample, 
 albeit slightly conservative, local validity with respect to binning and 
 possess nominal finite-sample conditional coverage over most of the support. 
-The LSLW conformal prediction region provides lower prediciton error than the 
-parametric conformal prediciton regions.  However, the LSLW conformal 
+The LSLW conformal prediction region provides lower prediction error than the 
+parametric conformal prediction regions.  However, the LSLW conformal 
 prediction possesses some erratic coverage properties.  
 It also does not fit the data well when the deviations about the 
 estimated mean function are clearly not symmetric as evidenced by 
@@ -2904,11 +2904,11 @@ from a Gamma distribution with small shape parameter values.
 The binned nonparametric conformal prediction region gives closer to nominal 
 coverage and it possesses finite-sample local validity with respect to 
 binning.  However, this prediction region is larger and gives higher 
-prediciton error than the parametric and LSLW conformal prediction 
-regions and HD prediction region.  The LS conformal prediciton region 
+prediction error than the parametric and LSLW conformal prediction 
+regions and HD prediction region.  The LS conformal prediction region 
 provides extreme overcoverage at small values of $x$ and extreme 
 undercoverage at large values of $x$.  This prediction region is also larger 
-and gives higher prediciton error than the parametric and LSLW conformal 
+and gives higher prediction error than the parametric and LSLW conformal 
 prediction regions and HD prediction region.
 
 
@@ -2927,10 +2927,10 @@ prediction regions and HD prediction region.
   transformation, 
   binned nonparametric,
   least squares, and 
-  least squares locally weighted conformal prediciton region and the 
+  least squares locally weighted conformal prediction region and the 
   highest density predcition region when $n = 150$ and the number of bins 
   equals 2.  
-  The specific diagnostics used to compare these prediciton regions are the 
+  The specific diagnostics used to compare these prediction regions are the 
     area,
     prediction error, 
     marginal coverage probability,
@@ -2974,10 +2974,10 @@ prediction regions and HD prediction region.
   transformation,
   binned nonparametric,
   least squares, and 
-  least squares locally weighted conformal prediciton region and the 
+  least squares locally weighted conformal prediction region and the 
   highest density prediction region when $n = 250$ and the number of bins 
   equals 3.  
-  The specific diagnostics used to compare these prediciton regions is the 
+  The specific diagnostics used to compare these prediction regions is the 
     area,
     prediction error, 
     marginal coverage probability,
@@ -3023,10 +3023,10 @@ prediction regions and HD prediction region.
   transformation,
   binned nonparametric,
   least squares, and 
-  least squares locally weighted conformal prediciton region and the 
+  least squares locally weighted conformal prediction region and the 
   highest density prediction region when $n = 500$ and the number of bins 
   equals 3.  
-  The specific diagnostics used to compare these prediciton regions is the 
+  The specific diagnostics used to compare these prediction regions is the 
     area,
     prediction error, 
     marginal coverage probability,
@@ -3972,24 +3972,24 @@ We also expect for the misspecified transformation based conformal
 prediction region to have poor local and conditional coverage properties 
 when compared with the binned parametric conformal prediction region.
 From these simulations we see that the parametric conformal 
-prediction regions are similar to the LSLW prediciton region in area and 
+prediction regions are similar to the LSLW prediction region in area and 
 prediction error.  However, these prediction have drastically different 
 coverage properties.  The binned parametric conformal prediction region 
 possesses desirable local and conditional coverages in comparison to the 
 others, and LSLW conformal prediction region gives exhibit slight 
-undercoverage.  Moreover, these prediciton regions visually 
+undercoverage.  Moreover, these prediction regions visually 
 fit the data well as seen in Section~\ref{sec:misspecplots}.
 The nonparametric conformal prediction region gives closer to nominal 
 coverage than both the parametric and LSLW conformal prediction regions, 
 and it possesses finite-sample local validity with respect to 
 binning.  However, this prediction region is larger, gives higher 
-prediciton error than the parametric and LSLW conformal prediction 
+prediction error than the parametric and LSLW conformal prediction 
 regions, and does not visually fit the data well for most simulation settings 
 as seen in Section~\ref{sec:misspecplots}.  The misspecified transformation 
 based conformal prediction region and the HD and LS 
 conformal prediction regions exhibit extreme undercoverage at small values 
 of $x$ and extreme overcoverage at large values of $x$.  These prediction 
-regions are also larger, they give higher prediciton error than the 
+regions are also larger, they give higher prediction error than the 
 binned parametric and LSLW conformal prediction regions, and the LS 
 conformal prediction region does not visually fit the data well for most 
 simulation settings as seen in Section~\ref{sec:misspecplots}. 
@@ -4016,10 +4016,10 @@ simulation settings as seen in Section~\ref{sec:misspecplots}.
   misspecified transformation,  
   binned nonparametric,
   least squares, and 
-  least squares locally weighted conformal prediciton regions and the 
+  least squares locally weighted conformal prediction regions and the 
   misspecified and correctly specified highest density prediction regions 
   when $n = 150$ and the number of bins equals 2.  
-  The specific diagnostics used to compare these prediciton regions is the 
+  The specific diagnostics used to compare these prediction regions is the 
     area,
     prediction error, 
     marginal coverage probability, 
@@ -4064,10 +4064,10 @@ simulation settings as seen in Section~\ref{sec:misspecplots}.
   misspecified transformation, 
   binned nonparametric,
   least squares, and 
-  least squares locally weighted conformal prediciton region and the 
+  least squares locally weighted conformal prediction region and the 
   correctly specified highest density prediction regions when $n = 250$ 
   and the number of bins equals 3.  
-  The specific diagnostics used to compare these prediciton regions is the 
+  The specific diagnostics used to compare these prediction regions is the 
     area,
     prediction error, 
     marginal coverage probability,     
@@ -4113,10 +4113,10 @@ simulation settings as seen in Section~\ref{sec:misspecplots}.
   misspecified transformation, 
   binned nonparametric,
   least squares, and 
-  least squares locally weighted conformal prediciton regions and the 
+  least squares locally weighted conformal prediction regions and the 
   correctly specified highest density prediction region when $n = 500$ and the 
   number of bins equals 3.  
-  The specific diagnostics used to compare these prediciton regions is the 
+  The specific diagnostics used to compare these prediction regions is the 
     area,
     prediction error, 
     marginal coverage probability,     
@@ -4399,12 +4399,12 @@ conformal prediction regions to perform nearly as well as the oracle HD
 prediction region.  These prediction regions also exhibit finite-sample 
 marginal validity, local validity with respect to binning, and near 
 conditional validity across the support.  The parametric conformal prediction 
-region is similar to the LS and LSLW conformal prediciton regions and the HD 
+region is similar to the LS and LSLW conformal prediction regions and the HD 
 prediction region in area, prediction error, finite-sample coverage 
-properties, and appearance.  However, the parametric conformal prediciton 
+properties, and appearance.  However, the parametric conformal prediction 
 region is slightly larger and gives more conservative coverage that these 
-other prediction regions.  The nonparametric conformal prediciton region 
-is larger and gives larger prediciton errors than the other prediciton 
+other prediction regions.  The nonparametric conformal prediction region 
+is larger and gives larger prediction errors than the other prediction 
 regions.  It also appears to not visually fit the data well while the others 
 do as seen in Section~\ref{sec:regressionplots}.
 
@@ -4602,7 +4602,7 @@ The nonparametric conformal prediction region is coarse and is larger than
 necessary when the mean function is steep relative to its variability.  
 The LS conformal prediction performs well when deviations about the estimated 
 mean function are symmetirc and is sensitive to mild departures from that 
-setting.  This prediciton region is seen to provide overcoverage 
+setting.  This prediction region is seen to provide overcoverage 
 (undercoverage) in regions of the predictor space where variability about the 
 estimated mean function is relatively small (large).
 
@@ -4638,7 +4638,7 @@ estimated mean function is relatively small (large).
 \subsection{Plots corresponding to Section~\ref{sec:Gamma}}
 \label{sec:gammaplots}
 
-%Plot of conformal prediciton regions in sim setting A when n = 150
+%Plot of conformal prediction regions in sim setting A when n = 150
 \begin{figure}[h!]
 \begin{center}
 \begin{knitrout}
@@ -4657,7 +4657,7 @@ estimated mean function is relatively small (large).
 
 
 \newpage
-%Plot of conformal prediciton regions in sim setting A when n = 250
+%Plot of conformal prediction regions in sim setting A when n = 250
 \begin{figure}[h!]
 \begin{center}
 \begin{knitrout}
@@ -4676,7 +4676,7 @@ estimated mean function is relatively small (large).
 
 
 \newpage
-%Plot of conformal prediciton regions in sim setting A when n = 500
+%Plot of conformal prediction regions in sim setting A when n = 500
 \begin{figure}[h!]
 \begin{center}
 \begin{knitrout}
@@ -4698,7 +4698,7 @@ estimated mean function is relatively small (large).
 \label{sec:misspecplots}
 
 
-%Plot of conformal prediciton regions in sim setting B when n = 150
+%Plot of conformal prediction regions in sim setting B when n = 150
 \begin{figure}[h!]
 \begin{center}
 \begin{knitrout}
@@ -4717,7 +4717,7 @@ estimated mean function is relatively small (large).
 
 
 \newpage
-%Plot of conformal prediciton regions in sim setting B when n = 250
+%Plot of conformal prediction regions in sim setting B when n = 250
 \begin{figure}[h!]
 \begin{center}
 \begin{knitrout}
@@ -4736,7 +4736,7 @@ estimated mean function is relatively small (large).
 
 
 \newpage
-%Plot of conformal prediciton regions in sim setting B when n = 500
+%Plot of conformal prediction regions in sim setting B when n = 500
 \begin{figure}[h!]
 \begin{center}
 \begin{knitrout}
@@ -4761,7 +4761,7 @@ estimated mean function is relatively small (large).
 \subsection{Plots corresponding to Section~\ref{sec:regression}}
 \label{sec:regressionplots}
 
-%Plot of conformal prediciton regions in sim setting C
+%Plot of conformal prediction regions in sim setting C
 \begin{figure}[h!]
 \begin{center}
 \begin{knitrout}
