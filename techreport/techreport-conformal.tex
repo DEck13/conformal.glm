@@ -348,7 +348,7 @@ it will take longer to run.
 We now compute the least squares with local weighting (LSLW) conformal 
 prediction region \citep[Section 5.2]{lei2018distribution} using the 
 \texttt{conformal.pred} function in the \texttt{conformalInference} package 
-\citep{thibshirani2016conformalR}.  
+\citep{tibshirani2016conformalR}.  
 %This LSLW conformal prediction region is constructed with local weighting as 
 %in \citet[Section 5.2]{lei2018distribution}.
 In this procedure, the residuals from a regression fit are weighted by an 
@@ -424,17 +424,17 @@ the \texttt{HDInterval} package \citep{meredith2018HDIntervalR}.
 \end{knitrout}
 
 
-The four prediction regions for this data are depicted below.  The top row 
-depicts the parametric conformal prediction region (left panel) and the 
-nonparametric conformal prediction region (right panel).  The bin width was 
-specified as 1/3 for these conformal prediction regions.  The bottom row 
-depicts the least squares conformal prediction region (left panel) and the 
-highest density region (right panel).  We see that the parametric conformal 
-prediction region is a close discretization of the highest density region, the 
-nonparametric conformal prediction region is quite jagged and unnatural, and 
-the least squares conformal prediction region exhibits undercoverage for small 
-$x$, exhibits overcoverage for large $x$, and includes negative response 
-values of large magnitude. 
+Four of the five prediction regions considered for this data are depicted in 
+Figure~\ref{Fig:plots}.  The top row depicts the transformation parametric 
+conformal prediction region (left panel) and the binned parametric conformal 
+prediction region (right panel).  The bottom row depicts the binned 
+nonparametric conformal prediction region (left panel) and the LSLW conformal 
+prediction region (right panel).  The bin width was specified as 1/3 for the 
+binned conformal prediction regions.  We see that the binned parametric 
+conformal prediction region is a close discretization of the transformation 
+conformal prediction region, the nonparametric conformal prediction region is 
+quite jagged and unnatural, and the LSLW conformal prediction region includes 
+negative response values and is jagged. 
 
 
 %\newpage
@@ -487,7 +487,7 @@ LSLW conformal prediction region has an estimated area of 2.56 and
 The nonparametric conformal prediction region has an estimated area of 2.68. 
 Under correct model specification, the parametric conformal prediction 
 regions are similar in performance to that of the highest density prediction 
-region.
+region. 
 
 
 
@@ -566,7 +566,7 @@ region.
 \hlkwd{xtable}\hlstd{(diagnostics,} \hlkwc{digits} \hlstd{=} \hlkwd{c}\hlstd{(}\hlnum{0}\hlstd{,} \hlnum{2}\hlstd{,} \hlnum{2}\hlstd{,} \hlnum{2}\hlstd{,} \hlnum{2}\hlstd{,} \hlnum{2}\hlstd{))}
 \end{alltt}
 \end{kframe}% latex table generated in R 3.4.4 by xtable 1.8-3 package
-% Mon Oct  7 13:40:01 2019
+% Mon Oct  7 16:43:06 2019
 \begin{table}[ht]
 \centering
 \begin{tabular}{rrrrrr}
@@ -1569,7 +1569,7 @@ Table 2 and Figure 4 in \citet{eck2019conformal} are shown below.
 \hlkwd{xtable}\hlstd{(diagnostics,} \hlkwc{digits} \hlstd{=} \hlkwd{c}\hlstd{(}\hlnum{0}\hlstd{,} \hlnum{3}\hlstd{,} \hlnum{3}\hlstd{,} \hlnum{3}\hlstd{,} \hlnum{3}\hlstd{,} \hlnum{3}\hlstd{,} \hlnum{3}\hlstd{,} \hlnum{3}\hlstd{))}
 \end{alltt}
 \end{kframe}% latex table generated in R 3.4.4 by xtable 1.8-3 package
-% Mon Oct  7 13:40:03 2019
+% Mon Oct  7 16:43:07 2019
 \begin{table}[ht]
 \centering
 \begin{tabular}{rrrrrrrr}
