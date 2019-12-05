@@ -27,7 +27,7 @@ conformal prediction regions to the oracle highest density region under
 the correct model. This example is included in the corresponding paper:  
 
   Eck, D.J. and Crawford, F.W. (2019+)
-  Conformal prediction for exponential families and generalized linear models.
+  Efficient and minimal length parametric conformal prediction regions.
   Preprint available on request (email dje13@illinois.edu).
 
 ```r
@@ -289,7 +289,7 @@ citation("conformal.glm")
 For more details on the parametric conformal prediction region, see:
 
   Eck, D.J. and Crawford, F.W. (2019+)
-  Conformal prediction for exponential families and generalized linear models.
+  Efficient and minimal length parametric conformal prediction regions.
   Preprint available on request (email dje13@illinois.edu).
 
 For more details on the prediciton region formed from conformalization of 
