@@ -348,7 +348,7 @@ it will take longer to run.
 We now compute the least squares with local weighting (LSLW) conformal 
 prediction region \citep[Section 5.2]{lei2018distribution} using the 
 \texttt{conformal.pred} function in the \texttt{conformalInference} package 
-\citep{thibshirani2016conformalR}.  
+\citep{tibshirani2016conformalR}.  
 %This LSLW conformal prediction region is constructed with local weighting as 
 %in \citet[Section 5.2]{lei2018distribution}.
 In this procedure, the residuals from a regression fit are weighted by an 
@@ -424,17 +424,17 @@ the \texttt{HDInterval} package \citep{meredith2018HDIntervalR}.
 \end{knitrout}
 
 
-The four prediction regions for this data are depicted below.  The top row 
-depicts the parametric conformal prediction region (left panel) and the 
-nonparametric conformal prediction region (right panel).  The bin width was 
-specified as 1/3 for these conformal prediction regions.  The bottom row 
-depicts the least squares conformal prediction region (left panel) and the 
-highest density region (right panel).  We see that the parametric conformal 
-prediction region is a close discretization of the highest density region, the 
-nonparametric conformal prediction region is quite jagged and unnatural, and 
-the least squares conformal prediction region exhibits undercoverage for small 
-$x$, exhibits overcoverage for large $x$, and includes negative response 
-values of large magnitude. 
+Four of the five prediction regions considered for this data are depicted in 
+Figure~\ref{Fig:plots}.  The top row depicts the transformation parametric 
+conformal prediction region (left panel) and the binned parametric conformal 
+prediction region (right panel).  The bottom row depicts the binned 
+nonparametric conformal prediction region (left panel) and the LSLW conformal 
+prediction region (right panel).  The bin width was specified as 1/3 for the 
+binned conformal prediction regions.  We see that the binned parametric 
+conformal prediction region is a close discretization of the transformation 
+conformal prediction region, the nonparametric conformal prediction region is 
+quite jagged and unnatural, and the LSLW conformal prediction region includes 
+negative response values and is jagged. 
 
 
 %\newpage
@@ -487,7 +487,7 @@ LSLW conformal prediction region has an estimated area of 2.56 and
 The nonparametric conformal prediction region has an estimated area of 2.68. 
 Under correct model specification, the parametric conformal prediction 
 regions are similar in performance to that of the highest density prediction 
-region.
+region. 
 
 
 
@@ -566,7 +566,7 @@ region.
 \hlkwd{xtable}\hlstd{(diagnostics,} \hlkwc{digits} \hlstd{=} \hlkwd{c}\hlstd{(}\hlnum{0}\hlstd{,} \hlnum{2}\hlstd{,} \hlnum{2}\hlstd{,} \hlnum{2}\hlstd{,} \hlnum{2}\hlstd{,} \hlnum{2}\hlstd{))}
 \end{alltt}
 \end{kframe}% latex table generated in R 3.4.4 by xtable 1.8-3 package
-% Mon Sep 23 15:47:45 2019
+% Mon Oct  7 16:43:06 2019
 \begin{table}[ht]
 \centering
 \begin{tabular}{rrrrrr}
@@ -644,7 +644,7 @@ To assess finite-sample marginal validity we calculate the proportion of
 responses that fall within the prediction region.  To assess finite-sample 
 local validity with respect to binning we first bin the predictor data and 
 then, for each bin, we calculate the proportion of responses that fall 
-within the prediciton region. The same procedure is used to assess 
+within the prediction region. The same procedure is used to assess 
 finite-sample conditional validity, but we use a much finer binning regime 
 than what was used to assess finite-sample local validity.  
 
@@ -1569,7 +1569,7 @@ Table 2 and Figure 4 in \citet{eck2019conformal} are shown below.
 \hlkwd{xtable}\hlstd{(diagnostics,} \hlkwc{digits} \hlstd{=} \hlkwd{c}\hlstd{(}\hlnum{0}\hlstd{,} \hlnum{3}\hlstd{,} \hlnum{3}\hlstd{,} \hlnum{3}\hlstd{,} \hlnum{3}\hlstd{,} \hlnum{3}\hlstd{,} \hlnum{3}\hlstd{,} \hlnum{3}\hlstd{))}
 \end{alltt}
 \end{kframe}% latex table generated in R 3.4.4 by xtable 1.8-3 package
-% Mon Sep 23 15:47:47 2019
+% Mon Oct  7 16:43:07 2019
 \begin{table}[ht]
 \centering
 \begin{tabular}{rrrrrrrr}
@@ -2888,27 +2888,27 @@ Figures~\ref{Fig:gamma.inx.150}, \ref{Fig:gamma.inx.250}, and
 \ref{Fig:gamma.inx.500} for $n = 150$, $250$, and $500$ respectively.
 
 From these simulations we see that both parametric conformal prediction 
-regions are similar to the HD prediciton region in area, prediction error, and 
+regions are similar to the HD prediction region in area, prediction error, and 
 appearance (as seen in Section~\ref{sec:gammaplots}), where the transformation 
 based conformal prediction region is slightly preferrable to its binned counterpart.  
 Moreover, the parametric conformal prediction regions possess finite-sample, 
 albeit slightly conservative, local validity with respect to binning and 
 possess nominal finite-sample conditional coverage over most of the support. 
-The LSLW conformal prediction region provides lower prediciton error than the 
-parametric conformal prediciton regions.  However, the LSLW conformal 
+The LSLW conformal prediction region provides lower prediction error than the 
+parametric conformal prediction regions.  However, the LSLW conformal 
 prediction possesses some erratic coverage properties.  
-{\bf Revisit} It also does not fit the data well when the deviations about the 
+It also does not fit the data well when the deviations about the 
 estimated mean function are clearly not symmetric as evidenced by 
 in Section~\ref{sec:gammaplots}.  These figures correspond to data generated 
 from a Gamma distribution with small shape parameter values.  
 The binned nonparametric conformal prediction region gives closer to nominal 
 coverage and it possesses finite-sample local validity with respect to 
 binning.  However, this prediction region is larger and gives higher 
-prediciton error than the parametric and LSLW conformal prediction 
-regions and HD prediction region.  The LS conformal prediciton region 
+prediction error than the parametric and LSLW conformal prediction 
+regions and HD prediction region.  The LS conformal prediction region 
 provides extreme overcoverage at small values of $x$ and extreme 
 undercoverage at large values of $x$.  This prediction region is also larger 
-and gives higher prediciton error than the parametric and LSLW conformal 
+and gives higher prediction error than the parametric and LSLW conformal 
 prediction regions and HD prediction region.
 
 
@@ -2927,10 +2927,10 @@ prediction regions and HD prediction region.
   transformation, 
   binned nonparametric,
   least squares, and 
-  least squares locally weighted conformal prediciton region and the 
+  least squares locally weighted conformal prediction region and the 
   highest density predcition region when $n = 150$ and the number of bins 
   equals 2.  
-  The specific diagnostics used to compare these prediciton regions are the 
+  The specific diagnostics used to compare these prediction regions are the 
     area,
     prediction error, 
     marginal coverage probability,
@@ -2974,10 +2974,10 @@ prediction regions and HD prediction region.
   transformation,
   binned nonparametric,
   least squares, and 
-  least squares locally weighted conformal prediciton region and the 
+  least squares locally weighted conformal prediction region and the 
   highest density prediction region when $n = 250$ and the number of bins 
   equals 3.  
-  The specific diagnostics used to compare these prediciton regions is the 
+  The specific diagnostics used to compare these prediction regions is the 
     area,
     prediction error, 
     marginal coverage probability,
@@ -3023,10 +3023,10 @@ prediction regions and HD prediction region.
   transformation,
   binned nonparametric,
   least squares, and 
-  least squares locally weighted conformal prediciton region and the 
+  least squares locally weighted conformal prediction region and the 
   highest density prediction region when $n = 500$ and the number of bins 
   equals 3.  
-  The specific diagnostics used to compare these prediciton regions is the 
+  The specific diagnostics used to compare these prediction regions is the 
     area,
     prediction error, 
     marginal coverage probability,
@@ -3972,27 +3972,27 @@ We also expect for the misspecified transformation based conformal
 prediction region to have poor local and conditional coverage properties 
 when compared with the binned parametric conformal prediction region.
 From these simulations we see that the parametric conformal 
-prediction regions are similar to the LSLW prediciton region in area and 
+prediction regions are similar to the LSLW prediction region in area and 
 prediction error.  However, these prediction have drastically different 
 coverage properties.  The binned parametric conformal prediction region 
 possesses desirable local and conditional coverages in comparison to the 
 others, and LSLW conformal prediction region gives exhibit slight 
-undercoverage.  {\bf Revisit} Moreover, these prediciton regions visually 
+undercoverage.  Moreover, these prediction regions visually 
 fit the data well as seen in Section~\ref{sec:misspecplots}.
 The nonparametric conformal prediction region gives closer to nominal 
 coverage than both the parametric and LSLW conformal prediction regions, 
 and it possesses finite-sample local validity with respect to 
 binning.  However, this prediction region is larger, gives higher 
-prediciton error than the parametric and LSLW conformal prediction 
+prediction error than the parametric and LSLW conformal prediction 
 regions, and does not visually fit the data well for most simulation settings 
 as seen in Section~\ref{sec:misspecplots}.  The misspecified transformation 
 based conformal prediction region and the HD and LS 
 conformal prediction regions exhibit extreme undercoverage at small values 
 of $x$ and extreme overcoverage at large values of $x$.  These prediction 
-regions are also larger, they give higher prediciton error than the 
-parametric and LSLW conformal prediction regions, and the LS conformal 
-prediction region does not visually fit the data well for most simulation 
-settings as seen in Section~\ref{sec:misspecplots}. 
+regions are also larger, they give higher prediction error than the 
+binned parametric and LSLW conformal prediction regions, and the LS 
+conformal prediction region does not visually fit the data well for most 
+simulation settings as seen in Section~\ref{sec:misspecplots}. 
 
 
 
@@ -4016,10 +4016,10 @@ settings as seen in Section~\ref{sec:misspecplots}.
   misspecified transformation,  
   binned nonparametric,
   least squares, and 
-  least squares locally weighted conformal prediciton regions and the 
+  least squares locally weighted conformal prediction regions and the 
   misspecified and correctly specified highest density prediction regions 
   when $n = 150$ and the number of bins equals 2.  
-  The specific diagnostics used to compare these prediciton regions is the 
+  The specific diagnostics used to compare these prediction regions is the 
     area,
     prediction error, 
     marginal coverage probability, 
@@ -4064,10 +4064,10 @@ settings as seen in Section~\ref{sec:misspecplots}.
   misspecified transformation, 
   binned nonparametric,
   least squares, and 
-  least squares locally weighted conformal prediciton region and the 
+  least squares locally weighted conformal prediction region and the 
   correctly specified highest density prediction regions when $n = 250$ 
   and the number of bins equals 3.  
-  The specific diagnostics used to compare these prediciton regions is the 
+  The specific diagnostics used to compare these prediction regions is the 
     area,
     prediction error, 
     marginal coverage probability,     
@@ -4113,10 +4113,10 @@ settings as seen in Section~\ref{sec:misspecplots}.
   misspecified transformation, 
   binned nonparametric,
   least squares, and 
-  least squares locally weighted conformal prediciton regions and the 
+  least squares locally weighted conformal prediction regions and the 
   correctly specified highest density prediction region when $n = 500$ and the 
   number of bins equals 3.  
-  The specific diagnostics used to compare these prediciton regions is the 
+  The specific diagnostics used to compare these prediction regions is the 
     area,
     prediction error, 
     marginal coverage probability,     
@@ -4153,23 +4153,18 @@ settings as seen in Section~\ref{sec:misspecplots}.
 \section{Linear Regression Simulations}
 \label{sec:regression}
 
-In this Section, we compare the parametric conformal prediction 
-region, the nonparametric conformal prediction region, the LSLW conformal 
+In this Section, we compare both parametric conformal prediction 
+regions, the binned nonparametric conformal prediction region, the LSLW conformal 
 prediction region, the LS conformal prediction region, and the HD prediction 
 region for linear regression models with normal errors and constant variance.  
 We specify that $\beta = (2, 5)^T$ and the standard deviation of the errors 
 about the mean function as $\sigma = 1$.
 We consider sample sizes of $n \in \{150, 250, 500\}$. 
-When $n = 150$ we build the parametric and nonparametric conformal prediction 
-regions using 2 bins.  When $n = 250, 500$ we build the parametric and 
-nonparametric conformal prediction regions using 3 bins.  These number of bin 
-choices correspond to the bin width asymptotics of \citet{lei2014distribution}. 
-
-
-
-\begin{center}
-{\Huge Revised up to here}
-\end{center}
+When $n = 150$ we build the binned parametric and nonparametric conformal 
+prediction regions using 2 bins.  When $n = 250, 500$ we build the parametric 
+and nonparametric conformal prediction regions using 3 bins.  These number of 
+bin choices correspond to the bin width asymptotics of 
+\citet{lei2014distribution}. 
 
 
 \subsection{Simulations}
@@ -4182,58 +4177,49 @@ $Y \sim N(X'\beta, \sigma^2)$ and $X \sim U(0,1)$.
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 \begin{alltt}
-\hlstd{regression.simulator} \hlkwb{<-} \hlkwa{function}\hlstd{(}\hlkwc{n} \hlstd{=} \hlnum{500}\hlstd{,} \hlkwc{alpha} \hlstd{=} \hlnum{0.10}\hlstd{,} \hlkwc{beta}\hlstd{,}
-  \hlkwc{bins} \hlstd{=} \hlnum{3}\hlstd{,} \hlkwc{sd} \hlstd{=} \hlnum{1}\hlstd{,} \hlkwc{parametric} \hlstd{=} \hlnum{TRUE}\hlstd{,} \hlkwc{nonparametric} \hlstd{=} \hlnum{TRUE}\hlstd{,}
-  \hlkwc{LS} \hlstd{=} \hlnum{TRUE}\hlstd{,} \hlkwc{LSLW} \hlstd{=} \hlnum{TRUE}\hlstd{,} \hlkwc{HD} \hlstd{=} \hlnum{TRUE}\hlstd{,} \hlkwc{cores} \hlstd{=} \hlnum{6}\hlstd{)\{}
+\hlstd{regression_simulator} \hlkwb{<-} \hlkwa{function}\hlstd{(}\hlkwc{beta}\hlstd{,} \hlkwc{n} \hlstd{=} \hlnum{150}\hlstd{,} \hlkwc{sd} \hlstd{=} \hlnum{1}\hlstd{,}
+  \hlkwc{alpha} \hlstd{=} \hlnum{0.10}\hlstd{,} \hlkwc{B} \hlstd{=} \hlnum{2}\hlstd{,} \hlkwc{bins} \hlstd{= bins)\{}
 
   \hlstd{p} \hlkwb{<-} \hlstd{d} \hlkwb{<-} \hlkwd{length}\hlstd{(beta)} \hlopt{-} \hlnum{1}
-  \hlstd{x} \hlkwb{<-} \hlkwd{matrix}\hlstd{(}\hlkwd{runif}\hlstd{(n),} \hlkwc{ncol} \hlstd{= p)}
-  \hlstd{y} \hlkwb{<-} \hlkwd{rep}\hlstd{(}\hlnum{0}\hlstd{,n)}
-  \hlstd{data} \hlkwb{<-} \hlkwa{NULL}
 
-  \hlcom{## set up partition}
-  \hlkwa{if}\hlstd{(}\hlkwd{class}\hlstd{(bins)} \hlopt{==} \hlstr{"NULL"}\hlstd{)\{}
-    \hlstd{wn} \hlkwb{<-} \hlkwd{min}\hlstd{(}\hlnum{1}\hlopt{/} \hlkwd{floor}\hlstd{(}\hlnum{1} \hlopt{/} \hlstd{(}\hlkwd{log}\hlstd{(n)}\hlopt{/}\hlstd{n)}\hlopt{^}\hlstd{(}\hlnum{1}\hlopt{/}\hlstd{(d}\hlopt{+}\hlnum{3}\hlstd{))),} \hlnum{1}\hlopt{/}\hlnum{2}\hlstd{)}
-    \hlstd{bins} \hlkwb{<-} \hlnum{1} \hlopt{/} \hlstd{wn}
-  \hlstd{\}}
+  \hlstd{models} \hlkwb{<-} \hlkwd{lapply}\hlstd{(}\hlnum{1}\hlopt{:}\hlstd{B,} \hlkwc{FUN} \hlstd{=} \hlkwa{function}\hlstd{(}\hlkwc{j}\hlstd{)\{}
+    \hlstd{x} \hlkwb{<-} \hlkwd{matrix}\hlstd{(}\hlkwd{runif}\hlstd{(n),} \hlkwc{ncol} \hlstd{= p)}
+    \hlstd{mu} \hlkwb{<-} \hlkwd{cbind}\hlstd{(}\hlnum{1}\hlstd{, x)} \hlopt{%*%} \hlstd{beta}
+    \hlstd{y} \hlkwb{<-} \hlkwd{rnorm}\hlstd{(}\hlkwc{n} \hlstd{= n,} \hlkwc{mean} \hlstd{= mu,} \hlkwc{sd} \hlstd{= sd)}
+    \hlstd{y} \hlkwb{<-} \hlstd{y} \hlopt{/} \hlkwd{sd}\hlstd{(y)}
+    \hlstd{dat} \hlkwb{<-} \hlkwd{data.frame}\hlstd{(}\hlkwc{y} \hlstd{= y,} \hlkwc{x} \hlstd{= x)}
+    \hlkwd{colnames}\hlstd{(dat)[}\hlnum{2}\hlopt{:}\hlstd{(p}\hlopt{+}\hlnum{1}\hlstd{)]} \hlkwb{<-} \hlkwd{paste}\hlstd{(}\hlstr{"x"}\hlstd{,} \hlnum{1}\hlopt{:}\hlstd{p,} \hlkwc{sep} \hlstd{=} \hlstr{""}\hlstd{)}
+    \hlstd{fit} \hlkwb{<-} \hlkwd{glm}\hlstd{(y} \hlopt{~} \hlstd{x1,} \hlkwc{family} \hlstd{=} \hlstr{"gaussian"}\hlstd{,}
+      \hlkwc{data} \hlstd{= dat,} \hlkwc{x} \hlstd{=} \hlnum{TRUE}\hlstd{,} \hlkwc{y} \hlstd{=} \hlnum{TRUE}\hlstd{)}
+    \hlstd{output} \hlkwb{=} \hlkwd{list}\hlstd{(}\hlkwc{model} \hlstd{= fit,} \hlkwc{dat} \hlstd{= dat)}
+    \hlstd{output}
+  \hlstd{\})}
 
-  \hlcom{## generate the data }
-  \hlstd{mu} \hlkwb{<-} \hlkwd{cbind}\hlstd{(}\hlnum{1}\hlstd{, x)} \hlopt{%*%} \hlstd{beta}
-  \hlstd{y} \hlkwb{<-} \hlkwd{rnorm}\hlstd{(}\hlkwc{n} \hlstd{= n,} \hlkwc{mean} \hlstd{= mu,} \hlkwc{sd} \hlstd{= sd)}
-  \hlstd{data} \hlkwb{<-} \hlkwd{data.frame}\hlstd{(}\hlkwc{y} \hlstd{= y,} \hlkwc{x} \hlstd{= x)}
-  \hlkwd{colnames}\hlstd{(data)[}\hlnum{2}\hlopt{:}\hlstd{(p}\hlopt{+}\hlnum{1}\hlstd{)]} \hlkwb{<-} \hlkwd{paste}\hlstd{(}\hlstr{"x"}\hlstd{,} \hlnum{1}\hlopt{:}\hlstd{p,} \hlkwc{sep} \hlstd{=} \hlstr{""}\hlstd{)}
+  \hlstd{funs} \hlkwb{<-} \hlkwd{lm.funs}\hlstd{(}\hlkwc{intercept} \hlstd{=} \hlnum{TRUE}\hlstd{)}
+  \hlstd{train.fun} \hlkwb{<-} \hlstd{funs}\hlopt{$}\hlstd{train.fun}
+  \hlstd{predict.fun} \hlkwb{<-} \hlstd{funs}\hlopt{$}\hlstd{predict.fun}
+  \hlstd{conformal_regions} \hlkwb{<-} \hlkwd{lapply}\hlstd{(models,} \hlkwc{FUN} \hlstd{=} \hlkwa{function}\hlstd{(}\hlkwc{obj}\hlstd{)\{}
 
-  \hlcom{## fit the linear regression model}
-  \hlstd{fit} \hlkwb{<-} \hlkwd{glm}\hlstd{(y} \hlopt{~} \hlstd{x1,} \hlkwc{family} \hlstd{=} \hlstr{"gaussian"}\hlstd{,} \hlkwc{data} \hlstd{= data)}
-  \hlstd{paraCI} \hlkwb{<-} \hlstd{nonparaCI} \hlkwb{<-} \hlstd{LSCI} \hlkwb{<-} \hlstd{LSLWCI} \hlkwb{<-} \hlstd{HDCI} \hlkwb{<-} \hlkwa{NULL}
-  \hlstd{formula} \hlkwb{<-} \hlstd{fit}\hlopt{$}\hlstd{formula}
-  \hlstd{newdata} \hlkwb{<-} \hlstd{data}
-  \hlstd{respname} \hlkwb{<-} \hlkwd{all.vars}\hlstd{(formula)[}\hlnum{1}\hlstd{]}
-  \hlstd{newdata} \hlkwb{<-} \hlstd{newdata[,} \hlopt{!}\hlstd{(}\hlkwd{colnames}\hlstd{(data)} \hlopt{%in%} \hlstd{respname)]}
-  \hlstd{newdata} \hlkwb{<-} \hlkwd{as.matrix}\hlstd{(newdata)}
+    \hlstd{model} \hlkwb{<-} \hlstd{obj}\hlopt{$}\hlstd{model}
+    \hlstd{dat} \hlkwb{<-} \hlstd{obj}\hlopt{$}\hlstd{dat}
+    \hlstd{model}\hlopt{$}\hlstd{data} \hlkwb{<-} \hlstd{dat}
+    \hlstd{x} \hlkwb{<-} \hlstd{model}\hlopt{$}\hlstd{x[,} \hlnum{2}\hlstd{]}
+    \hlstd{y} \hlkwb{<-} \hlstd{model}\hlopt{$}\hlstd{y}
 
-  \hlcom{## obtain the prediction regions}
-  \hlkwa{if}\hlstd{(parametric)\{}
-    \hlstd{cpred} \hlkwb{<-} \hlkwd{conformal.glm}\hlstd{(fit,} \hlkwc{parametric} \hlstd{=} \hlnum{TRUE}\hlstd{,}
-      \hlkwc{nonparametric} \hlstd{=} \hlnum{FALSE}\hlstd{,} \hlkwc{alpha} \hlstd{= alpha,}
-      \hlkwc{bins} \hlstd{= bins,} \hlkwc{cores} \hlstd{= cores)}
-    \hlstd{paraCI} \hlkwb{<-} \hlstd{cpred}\hlopt{$}\hlstd{paraconformal}
-  \hlstd{\}}
-  \hlkwa{if}\hlstd{(nonparametric)\{}
-    \hlstd{cpred} \hlkwb{<-} \hlkwd{conformal.glm}\hlstd{(fit,} \hlkwc{parametric} \hlstd{=} \hlnum{FALSE}\hlstd{,}
-      \hlkwc{nonparametric} \hlstd{=} \hlnum{TRUE}\hlstd{,} \hlkwc{alpha} \hlstd{= alpha,}
-      \hlkwc{bins} \hlstd{= bins,} \hlkwc{cores} \hlstd{= cores)}
-    \hlstd{nonparaCI} \hlkwb{<-} \hlstd{cpred}\hlopt{$}\hlstd{nonparaconformal}
-  \hlstd{\}}
-  \hlkwa{if}\hlstd{(LS)\{}
+    \hlstd{fit.int} \hlkwb{<-} \hlkwd{lm}\hlstd{(y} \hlopt{~} \hlstd{x,} \hlkwc{data} \hlstd{= dat)}
+    \hlstd{betaMLE} \hlkwb{<-} \hlkwd{coefficients}\hlstd{(fit.int)}
+    \hlstd{sdMLE} \hlkwb{<-} \hlkwd{summary}\hlstd{(fit.int)}\hlopt{$}\hlstd{sigma}
+    \hlstd{meanMLE} \hlkwb{<-} \hlkwd{as.numeric}\hlstd{(}\hlkwd{cbind}\hlstd{(}\hlnum{1}\hlstd{, x)} \hlopt{%*%} \hlstd{betaMLE)}
+    \hlstd{HDCI} \hlkwb{<-} \hlkwd{do.call}\hlstd{(rbind,} \hlkwd{lapply}\hlstd{(}\hlnum{1}\hlopt{:}\hlstd{n,} \hlkwa{function}\hlstd{(}\hlkwc{j}\hlstd{)\{}
+      \hlkwd{hdi}\hlstd{(qnorm,} \hlnum{1} \hlopt{-} \hlstd{alpha,} \hlkwc{mean} \hlstd{= meanMLE[j],} \hlkwc{sd} \hlstd{= sdMLE)}
+    \hlstd{\}))}
+
     \hlstd{p1.tibs} \hlkwb{<-} \hlkwd{conformal.pred}\hlstd{(}\hlkwc{x} \hlstd{= x,} \hlkwc{y} \hlstd{= y,} \hlkwc{x0} \hlstd{= x,}
       \hlkwc{train.fun} \hlstd{= train.fun,} \hlkwc{predict.fun} \hlstd{= predict.fun,}
       \hlkwc{alpha} \hlstd{= alpha)}
     \hlstd{LSCI} \hlkwb{<-} \hlkwd{cbind}\hlstd{(p1.tibs}\hlopt{$}\hlstd{lo, p1.tibs}\hlopt{$}\hlstd{up)}
-  \hlstd{\}}
-  \hlkwa{if}\hlstd{(LSLW)\{}
-    \hlstd{regression.model} \hlkwb{<-} \hlkwd{lm}\hlstd{(y} \hlopt{~} \hlstd{x)}
-    \hlstd{abs.resid} \hlkwb{<-} \hlkwd{abs}\hlstd{(regression.model}\hlopt{$}\hlstd{resid)}
+
+    \hlstd{abs.resid} \hlkwb{<-} \hlkwd{abs}\hlstd{(fit.int}\hlopt{$}\hlstd{resid)}
     \hlstd{smooth.call} \hlkwb{<-} \hlkwd{smooth.spline}\hlstd{(x, abs.resid,}
       \hlkwc{nknots} \hlstd{=} \hlnum{10}\hlstd{)}
     \hlstd{lambda} \hlkwb{<-} \hlstd{smooth.call}\hlopt{$}\hlstd{lambda}
@@ -4242,96 +4228,71 @@ $Y \sim N(X'\beta, \sigma^2)$ and $X \sim U(0,1)$.
       \hlkwd{smooth.spline}\hlstd{(x[,} \hlnum{1}\hlstd{], y,} \hlkwc{lambda} \hlstd{= lambda,}
       \hlkwc{df} \hlstd{= df,} \hlkwc{nknots} \hlstd{=} \hlnum{10}\hlstd{)}
     \hlstd{\}}
+    \hlstd{mad.predict.fun} \hlkwb{<-} \hlkwa{function}\hlstd{(}\hlkwc{out}\hlstd{,} \hlkwc{newx}\hlstd{)\{}
+      \hlkwd{predict}\hlstd{(out,} \hlkwd{as.data.frame}\hlstd{(newx))}\hlopt{$}\hlstd{y[,} \hlnum{1}\hlstd{]}
+    \hlstd{\}}
     \hlstd{p2.tibs} \hlkwb{<-} \hlkwd{conformal.pred}\hlstd{(}\hlkwc{x} \hlstd{= x,} \hlkwc{y} \hlstd{= y,} \hlkwc{x0} \hlstd{= x,}
       \hlkwc{train.fun} \hlstd{= train.fun,} \hlkwc{predict.fun} \hlstd{= predict.fun,}
       \hlkwc{mad.train.fun} \hlstd{= mad.train.fun,}
       \hlkwc{mad.predict.fun} \hlstd{= mad.predict.fun,}
       \hlkwc{alpha} \hlstd{= alpha)}
     \hlstd{LSLWCI} \hlkwb{<-} \hlkwd{cbind}\hlstd{(p2.tibs}\hlopt{$}\hlstd{lo, p2.tibs}\hlopt{$}\hlstd{up)}
-  \hlstd{\}}
-  \hlkwa{if}\hlstd{(HD)\{}
-    \hlstd{fit} \hlkwb{=} \hlkwd{lm}\hlstd{(y} \hlopt{~} \hlstd{x,} \hlkwc{data} \hlstd{= data)}
-    \hlstd{betaMLE} \hlkwb{<-} \hlkwd{coefficients}\hlstd{(fit)}
-    \hlstd{sdMLE} \hlkwb{<-} \hlkwd{summary}\hlstd{(fit)}\hlopt{$}\hlstd{sigma}
-    \hlstd{meanMLE} \hlkwb{<-} \hlkwd{as.numeric}\hlstd{(}\hlkwd{cbind}\hlstd{(}\hlnum{1}\hlstd{, x)} \hlopt{%*%} \hlstd{betaMLE)}
-    \hlstd{HDCI} \hlkwb{<-} \hlkwd{do.call}\hlstd{(rbind,} \hlkwd{lapply}\hlstd{(}\hlnum{1}\hlopt{:}\hlkwd{nrow}\hlstd{(newdata),} \hlkwa{function}\hlstd{(}\hlkwc{j}\hlstd{)\{}
-      \hlkwd{hdi}\hlstd{(qnorm,} \hlnum{1} \hlopt{-} \hlstd{alpha,} \hlkwc{sd} \hlstd{= sdMLE,} \hlkwc{mean} \hlstd{= meanMLE[j])}
-    \hlstd{\}))}
-  \hlstd{\}}
 
-  \hlcom{## local coverage prediction regions}
-  \hlstd{output.parametric} \hlkwb{<-} \hlstd{output.nonparametric} \hlkwb{<-}
-    \hlstd{output.LS} \hlkwb{<-} \hlstd{output.LSLW} \hlkwb{<-} \hlstd{output.HD} \hlkwb{<-} \hlkwd{rep}\hlstd{(}\hlnum{NA}\hlstd{, bins} \hlopt{+} \hlnum{1}\hlstd{)}
-  \hlkwa{if}\hlstd{(parametric)\{}
-    \hlstd{marginal.parametric} \hlkwb{<-} \hlkwd{local.coverage}\hlstd{(}\hlkwc{region} \hlstd{= paraCI,}
-      \hlkwc{data} \hlstd{= data,} \hlkwc{d} \hlstd{= p,} \hlkwc{bins} \hlstd{=} \hlnum{1}\hlstd{,} \hlkwc{at.data} \hlstd{=} \hlstr{"TRUE"}\hlstd{)}
-    \hlstd{local.parametric} \hlkwb{<-} \hlkwd{local.coverage}\hlstd{(}\hlkwc{region} \hlstd{= paraCI,}
-      \hlkwc{data} \hlstd{= data,} \hlkwc{d} \hlstd{= p,} \hlkwc{bins} \hlstd{= bins,} \hlkwc{at.data} \hlstd{=} \hlstr{"TRUE"}\hlstd{)}
-    \hlstd{local.inx.parametric} \hlkwb{<-} \hlkwd{local.coverage}\hlstd{(}\hlkwc{region} \hlstd{= paraCI,}
-      \hlkwc{data} \hlstd{= data,} \hlkwc{d} \hlstd{= p,} \hlkwc{bins} \hlstd{=} \hlnum{25}\hlstd{,} \hlkwc{at.data} \hlstd{=} \hlstr{"TRUE"}\hlstd{)}
-    \hlstd{output.parametric} \hlkwb{<-} \hlkwd{c}\hlstd{(marginal.parametric, local.parametric,}
-      \hlstd{local.inx.parametric,}
-      \hlkwd{mean}\hlstd{(}\hlkwd{apply}\hlstd{(paraCI,} \hlnum{1}\hlstd{, diff)),}
-      \hlkwd{absolute.error}\hlstd{(}\hlkwc{y} \hlstd{= y,} \hlkwc{region} \hlstd{= paraCI))}
-  \hlstd{\}}
-  \hlkwa{if}\hlstd{(nonparametric)\{}
-    \hlstd{marginal.nonparametric} \hlkwb{<-} \hlkwd{local.coverage}\hlstd{(}\hlkwc{region} \hlstd{= nonparaCI,}
-      \hlkwc{nonparametric} \hlstd{=} \hlstr{"TRUE"}\hlstd{,} \hlkwc{data} \hlstd{= data,} \hlkwc{d} \hlstd{= p,} \hlkwc{bins} \hlstd{=} \hlnum{1}\hlstd{,}
-      \hlkwc{at.data} \hlstd{=} \hlstr{"TRUE"}\hlstd{)}
-    \hlstd{local.nonparametric} \hlkwb{<-} \hlkwd{local.coverage}\hlstd{(}\hlkwc{region} \hlstd{= nonparaCI,}
-      \hlkwc{nonparametric} \hlstd{=} \hlstr{"TRUE"}\hlstd{,} \hlkwc{data} \hlstd{= data,} \hlkwc{d} \hlstd{= p,} \hlkwc{bins} \hlstd{= bins,}
-      \hlkwc{at.data} \hlstd{=} \hlstr{"TRUE"}\hlstd{)}
-    \hlstd{local.inx.nonparametric} \hlkwb{<-} \hlkwd{local.coverage}\hlstd{(}\hlkwc{region} \hlstd{= nonparaCI,}
-      \hlkwc{nonparametric} \hlstd{=} \hlstr{"TRUE"}\hlstd{,} \hlkwc{data} \hlstd{= data,} \hlkwc{d} \hlstd{= p,} \hlkwc{bins} \hlstd{=} \hlnum{25}\hlstd{,}
-      \hlkwc{at.data} \hlstd{=} \hlstr{"TRUE"}\hlstd{)}
-    \hlstd{output.nonparametric} \hlkwb{<-}
-      \hlkwd{c}\hlstd{(marginal.nonparametric, local.nonparametric,}
-        \hlstd{local.inx.nonparametric,}
-        \hlkwd{area.nonparametric}\hlstd{(nonparaCI),}
-        \hlkwd{absolute.error.nonparametric}\hlstd{(}\hlkwc{data} \hlstd{= data,}
-          \hlkwc{region} \hlstd{= nonparaCI))}
-  \hlstd{\}}
-  \hlkwa{if}\hlstd{(LS)\{}
-    \hlstd{marginal.LS} \hlkwb{<-} \hlkwd{local.coverage}\hlstd{(}\hlkwc{region} \hlstd{= LSCI,}
-      \hlkwc{data} \hlstd{= data,} \hlkwc{d} \hlstd{= p,} \hlkwc{bins} \hlstd{=} \hlnum{1}\hlstd{,} \hlkwc{at.data} \hlstd{=} \hlstr{"TRUE"}\hlstd{)}
-    \hlstd{local.LS} \hlkwb{<-} \hlkwd{local.coverage}\hlstd{(}\hlkwc{region} \hlstd{= LSCI,}
-      \hlkwc{data} \hlstd{= data,} \hlkwc{d} \hlstd{= p,} \hlkwc{bins} \hlstd{= bins,} \hlkwc{at.data} \hlstd{=} \hlstr{"TRUE"}\hlstd{)}
-    \hlstd{local.inx.LS} \hlkwb{<-} \hlkwd{local.coverage}\hlstd{(}\hlkwc{region} \hlstd{= LSCI,}
-      \hlkwc{data} \hlstd{= data,} \hlkwc{d} \hlstd{= p,} \hlkwc{bins} \hlstd{=} \hlnum{25}\hlstd{,} \hlkwc{at.data} \hlstd{=} \hlstr{"TRUE"}\hlstd{)}
-    \hlstd{output.LS} \hlkwb{<-} \hlkwd{c}\hlstd{(marginal.LS, local.LS, local.inx.LS,}
-      \hlkwd{mean}\hlstd{(}\hlkwd{apply}\hlstd{(LSCI,} \hlnum{1}\hlstd{, diff)),}
-      \hlkwd{absolute.error}\hlstd{(}\hlkwc{y} \hlstd{= y,} \hlkwc{region} \hlstd{= LSCI))}
-  \hlstd{\}}
-  \hlkwa{if}\hlstd{(LSLW)\{}
-    \hlstd{marginal.LSLW} \hlkwb{<-} \hlkwd{local.coverage}\hlstd{(}\hlkwc{region} \hlstd{= LSLWCI,}
-      \hlkwc{data} \hlstd{= data,} \hlkwc{d} \hlstd{= p,} \hlkwc{bins} \hlstd{=} \hlnum{1}\hlstd{,} \hlkwc{at.data} \hlstd{=} \hlstr{"TRUE"}\hlstd{)}
-    \hlstd{local.LSLW} \hlkwb{<-} \hlkwd{local.coverage}\hlstd{(}\hlkwc{region} \hlstd{= LSLWCI,}
-      \hlkwc{data} \hlstd{= data,} \hlkwc{d} \hlstd{= p,} \hlkwc{bins} \hlstd{= bins,} \hlkwc{at.data} \hlstd{=} \hlstr{"TRUE"}\hlstd{)}
-    \hlstd{local.inx.LSLW} \hlkwb{<-} \hlkwd{local.coverage}\hlstd{(}\hlkwc{region} \hlstd{= LSLWCI,}
-      \hlkwc{data} \hlstd{= data,} \hlkwc{d} \hlstd{= p,} \hlkwc{bins} \hlstd{=} \hlnum{25}\hlstd{,} \hlkwc{at.data} \hlstd{=} \hlstr{"TRUE"}\hlstd{)}
-    \hlstd{output.LSLW} \hlkwb{<-} \hlkwd{c}\hlstd{(marginal.LSLW, local.LSLW, local.inx.LSLW,}
-      \hlkwd{mean}\hlstd{(}\hlkwd{apply}\hlstd{(LSLWCI,} \hlnum{1}\hlstd{, diff)),}
-      \hlkwd{absolute.error}\hlstd{(}\hlkwc{y} \hlstd{= y,} \hlkwc{region} \hlstd{= LSLWCI))}
-  \hlstd{\}}
-  \hlkwa{if}\hlstd{(HD)\{}
-    \hlstd{marginal.HD} \hlkwb{<-} \hlkwd{local.coverage}\hlstd{(}\hlkwc{region} \hlstd{= HDCI,}
-      \hlkwc{data} \hlstd{= data,} \hlkwc{d} \hlstd{= p,} \hlkwc{bins} \hlstd{=} \hlnum{1}\hlstd{,} \hlkwc{at.data} \hlstd{=} \hlstr{"TRUE"}\hlstd{)}
-    \hlstd{local.HD} \hlkwb{<-} \hlkwd{local.coverage}\hlstd{(}\hlkwc{region} \hlstd{= HDCI,}
-      \hlkwc{data} \hlstd{= data,} \hlkwc{d} \hlstd{= p,} \hlkwc{bins} \hlstd{= bins,} \hlkwc{at.data} \hlstd{=} \hlstr{"TRUE"}\hlstd{)}
-    \hlstd{local.inx.HD} \hlkwb{<-} \hlkwd{local.coverage}\hlstd{(}\hlkwc{region} \hlstd{= HDCI,}
-      \hlkwc{data} \hlstd{= data,} \hlkwc{d} \hlstd{= p,} \hlkwc{bins} \hlstd{=} \hlnum{25}\hlstd{,} \hlkwc{at.data} \hlstd{=} \hlstr{"TRUE"}\hlstd{)}
-    \hlstd{output.HD} \hlkwb{<-} \hlkwd{c}\hlstd{(marginal.HD, local.HD, local.inx.HD,}
-      \hlkwd{mean}\hlstd{(}\hlkwd{apply}\hlstd{(HDCI,} \hlnum{1}\hlstd{, diff)),}
-      \hlkwd{absolute.error}\hlstd{(}\hlkwc{y} \hlstd{= y,} \hlkwc{region} \hlstd{= HDCI))}
-  \hlstd{\}}
+    \hlstd{conf} \hlkwb{<-} \hlkwd{conformal.glm}\hlstd{(model,} \hlkwc{nonparametric} \hlstd{=} \hlnum{TRUE}\hlstd{,} \hlkwc{method} \hlstd{=} \hlstr{"both"}\hlstd{,}
+      \hlkwc{bins} \hlstd{= bins,} \hlkwc{cores} \hlstd{=} \hlnum{7}\hlstd{)}
+    \hlstd{parabinCI} \hlkwb{<-} \hlstd{conf}\hlopt{$}\hlstd{paraconfbin}
+    \hlstd{transformCI} \hlkwb{<-} \hlstd{conf}\hlopt{$}\hlstd{transformconf}
+    \hlstd{nonparabinCI} \hlkwb{<-} \hlstd{conf}\hlopt{$}\hlstd{nonparaconfbin}
 
-  \hlstd{output} \hlkwb{<-} \hlkwd{list}\hlstd{(}\hlkwc{output.parametric} \hlstd{= output.parametric,}
-    \hlkwc{output.nonparametric} \hlstd{= output.nonparametric,}
-    \hlkwc{output.LS} \hlstd{= output.LS,}
-    \hlkwc{output.LSLW} \hlstd{= output.LSLW,}
-    \hlkwc{output.HD} \hlstd{= output.HD)}
-  \hlstd{output}
+    \hlstd{out} \hlkwb{=} \hlkwd{list}\hlstd{(}\hlkwc{parabinCI} \hlstd{= parabinCI,} \hlkwc{transformCI} \hlstd{= transformCI,}
+      \hlkwc{nonparabinCI} \hlstd{= nonparabinCI,} \hlkwc{LSLWCI} \hlstd{= LSLWCI,} \hlkwc{LSCI} \hlstd{= LSCI,}
+      \hlkwc{HDCI} \hlstd{= HDCI)}
+    \hlstd{out}
+  \hlstd{\})}
 
+
+  \hlstd{diagnostics_regions} \hlkwb{<-} \hlkwd{lapply}\hlstd{(}\hlnum{1}\hlopt{:}\hlstd{B,} \hlkwc{FUN} \hlstd{=} \hlkwa{function}\hlstd{(}\hlkwc{j}\hlstd{)\{}
+
+    \hlstd{obj} \hlkwb{<-} \hlstd{conformal_regions[[j]]}
+    \hlstd{dat} \hlkwb{<-} \hlkwd{as.data.frame}\hlstd{(models[[j]]}\hlopt{$}\hlstd{dat)}
+    \hlstd{y} \hlkwb{<-} \hlkwd{as.numeric}\hlstd{(dat[,} \hlnum{1}\hlstd{])}
+
+    \hlstd{diagnostics} \hlkwb{<-} \hlkwd{lapply}\hlstd{(obj,} \hlkwc{FUN} \hlstd{=} \hlkwa{function}\hlstd{(}\hlkwc{region}\hlstd{)\{}
+
+      \hlstd{output} \hlkwb{<-} \hlkwa{NULL}
+      \hlkwa{if}\hlstd{(}\hlkwd{class}\hlstd{(region)} \hlopt{==} \hlstr{"matrix"}\hlstd{)\{}
+        \hlstd{marginal.coverage} \hlkwb{<-} \hlkwd{local.coverage}\hlstd{(}\hlkwc{region} \hlstd{= region,}
+          \hlkwc{data} \hlstd{= dat,} \hlkwc{d} \hlstd{= p,} \hlkwc{bins} \hlstd{=} \hlnum{1}\hlstd{,} \hlkwc{at.data} \hlstd{=} \hlstr{"TRUE"}\hlstd{)}
+        \hlstd{local.coverage} \hlkwb{<-} \hlkwd{local.coverage}\hlstd{(}\hlkwc{region} \hlstd{= region,}
+          \hlkwc{data} \hlstd{= dat,} \hlkwc{d} \hlstd{= p,} \hlkwc{bins} \hlstd{= bins,} \hlkwc{at.data} \hlstd{=} \hlstr{"TRUE"}\hlstd{)}
+        \hlstd{local.inx.coverage} \hlkwb{<-} \hlkwd{local.coverage}\hlstd{(}\hlkwc{region} \hlstd{= region,}
+          \hlkwc{data} \hlstd{= dat,} \hlkwc{d} \hlstd{= p,} \hlkwc{bins} \hlstd{=} \hlnum{25}\hlstd{,} \hlkwc{at.data} \hlstd{=} \hlstr{"TRUE"}\hlstd{)}
+        \hlstd{output} \hlkwb{<-} \hlkwd{c}\hlstd{(marginal.coverage, local.coverage,}
+          \hlstd{local.inx.coverage,} \hlkwd{mean}\hlstd{(}\hlkwd{apply}\hlstd{(region,} \hlnum{1}\hlstd{, diff)),}
+          \hlkwd{absolute.error}\hlstd{(}\hlkwc{y} \hlstd{= y,} \hlkwc{region} \hlstd{= region))}
+      \hlstd{\}}
+      \hlkwa{else}\hlstd{\{}
+        \hlstd{marginal.coverage} \hlkwb{<-} \hlkwd{local.coverage}\hlstd{(}\hlkwc{region} \hlstd{= region,}
+          \hlkwc{nonparametric} \hlstd{=} \hlstr{"TRUE"}\hlstd{,} \hlkwc{data} \hlstd{= dat,} \hlkwc{d} \hlstd{= p,} \hlkwc{bins} \hlstd{=} \hlnum{1}\hlstd{,}
+          \hlkwc{at.data} \hlstd{=} \hlstr{"TRUE"}\hlstd{)}
+        \hlstd{local.coverage} \hlkwb{<-} \hlkwd{local.coverage}\hlstd{(}\hlkwc{region} \hlstd{= region,}
+          \hlkwc{nonparametric} \hlstd{=} \hlstr{"TRUE"}\hlstd{,} \hlkwc{data} \hlstd{= dat,} \hlkwc{d} \hlstd{= p,} \hlkwc{bins} \hlstd{= bins,}
+          \hlkwc{at.data} \hlstd{=} \hlstr{"TRUE"}\hlstd{)}
+        \hlstd{local.inx.coverage} \hlkwb{<-} \hlkwd{local.coverage}\hlstd{(}\hlkwc{region} \hlstd{= region,}
+          \hlkwc{nonparametric} \hlstd{=} \hlstr{"TRUE"}\hlstd{,} \hlkwc{data} \hlstd{= dat,} \hlkwc{d} \hlstd{= p,} \hlkwc{bins} \hlstd{=} \hlnum{25}\hlstd{,}
+          \hlkwc{at.data} \hlstd{=} \hlstr{"TRUE"}\hlstd{)}
+        \hlstd{output} \hlkwb{<-} \hlkwd{c}\hlstd{(marginal.coverage, local.coverage,}
+          \hlstd{local.inx.coverage,} \hlkwd{area.nonparametric}\hlstd{(region),}
+          \hlkwd{absolute.error.nonparametric}\hlstd{(}\hlkwc{data} \hlstd{= dat,}
+            \hlkwc{region} \hlstd{= region))}
+      \hlstd{\}}
+      \hlstd{output}
+    \hlstd{\})}
+    \hlkwd{do.call}\hlstd{(rbind, diagnostics)}
+
+  \hlstd{\})}
+
+  \hlstd{diagnostics_regions}
 \hlstd{\}}
 \end{alltt}
 \end{kframe}
@@ -4339,6 +4300,260 @@ $Y \sim N(X'\beta, \sigma^2)$ and $X \sim U(0,1)$.
 
 
 
+The following performs our Monte Carlo simulation of $B = 50$ iterations 
+when $n = 150$.
+
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlkwd{set.seed}\hlstd{(}\hlnum{13}\hlstd{)}
+\hlstd{beta} \hlkwb{<-} \hlkwd{c}\hlstd{(}\hlnum{2}\hlstd{,} \hlnum{5}\hlstd{)}
+\hlstd{n} \hlkwb{<-} \hlnum{150}
+\hlstd{bins} \hlkwb{<-} \hlnum{2}
+\hlstd{B} \hlkwb{<-} \hlnum{50}
+\hlkwd{set.seed}\hlstd{(}\hlnum{13}\hlstd{)}
+\hlkwd{system.time}\hlstd{(out.regression.150} \hlkwb{<-} \hlkwd{do.call}\hlstd{(rbind,}
+  \hlkwd{regression_simulator}\hlstd{(}\hlkwc{beta} \hlstd{= beta,} \hlkwc{n} \hlstd{= n,} \hlkwc{bins} \hlstd{= bins,} \hlkwc{B} \hlstd{= B)))}
+\end{alltt}
+\begin{verbatim}
+##     user   system  elapsed 
+## 3001.006   41.021 1406.746
+\end{verbatim}
+\begin{alltt}
+\hlstd{diagnostics.regression.150} \hlkwb{<-} \hlkwd{do.call}\hlstd{(rbind,} \hlkwd{lapply}\hlstd{(}\hlkwd{split}\hlstd{(out.regression.150,}
+  \hlkwc{f} \hlstd{=} \hlkwd{as.factor}\hlstd{(}\hlkwd{rownames}\hlstd{(out.regression.150))),}
+  \hlkwc{FUN} \hlstd{=} \hlkwa{function}\hlstd{(}\hlkwc{xx}\hlstd{)} \hlkwd{colMeans}\hlstd{(}\hlkwd{matrix}\hlstd{(xx,} \hlkwc{nrow} \hlstd{= B),} \hlkwc{na.rm} \hlstd{=} \hlnum{TRUE}\hlstd{)))}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+
+
+The following performs our Monte Carlo simulation of $B = 50$ iterations 
+when $n = 250$.
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlkwd{set.seed}\hlstd{(}\hlnum{13}\hlstd{)}
+\hlstd{beta} \hlkwb{<-} \hlkwd{c}\hlstd{(}\hlnum{2}\hlstd{,} \hlnum{5}\hlstd{)}
+\hlstd{n} \hlkwb{<-} \hlnum{250}
+\hlstd{bins} \hlkwb{<-} \hlnum{3}
+\hlstd{B} \hlkwb{<-} \hlnum{50}
+\hlkwd{set.seed}\hlstd{(}\hlnum{13}\hlstd{)}
+\hlkwd{system.time}\hlstd{(out.regression.250} \hlkwb{<-} \hlkwd{do.call}\hlstd{(rbind,}
+  \hlkwd{regression_simulator}\hlstd{(}\hlkwc{beta} \hlstd{= beta,} \hlkwc{n} \hlstd{= n,} \hlkwc{bins} \hlstd{= bins,} \hlkwc{B} \hlstd{= B)))}
+\end{alltt}
+\begin{verbatim}
+##     user   system  elapsed 
+## 5047.225   42.288 2400.109
+\end{verbatim}
+\begin{alltt}
+\hlstd{diagnostics.regression.250} \hlkwb{<-} \hlkwd{do.call}\hlstd{(rbind,} \hlkwd{lapply}\hlstd{(}\hlkwd{split}\hlstd{(out.regression.250,}
+  \hlkwc{f} \hlstd{=} \hlkwd{as.factor}\hlstd{(}\hlkwd{rownames}\hlstd{(out.regression.150))),}
+  \hlkwc{FUN} \hlstd{=} \hlkwa{function}\hlstd{(}\hlkwc{xx}\hlstd{)} \hlkwd{colMeans}\hlstd{(}\hlkwd{matrix}\hlstd{(xx,} \hlkwc{nrow} \hlstd{= B),} \hlkwc{na.rm} \hlstd{=} \hlnum{TRUE}\hlstd{)))}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+
+
+The following performs our Monte Carlo simulation of $B = 50$ iterations 
+when $n = 500$.
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlkwd{set.seed}\hlstd{(}\hlnum{13}\hlstd{)}
+\hlstd{beta} \hlkwb{<-} \hlkwd{c}\hlstd{(}\hlnum{2}\hlstd{,} \hlnum{5}\hlstd{)}
+\hlstd{n} \hlkwb{<-} \hlnum{500}
+\hlstd{bins} \hlkwb{<-} \hlnum{3}
+\hlstd{B} \hlkwb{<-} \hlnum{50}
+\hlkwd{set.seed}\hlstd{(}\hlnum{13}\hlstd{)}
+\hlkwd{system.time}\hlstd{(out.regression.500} \hlkwb{<-} \hlkwd{do.call}\hlstd{(rbind,}
+  \hlkwd{regression_simulator}\hlstd{(}\hlkwc{beta} \hlstd{= beta,} \hlkwc{n} \hlstd{= n,} \hlkwc{bins} \hlstd{= bins,} \hlkwc{B} \hlstd{= B)))}
+\end{alltt}
+\begin{verbatim}
+##     user   system  elapsed 
+## 12687.89    55.73  6168.26
+\end{verbatim}
+\begin{alltt}
+\hlstd{diagnostics.regression.500} \hlkwb{<-} \hlkwd{do.call}\hlstd{(rbind,} \hlkwd{lapply}\hlstd{(}\hlkwd{split}\hlstd{(out.regression.500,}
+  \hlkwc{f} \hlstd{=} \hlkwd{as.factor}\hlstd{(}\hlkwd{rownames}\hlstd{(out.regression.150))),}
+  \hlkwc{FUN} \hlstd{=} \hlkwa{function}\hlstd{(}\hlkwc{xx}\hlstd{)} \hlkwd{colMeans}\hlstd{(}\hlkwd{matrix}\hlstd{(xx,} \hlkwc{nrow} \hlstd{= B),} \hlkwc{na.rm} \hlstd{=} \hlnum{TRUE}\hlstd{)))}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+
+
+\subsection{Results}
+
+Results form our simulations are depicted in 
+Table~\ref{Tab:regression-results} and Figure~\ref{Fig:regresion.inx}.  
+This table and figure depicts the estimatated area, prediction 
+error, and local coverage probabilities for all five considered prediction 
+regions. 
+
+In these simulations, errors about the estimated mean function are symmetric 
+and homogeneous across the support.  We therefore expect for the LS and LSLW 
+conformal prediction regions to perform nearly as well as the oracle HD 
+prediction region.  These prediction regions also exhibit finite-sample 
+marginal validity, local validity with respect to binning, and near 
+conditional validity across the support.  The parametric conformal prediction 
+region is similar to the LS and LSLW conformal prediction regions and the HD 
+prediction region in area, prediction error, finite-sample coverage 
+properties, and appearance.  However, the parametric conformal prediction 
+region is slightly larger and gives more conservative coverage that these 
+other prediction regions.  The nonparametric conformal prediction region 
+is larger and gives larger prediction errors than the other prediction 
+regions.  It also appears to not visually fit the data well while the others 
+do as seen in Section~\ref{sec:regressionplots}.
+
+
+
+
+
+\begin{table}[h!]
+\scriptsize
+\begin{center}
+\begin{tabular}{llcccccc}
+  & & OLS trans & OLS bin   & bin nonparametric & LS        & LSLW      & HD     \\
+  & & conformal & conformal & conformal         & conformal & conformal & region \\ 
+  $n = 150$
+    & marginal coverage &
+  $0.911$ & 
+  $0.919$ & 
+  $0.911$ & 
+  $0.878$ & 
+  $0.883$ & 
+  $0.904$ \\
+    & local coverage when $0 < x < 1/2$ & 
+  $0.912$ & 
+  $0.918$ & 
+  $0.911$ & 
+  $0.878$ & 
+  $0.886$ & 
+  $0.903$ \\
+    & local coverage when $1/2 \leq x < 1$ & 
+  $0.909$ & 
+  $0.92$ & 
+  $0.911$ & 
+  $0.878$ & 
+  $0.881$ & 
+  $0.904$ \\
+    & area &
+  $1.88$ & 
+  $1.994$ & 
+  $2.408$ & 
+  $1.775$ & 
+  $1.782$ & 
+  $1.872$ \\
+    & prediction error &
+  $0.01$ & 
+  $0.007$ & 
+  $0.011$ & 
+  $0.012$ & 
+  $0.011$ & 
+  $0.01$ \\
+  \hline
+  $n = 250$  
+    & marginal coverage &
+  $0.908$ & 
+  $0.916$ & 
+  $0.909$ & 
+  $0.875$ & 
+  $0.878$ & 
+  $0.902$ \\
+    & local coverage when $0 < x < 1/3$ & 
+  $0.9$ & 
+  $0.916$ & 
+  $0.909$ & 
+  $0.87$ & 
+  $0.882$ & 
+  $0.896$ \\
+    & local coverage when $1/3 \leq x < 2/3$ & 
+  $0.914$ & 
+  $0.913$ & 
+  $0.909$ & 
+  $0.879$ & 
+  $0.876$ & 
+  $0.907$ \\
+    & local coverage when $2/3 \leq x < 1$ &
+  $0.909$ & 
+  $0.92$ & 
+  $0.909$ & 
+  $0.877$ & 
+  $0.876$ & 
+  $0.904$ \\
+    & area & 
+  $1.877$ & 
+  $1.974$ & 
+  $2.139$ & 
+  $1.751$ & 
+  $1.754$ & 
+  $1.864$ \\
+    & prediction error & 
+  $0.009$ & 
+  $0.007$ & 
+  $0.01$ & 
+  $0.013$ & 
+  $0.012$ & 
+  $0.01$ \\
+  \hline
+  $n = 500$
+    & marginal coverage &
+  $0.908$ & 
+  $0.907$ & 
+  $0.904$ & 
+  $0.875$ & 
+  $0.873$ & 
+  $0.902$ \\
+    & local coverage when $0 < x < 1/3$ & 
+  $0.911$ & 
+  $0.908$ & 
+  $0.906$ & 
+  $0.878$ & 
+  $0.875$ & 
+  $0.905$ \\
+    & local coverage when $1/3 \leq x < 2/3$ & 
+  $0.907$ & 
+  $0.907$ & 
+  $0.904$ & 
+  $0.874$ & 
+  $0.871$ & 
+  $0.902$ \\
+    & local coverage when $2/3 \leq x < 1$ &
+  $0.905$ & 
+  $0.907$ & 
+  $0.904$ & 
+  $0.874$ & 
+  $0.875$ & 
+  $0.899$ \\
+    & area & 
+  $1.886$ & 
+  $1.904$ & 
+  $2.098$ & 
+  $1.735$ & 
+  $1.731$ & 
+  $1.86$ \\
+    & prediction error & 
+  $0.009$ & 
+  $0.009$ & 
+  $0.011$ & 
+  $0.013$ & 
+  $0.013$ & 
+  $0.01$ 
+\end{tabular}
+\end{center}
+\caption{Diagnostics for conformal prediction regions for linear regression 
+  models with normal errors and constant variance.  Local and marginal 
+  coverage properties, areas, and prediction errors are presented for the 
+    transformation based and binned parametric conformal prediction regions,
+    binned nonparametric conformal prediction region,
+    LS conformal prediction region, 
+    LSLW conformal prediction region, and 
+    HD prediction region.} %Standard errors are in parentheses.}
+\label{Tab:regression-results}
+\end{table}
 
 
 
@@ -4346,12 +4561,220 @@ $Y \sim N(X'\beta, \sigma^2)$ and $X \sim U(0,1)$.
 
 
 
+\newpage
+\begin{figure}[h!]
+\begin{center}
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
+\includegraphics[width=\maxwidth]{figure/Fig-regression-inx-500-1} 
+
+\end{knitrout}
+\end{center}
+\caption{Plot of the estimated coverage probabilities of prediction regions 
+  across $x$ and sample sizes.}
+\label{Fig:regresion.inx}
+\end{figure}
+
+
+
+
+\newpage
+\section{Example plots of prediction regions}
+\label{sec:plotsofregions}
+
+In this section we construct prediction regions corresponding to the 
+simulations and results in Sections~\ref{sec:Gamma} through 
+\ref{sec:regressionplots}.  In Gamma analyses we generate a dataset for each 
+shape parameter considered with $n = 150$ and in regression analyses we 
+generate a dataset for all sample sizes considered.  For each of these datasets 
+we depict the parametric, nonparametric, LS, LSLW conformal prediction regions 
+over the observed data to visually assess the appropriateness of each 
+prediction region.  The findings from these figures are consistent with the 
+findings from our numerical diagnostics.  
+The parametric conformal prediction region gives visually natural bounds for 
+the observed data when the model is correctly specified in small to moderate 
+sample sizes and is appropriate when the model is misspecified. 
+The LSLW conformal prediction region gives visually natural bounds for the 
+observed data when the model is correctly specified, is appropriate under mild 
+model misspecification, and is ill-fitting in settings where deviations about 
+an estimated mean function are clearly not symmetric.
+The nonparametric conformal prediction region is coarse and is larger than 
+necessary when the mean function is steep relative to its variability.  
+The LS conformal prediction performs well when deviations about the estimated 
+mean function are symmetirc and is sensitive to mild departures from that 
+setting.  This prediction region is seen to provide overcoverage 
+(undercoverage) in regions of the predictor space where variability about the 
+estimated mean function is relatively small (large).
+
+
+
+\newpage
+\begin{figure}[h!]
+\begin{center}
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
+\includegraphics[width=\maxwidth]{figure/conformal-plots-1} 
+
+\end{knitrout}
+\end{center}
+\caption{The depiction of conformal prediction regions when $n = 150$ that 
+  appears in \citet{eck2019conformal}.  The rows display conformal prediction 
+  regions across simulation settings.  The columns display the different 
+  conformal prediction regions.  The top, middle, and bottom rows correspond 
+  to simulation setting A with shape parameter equal to 1, simulation setting 
+  B with shape parameter equal to 10, and simulation setting C respectively.  
+  The first column displays the transformation parametric conformal prediction 
+  region which is misspecified in row 2, the second column displays the binned 
+  parametric conformal prediction region which is misspecified in row 2,
+  the third column displays the least squares locally weighted conformal 
+  prediction region, the fourth column displays the binned 
+  nonparametric conformal prediction region.}
+\label{conformal-plots}
+\end{figure}
+
+
+
+\newpage
+\subsection{Plots corresponding to Section~\ref{sec:Gamma}}
+\label{sec:gammaplots}
+
+%Plot of conformal prediction regions in sim setting A when n = 150
+\begin{figure}[h!]
+\begin{center}
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
+\includegraphics[width=\maxwidth]{figure/conformal-plots-A-150-1} 
+
+\end{knitrout}
+\end{center}
+\caption{The depiction of conformal prediction regions under simulation 
+  setting A when $n = 150$ and the number of bins equals 2.
+}
+\label{conformal-plots-A-150}
+\end{figure}
+
+
+
+
+\newpage
+%Plot of conformal prediction regions in sim setting A when n = 250
+\begin{figure}[h!]
+\begin{center}
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
+\includegraphics[width=\maxwidth]{figure/conformal-plots-A-250-1} 
+
+\end{knitrout}
+\end{center}
+\caption{The depiction of conformal prediction regions under simulation 
+  setting A when $n = 250$ and the number of bins equals 3.
+}
+\label{conformal-plots-A-250}
+\end{figure}
+
+
+
+
+\newpage
+%Plot of conformal prediction regions in sim setting A when n = 500
+\begin{figure}[h!]
+\begin{center}
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
+\includegraphics[width=\maxwidth]{figure/conformal-plots-A-500-1} 
+
+\end{knitrout}
+\end{center}
+\caption{The depiction of conformal prediction regions under simulation 
+  setting A when $n = 500$ and the number of bins equals 3.
+}
+\label{conformal-plots-A-500}
+\end{figure}
+
+
+
+\newpage
+\subsection{Plots corresponding to Section~\ref{sec:misspec}}
+\label{sec:misspecplots}
+
+
+%Plot of conformal prediction regions in sim setting B when n = 150
+\begin{figure}[h!]
+\begin{center}
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
+\includegraphics[width=\maxwidth]{figure/conformal-plots-B-150-1} 
+
+\end{knitrout}
+\end{center}
+\caption{The depiction of conformal prediction regions under simulation 
+  setting B when $n = 150$ and the number of bins equals 2.
+}
+\label{conformal-plots-B-150}
+\end{figure}
+
+
+
+
+\newpage
+%Plot of conformal prediction regions in sim setting B when n = 250
+\begin{figure}[h!]
+\begin{center}
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
+\includegraphics[width=\maxwidth]{figure/conformal-plots-B-250-1} 
+
+\end{knitrout}
+\end{center}
+\caption{The depiction of conformal prediction regions under simulation 
+  setting B when $n = 250$ and the number of bins equals 3.
+}
+\label{conformal-plots-B-250}
+\end{figure}
+
+
+
+
+\newpage
+%Plot of conformal prediction regions in sim setting B when n = 500
+\begin{figure}[h!]
+\begin{center}
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
+\includegraphics[width=\maxwidth]{figure/conformal-plots-B-500-1} 
+
+\end{knitrout}
+\end{center}
+\caption{The depiction of conformal prediction regions under simulation 
+  setting B when $n = 500$ and the number of bins equals 3.
+}
+\label{conformal-plots-B-500}
+\end{figure}
 
 
 
 
 
 
+
+\newpage
+\subsection{Plots corresponding to Section~\ref{sec:regression}}
+\label{sec:regressionplots}
+
+%Plot of conformal prediction regions in sim setting C
+\begin{figure}[h!]
+\begin{center}
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
+\includegraphics[width=\maxwidth]{figure/conformal-plots-C-1} 
+
+\end{knitrout}
+\end{center}
+\caption{The depiction of conformal prediction regions under simulation 
+  setting C.
+}
+\label{conformal-plots-C}
+\end{figure}
 
 
 
